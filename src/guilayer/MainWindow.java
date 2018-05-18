@@ -5,10 +5,7 @@ import javax.swing.JPanel;
 import java.awt.EventQueue;
 import java.awt.CardLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Font;
-import java.awt.Window;
-import java.awt.event.MouseEvent;
 
 import guilayer.contentpanels.*;
 import guilayer.menu.Menu;
@@ -88,7 +85,11 @@ public class MainWindow {
 		content.setFont(contentFont);
 		contentPane.add(content);
 		
+		//content.add(new Analytics(), "0");
 		content.add(new ManageInventory(), "1");
+		//content.add(new ManageSuppliers(), "2");
+		//content.add(new ManageMenuItems(), "3");
+		//content.add(new ManageEmployees(), "4");
 		
 		menu.addMenuItemListener(new MenuItemListener() {
 			@Override
