@@ -5,7 +5,7 @@ public class Item {
 	private String barcode;
 	private String name;
 	private int quantity;
-	private String unit;
+	private Unit unit;
 	
 	public Item() {
 		
@@ -20,7 +20,7 @@ public class Item {
 	public int getQuantity() {
 		return quantity;
 	}
-	public String getUnit() {
+	public Unit getUnit() {
 		return unit;
 	}
 
@@ -33,7 +33,7 @@ public class Item {
 	public void setQuantity(int quantity) {
 		this.quantity = quantity;
 	}
-	public void setUnit(String unit) {
+	public void setUnit(Unit unit) {
 		this.unit = unit;
 	}
 	

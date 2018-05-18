@@ -4,23 +4,29 @@ import java.util.Date;
 
 public class Session {
 
-	private Date date;
-	private String employee;
+	private int id;
+	private Date timestamp;
+	private Employee employee;
 	
 	public Session() {
 	}
 
-	public Date getDate() {
-		return date;
+	public int getId() {
+		return id;
 	}
-	public String getEmployee() {
+	public Date getTimestamp() {
+		return timestamp;
+	}
+	public Employee getEmployee() {
 		return employee;
 	}
-	
-	public void setDate(Date date) {
-		this.date = date;
+	public void setId(int id) {
+		this.id = id;
 	}
-	public void setEmployee(String employee) {
+	public void setTimestamp(Date timestamp) {
+		this.timestamp = timestamp;
+	}
+	public void setEmployee(Employee employee) {
 		this.employee = employee;
 	}
 }

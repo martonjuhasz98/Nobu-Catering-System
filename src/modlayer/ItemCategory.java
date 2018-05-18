@@ -1,14 +1,14 @@
 package modlayer;
 
-public class MenuItemCategory {
+public class ItemCategory {
 
 	private int id;
 	private String name;
 	
-	public MenuItemCategory() {
+	public ItemCategory() {
 		
 	}
-
+	
 	public int getId() {
 		return id;
 	}

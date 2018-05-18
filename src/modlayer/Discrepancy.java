@@ -1,12 +1,12 @@
 package modlayer;
 
-public class Adjustment {
+public class Discrepancy {
 	
 	private Item item;
 	private int quantity;
-	private Session date;
+	private Session session;
 	
-	public Adjustment() {
+	public Discrepancy() {
 		
 	}
 
@@ -16,8 +16,8 @@ public class Adjustment {
 	public int getQuantity() {
 		return quantity;
 	}
-	public Session getDate() {
-		return date;
+	public Session getSession() {
+		return session;
 	}
 	public void setItem(Item item) {
 		this.item = item;
@@ -25,7 +25,7 @@ public class Adjustment {
 	public void setQuantity(int quantity) {
 		this.quantity = quantity;
 	}
-	public void setDate(Session date) {
-		this.date = date;
+	public void setSession(Session session) {
+		this.session = session;
 	}
 }

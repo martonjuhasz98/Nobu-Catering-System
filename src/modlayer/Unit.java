@@ -1,22 +1,22 @@
 package modlayer;
 
-public class MenuItemCategory {
+public class Unit {
 
-	private int id;
+	private String abbr;
 	private String name;
 	
-	public MenuItemCategory() {
+	public Unit() {
 		
 	}
 
-	public int getId() {
-		return id;
+	public String getAbbr() {
+		return abbr;
 	}
 	public String getName() {
 		return name;
 	}
-	public void setId(int id) {
-		this.id = id;
+	public void setAbbr(String abbr) {
+		this.abbr = abbr;
 	}
 	public void setName(String name) {
 		this.name = name;
