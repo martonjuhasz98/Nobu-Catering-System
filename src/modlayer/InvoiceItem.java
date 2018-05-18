@@ -2,7 +2,6 @@ package modlayer;
 
 public class InvoiceItem {
 
-	private Invoice invoice;
 	private Item item;
 	private int quantity;
 	private double unitPrice;
@@ -11,9 +10,6 @@ public class InvoiceItem {
 		
 	}
 
-	public Invoice getInvoice() {
-		return invoice;
-	}
 	public Item getItem() {
 		return item;
 	}
@@ -22,9 +18,6 @@ public class InvoiceItem {
 	}
 	public double getUnitPrice() {
 		return unitPrice;
-	}
-	public void setInvoice(Invoice invoice) {
-		this.invoice = invoice;
 	}
 	public void setItem(Item item) {
 		this.item = item;

@@ -20,6 +20,9 @@ public class MenuItem {
 	public double getPrice() {
 		return price;
 	}
+	public MenuItemCategory getCategory() {
+		return category;
+	}
 	public void setId(int id) {
 		this.id = id;
 	}
@@ -28,9 +31,6 @@ public class MenuItem {
 	}
 	public void setPrice(double price) {
 		this.price = price;
-	}
-	public MenuItemCategory getCategory() {
-		return category;
 	}
 	public void setCategory(MenuItemCategory category) {
 		this.category = category;

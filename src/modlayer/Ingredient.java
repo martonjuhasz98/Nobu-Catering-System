@@ -4,7 +4,7 @@ public class Ingredient {
 
 	private Item item;
 	private MenuItem menuItem;
-	private int quantity;
+	private double quantity;
 	
 	public Ingredient() {
 		
@@ -16,7 +16,7 @@ public class Ingredient {
 	public MenuItem getMenuItem() {
 		return menuItem;
 	}
-	public int getQuantity() {
+	public double getQuantity() {
 		return quantity;
 	}
 	public void setItem(Item item) {
@@ -25,7 +25,7 @@ public class Ingredient {
 	public void setMenuItem(MenuItem menuItem) {
 		this.menuItem = menuItem;
 	}
-	public void setQuantity(int quantity) {
+	public void setQuantity(double quantity) {
 		this.quantity = quantity;
 	}
 }
