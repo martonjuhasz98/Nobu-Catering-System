@@ -43,12 +43,19 @@ public class DBItemCategory implements IFDBItemCategory {
 	@Override
 	public int insertCategory(ItemCategory category) {
 		// TODO Auto-generated method stub
+		categories.add(category);
 		return category.getId();
 	}
 
 	@Override
 	public boolean deleteCategory(ItemCategory category) {
 		// TODO Auto-generated method stub
-		return true;
+		for (int i = 0; i < categories.size(); i++) {
+			if (categories.get(i).getId() == category.getId()) {
+				categories.remove(i);
+				return true;
+			}
+		}
+		return false;
 	}
 }

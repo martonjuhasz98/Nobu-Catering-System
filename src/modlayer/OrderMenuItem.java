@@ -35,4 +35,20 @@ public class OrderMenuItem {
 	public void setFinished(boolean finished) {
 		this.isFinished = finished;
 	}
+	
+	@Override
+	public boolean equals(Object o) {
+	    if (o == this) {
+	      return true;
+	    }
+	    if (!(o instanceof OrderMenuItem)) {
+	      return false;
+	    }
+	    OrderMenuItem i = (OrderMenuItem)o;
+	    return i.order.equals(order) && i.menuItem.equals(menuItem);
+	}
+	@Override
+	public int hashCode() {
+	    return 0;
+	}
 }

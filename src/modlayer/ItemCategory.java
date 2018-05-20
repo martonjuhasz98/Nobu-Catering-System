@@ -26,8 +26,24 @@ public class ItemCategory {
 	public void setName(String name) {
 		this.name = name;
 	}
+	
 	@Override
 	public String toString() {
 		return name;
+	}
+	@Override
+	public boolean equals(Object o) {
+	    if (o == this) {
+	      return true;
+	    }
+	    if (!(o instanceof ItemCategory)) {
+	      return false;
+	    }
+	    ItemCategory i = (ItemCategory)o;
+	    return i.id == id;
+	}
+	@Override
+	public int hashCode() {
+	    return 0;
 	}
 }

@@ -35,4 +35,20 @@ public class MenuItem {
 	public void setCategory(MenuItemCategory category) {
 		this.category = category;
 	}
+	
+	@Override
+	public boolean equals(Object o) {
+	    if (o == this) {
+	      return true;
+	    }
+	    if (!(o instanceof MenuItem)) {
+	      return false;
+	    }
+	    MenuItem i = (MenuItem)o;
+	    return i.id == id;
+	}
+	@Override
+	public int hashCode() {
+	    return 0;
+	}
 }

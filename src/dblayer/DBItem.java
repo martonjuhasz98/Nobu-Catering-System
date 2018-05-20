@@ -75,19 +75,32 @@ public class DBItem implements IFDBItem {
 	@Override
 	public String insertItem(Item item) {
 		// TODO Auto-generated method stub
+		items.add(item);
 		return item.getBarcode();
 	}
 
 	@Override
 	public boolean updateItem(Item item) {
 		// TODO Auto-generated method stub
-		return true;
+		for (int i = 0; i < items.size(); i++) {
+			if (items.get(i).getBarcode().equals(item.getBarcode())) {
+				items.set(i, item);
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override
 	public boolean deleteItem(Item item) {
 		// TODO Auto-generated method stub
-		return true;
+		for (int i = 0; i < items.size(); i++) {
+			if (items.get(i).getBarcode().equals(item.getBarcode())) {
+				items.remove(i);
+				return true;
+			}
+		}
+		return false;
 	}
 
 	

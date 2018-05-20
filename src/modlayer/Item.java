@@ -50,4 +50,20 @@ public class Item {
 	public void setCategory(ItemCategory category) {
 		this.category = category;
 	}
+	
+	@Override
+	public boolean equals(Object o) {
+	    if (o == this) {
+	      return true;
+	    }
+	    if (!(o instanceof Item)) {
+	      return false;
+	    }
+	    Item i = (Item)o;
+	    return i.barcode.equals(barcode);
+	}
+	@Override
+	public int hashCode() {
+	    return 0;
+	}
 }

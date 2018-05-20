@@ -103,7 +103,7 @@ public class EditInventory extends EditPanel implements ActionListener, FocusLis
 		cmb_category.setBounds(16, 221, 376, 20);
 		add(cmb_category);
 		
-		btn_update = new JButton("Create");
+		btn_update = new JButton("Update");
 		btn_update.setBounds(536, 457, 122, 32);
 		add(btn_update);
 		
@@ -174,14 +174,14 @@ public class EditInventory extends EditPanel implements ActionListener, FocusLis
 			item.setCategory((ItemCategory)cmb_category.getSelectedItem());
 			
 			if (!itemCtrl.updateItem(item)) {
-				JOptionPane.showMessageDialog(null,
+				JOptionPane.showMessageDialog(this,
 					    "An error occured while creating the Item!",
 					    "Error!",
 					    JOptionPane.ERROR_MESSAGE);
 				return;
 			}
 			
-			JOptionPane.showMessageDialog(null,
+			JOptionPane.showMessageDialog(this,
 				    "The Item was successfully edited!",
 				    "Success!",
 				    JOptionPane.INFORMATION_MESSAGE);

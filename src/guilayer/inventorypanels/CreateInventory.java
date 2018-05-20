@@ -155,14 +155,14 @@ public class CreateInventory extends CreatePanel implements ActionListener, Focu
 			ItemCategory category = (ItemCategory)cmb_category.getSelectedItem();
 			
 			if (!itemCtrl.createItem(barcode, name, quantity, unit, category)) {
-				JOptionPane.showMessageDialog(null,
+				JOptionPane.showMessageDialog(this,
 					    "An error occured while creating the Item!",
 					    "Error!",
 					    JOptionPane.ERROR_MESSAGE);
 				return;
 			}
 			
-			JOptionPane.showMessageDialog(null,
+			JOptionPane.showMessageDialog(this,
 				    "The Item was successfully created!",
 				    "Success!",
 				    JOptionPane.INFORMATION_MESSAGE);

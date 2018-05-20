@@ -28,4 +28,20 @@ public class Discrepancy {
 	public void setSession(Session session) {
 		this.session = session;
 	}
+	
+	@Override
+	public boolean equals(Object o) {
+	    if (o == this) {
+	      return true;
+	    }
+	    if (!(o instanceof Discrepancy)) {
+	      return false;
+	    }
+	    Discrepancy d = (Discrepancy)o;
+	    return d.item.equals(item) && d.session.equals(session);
+	}
+	@Override
+	public int hashCode() {
+	    return 0;
+	}
 }

@@ -29,4 +29,20 @@ public class Session {
 	public void setEmployee(Employee employee) {
 		this.employee = employee;
 	}
+	
+	@Override
+	public boolean equals(Object o) {
+	    if (o == this) {
+	      return true;
+	    }
+	    if (!(o instanceof Session)) {
+	      return false;
+	    }
+	    Session i = (Session)o;
+	    return i.id == id;
+	}
+	@Override
+	public int hashCode() {
+	    return 0;
+	}
 }

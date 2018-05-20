@@ -21,4 +21,20 @@ public class MenuItemCategory {
 	public void setName(String name) {
 		this.name = name;
 	}
+	
+	@Override
+	public boolean equals(Object o) {
+	    if (o == this) {
+	      return true;
+	    }
+	    if (!(o instanceof MenuItemCategory)) {
+	      return false;
+	    }
+	    MenuItemCategory i = (MenuItemCategory)o;
+	    return i.id == id;
+	}
+	@Override
+	public int hashCode() {
+	    return 0;
+	}
 }

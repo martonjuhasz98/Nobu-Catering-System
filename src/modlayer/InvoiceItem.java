@@ -2,6 +2,7 @@ package modlayer;
 
 public class InvoiceItem {
 
+	private Invoice invoice;
 	private Item item;
 	private int quantity;
 	private double unitPrice;
@@ -10,6 +11,9 @@ public class InvoiceItem {
 		
 	}
 
+	public Invoice getInvoice() {
+		return invoice;
+	}
 	public Item getItem() {
 		return item;
 	}
@@ -19,6 +23,9 @@ public class InvoiceItem {
 	public double getUnitPrice() {
 		return unitPrice;
 	}
+	public void setInvoice(Invoice invoice) {
+		this.invoice = invoice;
+	}
 	public void setItem(Item item) {
 		this.item = item;
 	}
@@ -27,5 +34,21 @@ public class InvoiceItem {
 	}
 	public void setUnitPrice(double unitPrice) {
 		this.unitPrice = unitPrice;
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+	    if (o == this) {
+	      return true;
+	    }
+	    if (!(o instanceof InvoiceItem)) {
+	      return false;
+	    }
+	    InvoiceItem i = (InvoiceItem)o;
+	    return i.invoice.equals(invoice) && i.item.equals(item);
+	}
+	@Override
+	public int hashCode() {
+	    return 0;
 	}
 }

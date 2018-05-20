@@ -21,4 +21,20 @@ public class City {
 	public void setName(String name) {
 		this.name = name;
 	}
+	
+	@Override
+	public boolean equals(Object o) {
+	    if (o == this) {
+	      return true;
+	    }
+	    if (!(o instanceof City)) {
+	      return false;
+	    }
+	    City c = (City)o;
+	    return c.zipCode.equals(zipCode);
+	}
+	@Override
+	public int hashCode() {
+	    return 0;
+	}
 }

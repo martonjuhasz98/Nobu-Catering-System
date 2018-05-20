@@ -37,8 +37,10 @@ import javax.swing.JList;
 import javax.swing.AbstractAction;
 import javax.swing.AbstractListModel;
 import javax.swing.Action;
+import javax.swing.event.CaretListener;
+import javax.swing.event.CaretEvent;
 
-public class ListInventory extends JPanel implements ActionListener, MouseListener, CreateListener, EditListener {
+public class ListInventory extends JPanel implements ActionListener, MouseListener, CreateListener, EditListener, CaretListener {
 
 	private CreateInventory createInv;
 	private EditInventory editInv;
@@ -102,33 +104,45 @@ public class ListInventory extends JPanel implements ActionListener, MouseListen
 		        
 		        boolean success = itemCtrl.deleteItem(item);
 				if (!success) {
-					JOptionPane.showMessageDialog(null,
-						    "An error occured while deleting the Customer!",
+					JOptionPane.showMessageDialog(ListInventory.this,
+						    "An error occured while deleting the Item!",
 						    "Error!",
 						    JOptionPane.ERROR_MESSAGE);
 					return;
 				}
 				
-				JOptionPane.showMessageDialog(null,
-					"The Customer was successfully deleted!",
+				JOptionPane.showMessageDialog(ListInventory.this,
+					"The Item was successfully deleted!",
 				    "Success!",
 				    JOptionPane.INFORMATION_MESSAGE);
+				model.setItems(itemCtrl.getItems());
 		    }
 		};
 		
 		ButtonColumn btnColumn = new ButtonColumn(table, delete, model.getColumnCount()-1);
 		btnColumn.setMnemonic(KeyEvent.VK_D);
 		
+		txt_search.addCaretListener(this);
 		btn_search.addActionListener(this);
 		btn_create.addActionListener(this);
 		table.addMouseListener(this);
 	}
+	private void search() {
+
+		String keyword = txt_search.getText().trim();
+		model.setItems(itemCtrl.searchItems(keyword));
+	}
 	
+	@Override
+	public void caretUpdate(CaretEvent e) {
+		if (e.getSource() == txt_search) {
+			search();
+		}
+	}
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == btn_search) {
-			String keyword = txt_search.getText().trim();
-			model.setItems(itemCtrl.searchItems(keyword));
+			search();
 		} if (e.getSource() == btn_create) {
 			setVisible(false);
 			createInv.open();
@@ -233,7 +247,7 @@ public class ListInventory extends JPanel implements ActionListener, MouseListen
 		}
 		@Override
 		public boolean isCellEditable(int rowIndex, int columnIndex) {
-			return false;
+			return columnIndex == getColumnCount() - 1;
 		}
 		public void update() {
 			fireTableDataChanged();

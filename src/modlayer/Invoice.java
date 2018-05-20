@@ -58,4 +58,20 @@ public class Invoice {
 	public void setPayment(Payment payment) {
 		this.payment = payment;
 	}
+	
+	@Override
+	public boolean equals(Object o) {
+	    if (o == this) {
+	      return true;
+	    }
+	    if (!(o instanceof Invoice)) {
+	      return false;
+	    }
+	    Invoice i = (Invoice)o;
+	    return i.id == id;
+	}
+	@Override
+	public int hashCode() {
+	    return 0;
+	}
 }

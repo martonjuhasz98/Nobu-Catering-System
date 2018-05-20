@@ -70,4 +70,20 @@ public class Employee {
 	public void setAccessLevel(int accessLevel) {
 		this.accessLevel = accessLevel;
 	}
+	
+	@Override
+	public boolean equals(Object o) {
+	    if (o == this) {
+	      return true;
+	    }
+	    if (!(o instanceof Employee)) {
+	      return false;
+	    }
+	    Employee e = (Employee)o;
+	    return e.cpr.equals(cpr);
+	}
+	@Override
+	public int hashCode() {
+	    return 0;
+	}
 }

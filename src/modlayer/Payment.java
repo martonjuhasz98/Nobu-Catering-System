@@ -37,4 +37,20 @@ public class Payment {
 	public void setTimestamp(Date timestamp) {
 		this.timestamp = timestamp;
 	}
+	
+	@Override
+	public boolean equals(Object o) {
+	    if (o == this) {
+	      return true;
+	    }
+	    if (!(o instanceof Payment)) {
+	      return false;
+	    }
+	    Payment i = (Payment)o;
+	    return i.id == id;
+	}
+	@Override
+	public int hashCode() {
+	    return 0;
+	}
 }

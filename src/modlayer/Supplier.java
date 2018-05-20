@@ -49,4 +49,20 @@ public class Supplier {
 	public void setEmail(String email) {
 		this.email = email;
 	}
+	
+	@Override
+	public boolean equals(Object o) {
+	    if (o == this) {
+	      return true;
+	    }
+	    if (!(o instanceof Supplier)) {
+	      return false;
+	    }
+	    Supplier i = (Supplier)o;
+	    return i.cvr.equals(cvr);
+	}
+	@Override
+	public int hashCode() {
+	    return 0;
+	}
 }

@@ -35,4 +35,20 @@ public class Order {
 	public void setPayment(Payment payment) {
 		this.payment = payment;
 	}
+	
+	@Override
+	public boolean equals(Object o) {
+	    if (o == this) {
+	      return true;
+	    }
+	    if (!(o instanceof Order)) {
+	      return false;
+	    }
+	    Order i = (Order)o;
+	    return i.id == id;
+	}
+	@Override
+	public int hashCode() {
+	    return 0;
+	}
 }
