@@ -4,15 +4,14 @@ import java.awt.Font;
 import java.awt.Label;
 
 import javax.swing.ButtonGroup;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
-import ctrllayer.ItemCategoryController;
 import ctrllayer.ItemController;
-import ctrllayer.UnitController;
 import guilayer.MainWindow;
 import guilayer.interfaces.EditPanel;
 import modlayer.Item;
@@ -32,8 +31,6 @@ import javax.swing.JComboBox;
 public class EditInventory extends EditPanel implements ActionListener, FocusListener {
 
 	private ItemController itemCtrl;
-	private UnitController unitCtrl;
-	private ItemCategoryController categoryCtrl;
 	private Item item;
 	private JTextField txt_barcode;
 	private JTextField txt_name;
@@ -45,8 +42,6 @@ public class EditInventory extends EditPanel implements ActionListener, FocusLis
 	
 	public EditInventory() {
 		itemCtrl = new ItemController();
-		unitCtrl = new UnitController();
-		categoryCtrl = new ItemCategoryController();
 		item = null;
 		
 		initialize();
@@ -141,7 +136,9 @@ public class EditInventory extends EditPanel implements ActionListener, FocusLis
 		txt_barcode.setText("");
 		txt_name.setText("");
 		sprm_quantity.setValue(new Double(0.0));
+		cmb_unit.setModel(new DefaultComboBoxModel(itemCtrl.getUnits().toArray()));
 		cmb_unit.setSelectedIndex(-1);
+		cmb_category.setModel(new DefaultComboBoxModel(itemCtrl.getCategories().toArray()));
 		cmb_category.setSelectedIndex(-1);
 		
 		btn_update.setEnabled(false);

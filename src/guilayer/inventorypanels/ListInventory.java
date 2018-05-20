@@ -15,6 +15,8 @@ import guilayer.interfaces.CreateListener;
 import guilayer.interfaces.EditListener;
 import guilayer.inventorypanels.ListInventory;
 import modlayer.Item;
+import modlayer.ItemCategory;
+import modlayer.Unit;
 
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
@@ -36,24 +38,21 @@ import javax.swing.AbstractAction;
 import javax.swing.AbstractListModel;
 import javax.swing.Action;
 
-public class ListInventory extends JPanel implements ActionListener, ListSelectionListener, MouseListener, CreateListener, EditListener {
+public class ListInventory extends JPanel implements ActionListener, MouseListener, CreateListener, EditListener {
 
 	private CreateInventory createInv;
 	private EditInventory editInv;
 	private ItemController itemCtrl;
 	private JTable table;
 	private ItemTableModel model;
-	private int selectedId;
 	private JButton btn_search;
 	private JButton btn_create;
-	private JButton btn_delete;
 	private JTextField txt_search;
 	
 	public ListInventory(CreateInventory createInv, EditInventory editInv) {
 		this.createInv = createInv;
 		this.editInv = editInv;
 		itemCtrl = new ItemController();
-		selectedId = -1;
 		
 		createInv.addCreateListener(this);
 		editInv.addEditListener(this);
@@ -78,13 +77,8 @@ public class ListInventory extends JPanel implements ActionListener, ListSelecti
 		add(btn_search);
 		
 		btn_create = new JButton("Create");
-		btn_create.setBounds(436, 0, 73, 23);
+		btn_create.setBounds(517, 3, 73, 23);
 		add(btn_create);
-		
-		btn_delete = new JButton("Delete");
-		btn_delete.setBounds(517, 0, 73, 23);
-		btn_delete.setEnabled(false);
-		add(btn_delete);
 		
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setBounds(10, 28, 580, 473);
@@ -92,7 +86,8 @@ public class ListInventory extends JPanel implements ActionListener, ListSelecti
 		
 		table = new JTable();
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		table.getTableHeader().setReorderingAllowed(true);
+		table.getTableHeader().setReorderingAllowed(false);
+		table.setAutoCreateRowSorter(true);
 		model.setItems(itemCtrl.getItems());
 		table.setModel(model);
 		scrollPane.setViewportView(table);
@@ -105,7 +100,19 @@ public class ListInventory extends JPanel implements ActionListener, ListSelecti
 		        int modelRowIndex = Integer.valueOf(e.getActionCommand());
 		        Item item = model.getItemAt(modelRowIndex);
 		        
-		        //Delete Item
+		        boolean success = itemCtrl.deleteItem(item);
+				if (!success) {
+					JOptionPane.showMessageDialog(null,
+						    "An error occured while deleting the Customer!",
+						    "Error!",
+						    JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				
+				JOptionPane.showMessageDialog(null,
+					"The Customer was successfully deleted!",
+				    "Success!",
+				    JOptionPane.INFORMATION_MESSAGE);
 		    }
 		};
 		
@@ -114,9 +121,7 @@ public class ListInventory extends JPanel implements ActionListener, ListSelecti
 		
 		btn_search.addActionListener(this);
 		btn_create.addActionListener(this);
-		btn_delete.addActionListener(this);
 		table.addMouseListener(this);
-		table.getSelectionModel().addListSelectionListener(this);
 	}
 	
 	@Override
@@ -127,44 +132,6 @@ public class ListInventory extends JPanel implements ActionListener, ListSelecti
 		} if (e.getSource() == btn_create) {
 			setVisible(false);
 			createInv.open();
-		} else if (e.getSource() == btn_delete) {
-			boolean success = itemCtrl.deleteItem(model.getItemAt(selectedId));
-			if (!success) {
-				JOptionPane.showMessageDialog(null,
-					    "An error occured while deleting the Customer!",
-					    "Error!",
-					    JOptionPane.ERROR_MESSAGE);
-				return;
-			}
-			
-			JOptionPane.showMessageDialog(null,
-				"The Customer was successfully deleted!",
-			    "Success!",
-			    JOptionPane.INFORMATION_MESSAGE);
-		}
-	}
-	@Override
-	public void valueChanged(ListSelectionEvent e) {
-		if (e.getSource() == table.getSelectionModel()) {
-			ListSelectionModel lsm = (ListSelectionModel)e.getSource();
-	
-	        int firstIndex = e.getFirstIndex();
-	        int lastIndex = e.getLastIndex();
-	
-	        if (lsm.isSelectionEmpty()) {
-	            selectedId = -1;
-	            btn_delete.setEnabled(false);
-	        } else {
-	            int minIndex = lsm.getMinSelectionIndex();
-	            int maxIndex = lsm.getMaxSelectionIndex();
-	            for (int i = minIndex; i <= maxIndex; i++) {
-	                if (lsm.isSelectedIndex(i)) {
-	                    selectedId = i;
-	                    break;
-	                }
-	            }
-	            btn_delete.setEnabled(true);
-	        }
 		}
 	}
 	@Override
@@ -174,6 +141,7 @@ public class ListInventory extends JPanel implements ActionListener, ListSelecti
 			int modelRowIndex = table.convertRowIndexToModel(viewRowIndex);
 			Item item = model.getItemAt(modelRowIndex);
 			
+			setVisible(false);
 			editInv.open(item);
 		}
 	}
@@ -233,9 +201,9 @@ public class ListInventory extends JPanel implements ActionListener, ListSelecti
 				case 1:
 					return item.getQuantity();
 				case 2:
-					return item.getUnit();
+					return item.getUnit().getAbbr();
 				case 3:
-					return item.getCategory();
+					return item.getCategory().getName();
 				case 4:
 					return "Delete";
 			}
@@ -248,7 +216,20 @@ public class ListInventory extends JPanel implements ActionListener, ListSelecti
 		}
 		@Override
 		public Class getColumnClass(int columnIndex) {
-			return getValueAt(0, columnIndex).getClass();
+			switch(columnIndex) {
+				case 0:
+					return String.class;
+				case 1:
+					return double.class;
+				case 2:
+					return Unit.class;
+				case 3:
+					return ItemCategory.class;
+				case 4:
+					return JButton.class;
+		}
+		
+		return null;
 		}
 		@Override
 		public boolean isCellEditable(int rowIndex, int columnIndex) {

@@ -54,7 +54,7 @@ public class WasteTab extends JPanel {
 		toDatePicker.setBounds(195, 0, 150, 30);
 		add(toDatePicker);
 		
-		JComboBox filterBox = new JComboBox(ic.getCategories());
+		JComboBox filterBox = new JComboBox(ic.getCategories().toArray());
 		filterBox.setBounds(360, 0, 150, 30);
 		add(filterBox);
 		

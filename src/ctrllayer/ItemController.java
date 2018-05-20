@@ -8,11 +8,16 @@ import modlayer.*;
 public class ItemController {
 
 	private DBItem dbItem;
+	private DBItemCategory dbCategory;
+	private DBUnit dbUnit;
 
 	public ItemController() {
 		dbItem = new DBItem();
+		dbCategory = new DBItemCategory();
+		dbUnit = new DBUnit();
 	}
 
+	//Items
 	public ArrayList<Item> getItems() {
 		return dbItem.getItems();
 	}
@@ -43,8 +48,33 @@ public class ItemController {
 		return success;
 	}
 	
-	//TODO: get categories
-	public String[] getCategories(){
-		return new String[]{"meat","vegetable","non-perishable","dairy"};
+	//ItemCategories
+	public ArrayList<ItemCategory> getCategories() {
+		return dbCategory.getCategories();
+	}
+	public ItemCategory getCategory(int id) {
+		return dbCategory.selectCategory(id);
+	}
+	public boolean createItemCategory(int id, String name) {
+		ItemCategory category = new ItemCategory();
+		category.setId(id);
+		category.setName(name);
+		
+		boolean success = dbCategory.insertCategory(category) > 0;
+		
+		return success;
+	}
+	public boolean deleteItemCategory(ItemCategory category) {
+		boolean success = dbCategory.deleteCategory(category);
+		
+		return success;
+	}
+
+	//Units
+	public ArrayList<Unit> getUnits() {
+		return dbUnit.getUnits();
+	}
+	public Unit getUnit(String abbr) {
+		return dbUnit.selectUnit(abbr);
 	}
 }

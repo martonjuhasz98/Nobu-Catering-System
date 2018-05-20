@@ -8,6 +8,11 @@ public class Unit {
 	public Unit() {
 		
 	}
+	public Unit(String abbr, String name) {
+		super();
+		this.abbr = abbr;
+		this.name = name;
+	}
 
 	public String getAbbr() {
 		return abbr;
@@ -20,5 +25,9 @@ public class Unit {
 	}
 	public void setName(String name) {
 		this.name = name;
+	}
+	@Override
+	public String toString() {
+		return abbr;
 	}
 }
