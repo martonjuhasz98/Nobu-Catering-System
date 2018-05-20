@@ -22,6 +22,7 @@ import ctrllayer.ItemController;
 import modlayer.Item;
 
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JComboBox;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
@@ -30,60 +31,65 @@ import java.awt.event.ActionEvent;
 
 public class SalesTab extends JPanel {
 	private JTable table;
-	private ItemController ic = new ItemController();
+	private ItemController ic = new ItemController(); // TODO: replace with MenuItemController
 	private AnalyticsController ac = new AnalyticsController();
-	private SalesTableModel model = new SalesTableModel(); 
-    private String datePattern = "yyyy-MM-dd";
-    private SimpleDateFormat dateFormatter = new SimpleDateFormat(datePattern);
+	private SalesTableModel model = new SalesTableModel();
+	private String datePattern = "yyyy-MM-dd";
+	private SimpleDateFormat dateFormatter = new SimpleDateFormat(datePattern);
 
 	/**
 	 * Create the panel.
 	 */
 	public SalesTab() {
-		
+
 		setToolTipText("from");
 		setBounds(new Rectangle(0, 0, 800, 450));
 		setLayout(null);
-//		UtilDateModel model = new UtilDateModel();
+		// UtilDateModel model = new UtilDateModel();
 		JDatePicker fromDatePicker = new JDatePicker();
 		fromDatePicker.getFormattedTextField().setText("from");
 		fromDatePicker.setSize(150, 30);
 		fromDatePicker.setLocation(10, 0);
 
 		add(fromDatePicker);
-		
+
 		JLabel dash = new JLabel("-");
 		dash.setBounds(170, 6, 61, 16);
 		add(dash);
-		
+
 		JDatePicker toDatePicker = new JDatePicker();
 		toDatePicker.getFormattedTextField().setText("to");
 		toDatePicker.setBounds(195, 0, 150, 30);
 		add(toDatePicker);
-		
+
 		JComboBox filterBox = new JComboBox(ic.getCategories());
 		filterBox.setBounds(360, 0, 150, 30);
 		add(filterBox);
-		
+
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setBounds(0, 30, 778, 425);
 		add(scrollPane);
-		
+
 		table = new JTable(model);
+		table.setAutoCreateRowSorter(true);
 		scrollPane.setViewportView(table);
-		
+
 		JButton fetch = new JButton("Fetch");
 		fetch.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//java.util.Date dd = new java.util.Date(fromDatePicker.getFormattedTextField().getText());
+				// java.util.Date dd = new
+				// java.util.Date(fromDatePicker.getFormattedTextField().getText());
 				DateFormat format = new SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH);
 				try {
-					model.setData(ac.getSalesData(new java.sql.Date(format.parse(fromDatePicker.getFormattedTextField().getText()).getTime()), new java.sql.Date(format.parse(toDatePicker.getFormattedTextField().getText()).getTime())));
+					model.setData(ac.getSalesData(
+							new java.sql.Date(format.parse(fromDatePicker.getFormattedTextField().getText()).getTime()),
+							new java.sql.Date(format.parse(toDatePicker.getFormattedTextField().getText()).getTime())));
 				} catch (ParseException e1) {
 					// TODO Auto-generated catch block
-					e1.printStackTrace();
+
+					JOptionPane.showMessageDialog(null, "Please pick dates");
 				}
-				
+
 			}
 		});
 		fetch.setBounds(660, 0, 117, 29);
@@ -126,7 +132,11 @@ public class SalesTab extends JPanel {
 
 		@Override
 		public Class getColumnClass(int columnIndex) {
-			return getValueAt(0, columnIndex).getClass();
+			try {
+				return getValueAt(0, columnIndex).getClass();
+			} catch (Exception ignored) {
+				return new Object().getClass();
+			}
 		}
 
 		@Override
@@ -137,8 +147,9 @@ public class SalesTab extends JPanel {
 		public void update() {
 			fireTableDataChanged();
 		}
+
 		public void setData(String[][] data) {
-			this.data =data;
+			this.data = data;
 			update();
 		}
 	}

@@ -11,6 +11,7 @@ import java.util.Locale;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -37,7 +38,6 @@ public class WasteTab extends JPanel {
 		setToolTipText("from");
 		setBounds(new Rectangle(0, 0, 800, 450));
 		setLayout(null);
-//		UtilDateModel model = new UtilDateModel();
 		JDatePicker fromDatePicker = new JDatePicker();
 		fromDatePicker.getFormattedTextField().setText("from");
 		fromDatePicker.setSize(150, 30);
@@ -63,6 +63,7 @@ public class WasteTab extends JPanel {
 		add(scrollPane);
 		
 		table = new JTable(model);
+		table.setAutoCreateRowSorter(true);
 		scrollPane.setViewportView(table);
 		
 		JButton fetch = new JButton("Fetch");
@@ -71,11 +72,11 @@ public class WasteTab extends JPanel {
 				//java.util.Date dd = new java.util.Date(fromDatePicker.getFormattedTextField().getText());
 				DateFormat format = new SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH);
 				try {
-					model.setData(ac.getSalesData(new java.sql.Date(format.parse(fromDatePicker.getFormattedTextField().getText()).getTime()), new java.sql.Date(format.parse(toDatePicker.getFormattedTextField().getText()).getTime())));
+					model.setData(ac.getWasteData(new java.sql.Date(format.parse(fromDatePicker.getFormattedTextField().getText()).getTime()), new java.sql.Date(format.parse(toDatePicker.getFormattedTextField().getText()).getTime())));
 				} catch (ParseException e1) {
 					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
+					JOptionPane.showMessageDialog(null,"Please pick dates");
+					}
 				
 			}
 		});
@@ -86,7 +87,7 @@ public class WasteTab extends JPanel {
 
 	private class SalesTableModel extends AbstractTableModel {
 
-		private String[] columns = new String[] { "Date", "Revenue", "Costs", "Profit" };
+		private String[] columns = new String[] { "Barcode", "Name", "unit", "Used","Wasted","% Wasted" };
 		private String[][] data = new String[0][0];
 
 		public SalesTableModel() {
@@ -119,7 +120,11 @@ public class WasteTab extends JPanel {
 
 		@Override
 		public Class getColumnClass(int columnIndex) {
+			try {
 			return getValueAt(0, columnIndex).getClass();
+			} catch (Exception ignored) {
+				return new Object().getClass();
+			}
 		}
 
 		@Override
