@@ -1,33 +1,33 @@
 package guilayer;
- import java.awt.CardLayout;
-import java.awt.Color;
-import java.awt.EventQueue;
-import java.awt.Font;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import java.awt.EventQueue;
+import java.awt.CardLayout;
+import java.awt.Color;
+import java.awt.Font;
 
-import guilayer.analytics.*;
-import guilayer.contentpanels.ManageInventory;
+import guilayer.contentpanels.*;
+import guilayer.inventorypanels.ListInventory;
 import guilayer.menu.Menu;
 import guilayer.menu.MenuItemListener;
 
 public class MainWindow {
 	
-	private static final int totalWidth = 1000;
-	private static final int totalHeight = 500;
-	private static final int menuWidth = 200;
-	private static final int contentWidth = 800;
-	private static final int menuItemHeight = 48;
-	private static final Color menuFontColour = Color.WHITE;
-	private static final Color menuBackgroundColour = Color.DARK_GRAY;
-	private static final Color activeMenuItemBackgroundColour = Color.GRAY;
-	private static final Color activeMenuItemSignColour = Color.LIGHT_GRAY;
-	private static final Color contentFontColour = Color.DARK_GRAY;
-	private static final Color contentBackgroundColour = Color.WHITE;
-	private static final Font menuFont = new Font("Segoe UI", Font.BOLD, 16);
-	private static final Font contentFont = new Font("Segoe UI", Font.PLAIN, 14);
-	private JFrame frmNobuCateringManager;
+	public static final int totalWidth = 1000;
+	public static final int totalHeight = 500;
+	public static final int menuWidth = 200;
+	public static final int contentWidth = 800;
+	public static final int menuItemHeight = 48;
+	public static final Color menuFontColour = Color.WHITE;
+	public static final Color menuBackgroundColour = Color.DARK_GRAY;
+	public static final Color activeMenuItemBackgroundColour = Color.GRAY;
+	public static final Color activeMenuItemSignColour = Color.LIGHT_GRAY;
+	public static final Color contentFontColour = Color.DARK_GRAY;
+	public static final Color contentBackgroundColour = Color.WHITE;
+	public static final Font menuFont = new Font("Segoe UI", Font.BOLD, 16);
+	public static final Font contentFont = new Font("Segoe UI", Font.PLAIN, 14);
+	private JFrame frame;
 	private JPanel contentPane;
 
 	public static void main(String[] args) {
@@ -35,7 +35,7 @@ public class MainWindow {
 			public void run() {
 				try {
 					MainWindow window = new MainWindow();
-					window.frmNobuCateringManager.setVisible(true);
+					window.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -49,17 +49,17 @@ public class MainWindow {
 
 	private void initialize() {
 		
-		frmNobuCateringManager = new JFrame();
-		frmNobuCateringManager.setBounds(100, 100, totalWidth + 4, totalHeight + 28);
-		frmNobuCateringManager.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frmNobuCateringManager.setTitle("Nobu manager");
-		frmNobuCateringManager.setFont(contentFont);
-		frmNobuCateringManager.setResizable(false);
+		frame = new JFrame();
+		frame.setBounds(100, 100, totalWidth + 4, totalHeight + 28);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setTitle("Western Style Ltd.");
+		frame.setFont(contentFont);
+		frame.setResizable(false);
 		
 		contentPane = new JPanel();
 		contentPane.setBounds(0, 0, totalWidth, totalHeight);
 		contentPane.setLayout(null);
-		frmNobuCateringManager.setContentPane(contentPane);
+		frame.setContentPane(contentPane);
 		
 		Menu menu = new Menu();
 		menu.setLayout(null);

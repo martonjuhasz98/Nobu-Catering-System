@@ -1,6 +1,9 @@
-package guilayer.analytics;
+package guilayer.contentpanels;
 
 import javax.swing.JTabbedPane;
+
+import guilayer.analytics.SalesTab;
+import guilayer.analytics.WasteTab;
 
 public class AnalyticsTabbedPane extends JTabbedPane {
 
