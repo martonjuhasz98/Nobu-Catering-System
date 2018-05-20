@@ -42,4 +42,9 @@ public class ItemController {
 		
 		return success;
 	}
+	
+	//TODO: get categories
+	public String[] getCategories(){
+		return new String[]{"meat","vegetable","non-perishable","dairy"};
+	}
 }

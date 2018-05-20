@@ -1,13 +1,14 @@
 package guilayer;
+ import java.awt.CardLayout;
+import java.awt.Color;
+import java.awt.EventQueue;
+import java.awt.Font;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import java.awt.EventQueue;
-import java.awt.CardLayout;
-import java.awt.Color;
-import java.awt.Font;
 
-import guilayer.contentpanels.*;
+import guilayer.analytics.*;
+import guilayer.contentpanels.ManageInventory;
 import guilayer.menu.Menu;
 import guilayer.menu.MenuItemListener;
 
@@ -26,7 +27,7 @@ public class MainWindow {
 	private static final Color contentBackgroundColour = Color.WHITE;
 	private static final Font menuFont = new Font("Segoe UI", Font.BOLD, 16);
 	private static final Font contentFont = new Font("Segoe UI", Font.PLAIN, 14);
-	private JFrame frame;
+	private JFrame frmNobuCateringManager;
 	private JPanel contentPane;
 
 	public static void main(String[] args) {
@@ -34,7 +35,7 @@ public class MainWindow {
 			public void run() {
 				try {
 					MainWindow window = new MainWindow();
-					window.frame.setVisible(true);
+					window.frmNobuCateringManager.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -48,17 +49,17 @@ public class MainWindow {
 
 	private void initialize() {
 		
-		frame = new JFrame();
-		frame.setBounds(100, 100, totalWidth + 4, totalHeight + 28);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setTitle("Western Style Ltd.");
-		frame.setFont(contentFont);
-		frame.setResizable(false);
+		frmNobuCateringManager = new JFrame();
+		frmNobuCateringManager.setBounds(100, 100, totalWidth + 4, totalHeight + 28);
+		frmNobuCateringManager.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frmNobuCateringManager.setTitle("Nobu manager");
+		frmNobuCateringManager.setFont(contentFont);
+		frmNobuCateringManager.setResizable(false);
 		
 		contentPane = new JPanel();
 		contentPane.setBounds(0, 0, totalWidth, totalHeight);
 		contentPane.setLayout(null);
-		frame.setContentPane(contentPane);
+		frmNobuCateringManager.setContentPane(contentPane);
 		
 		Menu menu = new Menu();
 		menu.setLayout(null);
@@ -85,7 +86,7 @@ public class MainWindow {
 		content.setFont(contentFont);
 		contentPane.add(content);
 		
-		//content.add(new Analytics(), "0");
+		content.add(new AnalyticsTabbedPane(), "0");
 		content.add(new ManageInventory(), "1");
 		//content.add(new ManageSuppliers(), "2");
 		//content.add(new ManageMenuItems(), "3");
