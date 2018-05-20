@@ -8,7 +8,12 @@ public class ItemCategory {
 	public ItemCategory() {
 		
 	}
-	
+	public ItemCategory(int id, String name) {
+		super();
+		this.id = id;
+		this.name = name;
+	}
+
 	public int getId() {
 		return id;
 	}
@@ -20,5 +25,9 @@ public class ItemCategory {
 	}
 	public void setName(String name) {
 		this.name = name;
+	}
+	@Override
+	public String toString() {
+		return name;
 	}
 }

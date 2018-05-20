@@ -1,13 +1,39 @@
 package dblayer;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import dblayer.interfaces.IFDBItem;
 import modlayer.Item;
+import modlayer.ItemCategory;
+import modlayer.Unit;
 
 public class DBItem implements IFDBItem {
 
-	private ArrayList<Item> items = new ArrayList<Item>();
+	private ArrayList<Unit> units = new ArrayList<Unit>(Arrays.asList(
+			new Unit("g", "gramm"),
+			new Unit("dkg", "dekagramm"),
+			new Unit("kg", "kilogramm"),
+			new Unit("ml", "mililiter"),
+			new Unit("cl", "centiliter"),
+			new Unit("dl", "deciliter"),
+			new Unit("l", "liter"),
+			new Unit("pcs", "pieces")
+	));
+	private ArrayList<ItemCategory> categories = new ArrayList<ItemCategory>(Arrays.asList(
+			new ItemCategory(1, "Vegetables"),
+			new ItemCategory(2, "Meats"),
+			new ItemCategory(3, "Fishes"),
+			new ItemCategory(4, "Fruites"),
+			new ItemCategory(5, "Dairy")
+	));
+	private ArrayList<Item> items = new ArrayList<Item>(Arrays.asList(
+			new Item("1", "Carrots", 2.5, units.get(1), categories.get(0)),
+			new Item("2", "Chicken breast", 4.5, units.get(0), categories.get(1)),
+			new Item("3", "Salmon", 7.5, units.get(0), categories.get(2)),
+			new Item("4", "Apple", 13.2, units.get(2), categories.get(3)),
+			new Item("5", "Milk", 3.0, units.get(6), categories.get(4))
+	));
 	
 	@Override
 	public ArrayList<Item> getItems() {
