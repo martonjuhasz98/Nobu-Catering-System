@@ -23,6 +23,7 @@ import modlayer.Item;
 
 import javax.swing.JList;
 import javax.swing.JComboBox;
+import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.awt.event.ActionEvent;
