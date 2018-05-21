@@ -2,6 +2,7 @@ package guilayer.interfaces;
 
 public interface EditListener {
 
-	public void edited(boolean success);
-	
+	public void created();
+	public void updated();
+	public void cancelled();
 }

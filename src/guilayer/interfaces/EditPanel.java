@@ -19,9 +19,19 @@ public class EditPanel extends JPanel {
 		listeners.remove(listener);
 	}
 	
-	protected void triggerEditListeners(boolean success) {
+	protected void triggerCreateListeners() {
 		for (EditListener listener : listeners) {
-			listener.edited(success);
+			listener.created();
+		}
+	}
+	protected void triggerUpdateListeners() {
+		for (EditListener listener : listeners) {
+			listener.updated();
+		}
+	}
+	protected void triggerCancelListeners() {
+		for (EditListener listener : listeners) {
+			listener.cancelled();
 		}
 	}
 }

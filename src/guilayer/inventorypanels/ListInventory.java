@@ -11,7 +11,6 @@ import javax.swing.table.AbstractTableModel;
 import ctrllayer.ItemController;
 import guilayer.MainWindow;
 import guilayer.interfaces.ButtonColumn;
-import guilayer.interfaces.CreateListener;
 import guilayer.interfaces.EditListener;
 import guilayer.inventorypanels.ListInventory;
 import modlayer.Item;
@@ -40,10 +39,9 @@ import javax.swing.Action;
 import javax.swing.event.CaretListener;
 import javax.swing.event.CaretEvent;
 
-public class ListInventory extends JPanel implements ActionListener, MouseListener, CreateListener, EditListener, CaretListener {
+public class ListInventory extends JPanel implements ActionListener, MouseListener, EditListener, CaretListener {
 
-	private CreateInventory createInv;
-	private EditInventory editInv;
+	private ItemEditor itemEditor;
 	private ItemController itemCtrl;
 	private JTable table;
 	private ItemTableModel model;
@@ -51,12 +49,10 @@ public class ListInventory extends JPanel implements ActionListener, MouseListen
 	private JButton btn_create;
 	private JTextField txt_search;
 	
-	public ListInventory(CreateInventory createInv, EditInventory editInv) {
-		this.createInv = createInv;
-		this.editInv = editInv;
+	public ListInventory(ItemEditor editInv) {
+		this.itemEditor = editInv;
 		itemCtrl = new ItemController();
 		
-		createInv.addCreateListener(this);
 		editInv.addEditListener(this);
 		
 		initialize();
@@ -145,7 +141,7 @@ public class ListInventory extends JPanel implements ActionListener, MouseListen
 			search();
 		} if (e.getSource() == btn_create) {
 			setVisible(false);
-			createInv.open();
+			itemEditor.createItem();
 		}
 	}
 	@Override
@@ -156,21 +152,21 @@ public class ListInventory extends JPanel implements ActionListener, MouseListen
 			Item item = model.getItemAt(modelRowIndex);
 			
 			setVisible(false);
-			editInv.open(item);
+			itemEditor.updateItem(item);
 		}
 	}
 	@Override
-	public void edited(boolean success) {
-		if (success) {
-			model.setItems(itemCtrl.getItems());
-		}
+	public void created() {
+		model.setItems(itemCtrl.getItems());
 		setVisible(true);
 	}
 	@Override
-	public void created(boolean success) {
-		if (success) {
-			model.setItems(itemCtrl.getItems());
-		}
+	public void updated() {
+		model.setItems(itemCtrl.getItems());
+		setVisible(true);
+	}
+	@Override
+	public void cancelled() {
 		setVisible(true);
 	}
 	@Override

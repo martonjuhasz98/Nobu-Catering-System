@@ -2,6 +2,8 @@ package guilayer;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.UIManager;
+
 import java.awt.EventQueue;
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -34,6 +36,7 @@ public class MainWindow {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
+					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 					MainWindow window = new MainWindow();
 					window.frame.setVisible(true);
 				} catch (Exception e) {

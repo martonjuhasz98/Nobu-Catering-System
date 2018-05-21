@@ -5,9 +5,7 @@ import java.util.function.Consumer;
 
 import javax.swing.JPanel;
 
-import guilayer.inventorypanels.CreateInventory;
-import guilayer.inventorypanels.EditInventory;
-import guilayer.inventorypanels.ListInventory;
+import guilayer.inventorypanels.*;
 
 public class ManageInventory extends JPanel {
 	
@@ -21,13 +19,10 @@ public class ManageInventory extends JPanel {
 		
 		setLayout(null);
 		
-		CreateInventory createInv = new CreateInventory();
-		add(createInv);
+		ItemEditor itemEditor = new ItemEditor();
+		add(itemEditor);
 		
-		EditInventory editInv = new EditInventory();
-		add(editInv);
-		
-		ListInventory listInv = new ListInventory(createInv, editInv);
+		ListInventory listInv = new ListInventory(itemEditor);
 		add(listInv);
 	}
 }

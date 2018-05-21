@@ -55,12 +55,15 @@ public class ItemController {
 	public ItemCategory getCategory(int id) {
 		return dbCategory.selectCategory(id);
 	}
-	public boolean createItemCategory(int id, String name) {
+	public boolean createItemCategory(String name) {
 		ItemCategory category = new ItemCategory();
-		category.setId(id);
 		category.setName(name);
 		
-		boolean success = dbCategory.insertCategory(category) > 0;
+		int id = dbCategory.insertCategory(category);
+		boolean success = id > 0;
+		if (success) {
+			category.setId(id);
+		}
 		
 		return success;
 	}
