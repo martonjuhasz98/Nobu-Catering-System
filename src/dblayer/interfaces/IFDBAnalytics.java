@@ -7,4 +7,5 @@ public interface IFDBAnalytics {
 	public String[][] getDailySales(Date from, Date to);
 	
 	public String[][] getWaste(Date from, Date to);
+	public String[][] getDailyWaste(Date from, Date to);
 }

@@ -78,6 +78,11 @@ public class DBAnalytics implements IFDBAnalytics {
 		return new String[][] {{"151515","tomahto","kg","150","5","qik mafs"},{"666","potahto","l","9","0","0"}};
 	}
 	
+	public String[][] getDailyWaste(Date from, Date to){
+		return null;
+		
+	}
+	
 	
 	
 }
