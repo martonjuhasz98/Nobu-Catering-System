@@ -7,7 +7,7 @@ public class Ingredient {
 	private double quantity;
 	
 	public Ingredient() {
-		
+		quantity = 0.0;
 	}
 
 	public Item getItem() {

@@ -8,7 +8,8 @@ public class InvoiceItem {
 	private double unitPrice;
 	
 	public InvoiceItem() {
-		
+		quantity = 0;
+		unitPrice = 0.0;
 	}
 
 	public Invoice getInvoice() {

@@ -2,13 +2,14 @@ package modlayer;
 
 import java.util.Date;
 
-public class Session {
+public class Stocktaking {
 
 	private int id;
 	private Date timestamp;
 	private Employee employee;
 	
-	public Session() {
+	public Stocktaking() {
+		id = -1;
 	}
 
 	public int getId() {
@@ -35,10 +36,10 @@ public class Session {
 	    if (o == this) {
 	      return true;
 	    }
-	    if (!(o instanceof Session)) {
+	    if (!(o instanceof Stocktaking)) {
 	      return false;
 	    }
-	    Session i = (Session)o;
+	    Stocktaking i = (Stocktaking)o;
 	    return i.id == id;
 	}
 	@Override

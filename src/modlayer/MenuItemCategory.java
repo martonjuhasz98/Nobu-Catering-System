@@ -6,7 +6,7 @@ public class MenuItemCategory {
 	private String name;
 	
 	public MenuItemCategory() {
-		
+		id = -1;
 	}
 
 	public int getId() {

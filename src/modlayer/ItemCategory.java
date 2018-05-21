@@ -6,10 +6,9 @@ public class ItemCategory {
 	private String name;
 	
 	public ItemCategory() {
-		
+		id = -1;
 	}
 	public ItemCategory(int id, String name) {
-		super();
 		this.id = id;
 		this.name = name;
 	}

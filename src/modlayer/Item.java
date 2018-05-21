@@ -9,10 +9,9 @@ public class Item {
 	private ItemCategory category;
 	
 	public Item() {
-		
+		quantity = 0.0;
 	}
 	public Item(String barcode, String name, double quantity, Unit unit, ItemCategory category) {
-		super();
 		this.barcode = barcode;
 		this.name = name;
 		this.quantity = quantity;

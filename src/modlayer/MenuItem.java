@@ -8,7 +8,7 @@ public class MenuItem {
 	private MenuItemCategory category;
 	
 	public MenuItem() {
-		this.id = -1;
+		id = -1;
 	}
 	
 	public int getId() {

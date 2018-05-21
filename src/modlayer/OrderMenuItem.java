@@ -8,7 +8,7 @@ public class OrderMenuItem {
 	private boolean isFinished;
 	
 	public OrderMenuItem() {
-		
+		quantity = 0;
 	}
 
 	public Order getOrder() {

@@ -2,21 +2,21 @@ package modlayer;
 
 import java.util.Date;
 
-public class Payment {
+public class Transaction {
 
 	private int id;
-	private PaymentType type;
+	private TransactionType type;
 	private double amount;
 	private Date timestamp;
 	
-	public Payment() {
-		
+	public Transaction() {
+		id = -1;
 	}
 
 	public int getId() {
 		return id;
 	}
-	public PaymentType getType() {
+	public TransactionType getType() {
 		return type;
 	}
 	public double getAmount() {
@@ -28,7 +28,7 @@ public class Payment {
 	public void setId(int id) {
 		this.id = id;
 	}
-	public void setType(PaymentType type) {
+	public void setType(TransactionType type) {
 		this.type = type;
 	}
 	public void setAmount(double amount) {
@@ -43,10 +43,10 @@ public class Payment {
 	    if (o == this) {
 	      return true;
 	    }
-	    if (!(o instanceof Payment)) {
+	    if (!(o instanceof Transaction)) {
 	      return false;
 	    }
-	    Payment i = (Payment)o;
+	    Transaction i = (Transaction)o;
 	    return i.id == id;
 	}
 	@Override

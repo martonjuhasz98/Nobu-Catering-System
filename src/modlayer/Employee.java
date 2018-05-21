@@ -13,7 +13,7 @@ public class Employee {
 	private int accessLevel;
 	
 	public Employee() {
-		
+		accessLevel = -1;
 	}
 
 	public String getCpr() {

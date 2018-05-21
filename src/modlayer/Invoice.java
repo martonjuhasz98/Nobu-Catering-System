@@ -10,10 +10,10 @@ public class Invoice {
 	private Date dateDelivered;
 	private Employee createdBy;
 	private Supplier supplier;
-	private Payment payment;
+	private Transaction transaction;
 	
 	public Invoice() {
-		
+		id = -1;
 	}
 
 	public int getId() {
@@ -34,8 +34,8 @@ public class Invoice {
 	public Supplier getSupplier() {
 		return supplier;
 	}
-	public Payment getPayment() {
-		return payment;
+	public Transaction getTransaction() {
+		return transaction;
 	}
 	public void setId(int id) {
 		this.id = id;
@@ -55,8 +55,8 @@ public class Invoice {
 	public void setSupplier(Supplier supplier) {
 		this.supplier = supplier;
 	}
-	public void setPayment(Payment payment) {
-		this.payment = payment;
+	public void setTransaction(Transaction transaction) {
+		this.transaction = transaction;
 	}
 	
 	@Override

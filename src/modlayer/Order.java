@@ -5,10 +5,11 @@ public class Order {
 	private int id;
 	private int tableNo;
 	private Employee employee;
-	private Payment payment;
+	private Transaction transaction;
 	
 	public Order() {
-		super();
+		id = -1;
+		tableNo = -1;
 	}
 
 	public int getId() {
@@ -20,8 +21,8 @@ public class Order {
 	public Employee getEmployee() {
 		return employee;
 	}
-	public Payment getPayment() {
-		return payment;
+	public Transaction getTransaction() {
+		return transaction;
 	}
 	public void setId(int id) {
 		this.id = id;
@@ -32,8 +33,8 @@ public class Order {
 	public void setEmployee(Employee employee) {
 		this.employee = employee;
 	}
-	public void setPayment(Payment payment) {
-		this.payment = payment;
+	public void setTransaction(Transaction transaction) {
+		this.transaction = transaction;
 	}
 	
 	@Override

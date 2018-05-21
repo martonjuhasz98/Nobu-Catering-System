@@ -4,10 +4,10 @@ public class Discrepancy {
 	
 	private Item item;
 	private double quantity;
-	private Session session;
+	private Stocktaking stocktaking;
 	
 	public Discrepancy() {
-		
+		quantity = 0.0;
 	}
 
 	public Item getItem() {
@@ -16,8 +16,8 @@ public class Discrepancy {
 	public double getQuantity() {
 		return quantity;
 	}
-	public Session getSession() {
-		return session;
+	public Stocktaking getStocktaking() {
+		return stocktaking;
 	}
 	public void setItem(Item item) {
 		this.item = item;
@@ -25,8 +25,8 @@ public class Discrepancy {
 	public void setQuantity(double quantity) {
 		this.quantity = quantity;
 	}
-	public void setSession(Session session) {
-		this.session = session;
+	public void setStocktaking(Stocktaking stocktaking) {
+		this.stocktaking = stocktaking;
 	}
 	
 	@Override
@@ -38,7 +38,7 @@ public class Discrepancy {
 	      return false;
 	    }
 	    Discrepancy d = (Discrepancy)o;
-	    return d.item.equals(item) && d.session.equals(session);
+	    return d.item.equals(item) && d.stocktaking.equals(stocktaking);
 	}
 	@Override
 	public int hashCode() {
