@@ -98,8 +98,7 @@ public class ListInventory extends JPanel implements ActionListener, MouseListen
 		        int modelRowIndex = Integer.valueOf(e.getActionCommand());
 		        Item item = model.getItemAt(modelRowIndex);
 		        
-		        boolean success = itemCtrl.deleteItem(item);
-				if (!success) {
+				if (!itemCtrl.deleteItem(item)) {
 					JOptionPane.showMessageDialog(ListInventory.this,
 						    "An error occured while deleting the Item!",
 						    "Error!",

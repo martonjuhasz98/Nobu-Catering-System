@@ -172,10 +172,8 @@ public class ItemEditor extends EditPanel implements ActionListener, CaretListen
 		txt_barcode.setText("");
 		txt_name.setText("");
 		sprm_quantity.setValue(new Double(0.0));
-		cmb_unit.setModel(new DefaultComboBoxModel(itemCtrl.getUnits().toArray()));
 		cmb_unit.setSelectedIndex(-1);
 		rdbtn_selectCategory.setSelected(true);
-		cmb_category.setModel(new DefaultComboBoxModel(itemCtrl.getCategories().toArray()));
 		cmb_category.setSelectedIndex(-1);
 		txt_category.setText("");
 		
@@ -183,10 +181,17 @@ public class ItemEditor extends EditPanel implements ActionListener, CaretListen
 		btn_submit.setEnabled(false);
 	}
 	public void createItem() {
-		setVisible(true);
+		open();
 	}
 	public void updateItem(Item item) {
+		open();
 		fill(item);
+	}
+	private void open() {
+		cmb_unit.setModel(new DefaultComboBoxModel(itemCtrl.getUnits().toArray()));
+		cmb_unit.setSelectedIndex(-1);
+		cmb_category.setModel(new DefaultComboBoxModel(itemCtrl.getCategories().toArray()));
+		cmb_category.setSelectedIndex(-1);
 		setVisible(true);
 	}
 	private void close() {

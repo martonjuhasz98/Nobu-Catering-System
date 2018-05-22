@@ -14,31 +14,6 @@ import modlayer.ItemCategory;
 import modlayer.Unit;
 
 public class DBItem implements IFDBItem {
-
-	private ArrayList<Unit> units = new ArrayList<Unit>(Arrays.asList(
-			new Unit("g", "gramm"),
-			new Unit("dkg", "dekagramm"),
-			new Unit("kg", "kilogramm"),
-			new Unit("ml", "mililiter"),
-			new Unit("cl", "centiliter"),
-			new Unit("dl", "deciliter"),
-			new Unit("l", "liter"),
-			new Unit("pcs", "pieces")
-	));
-	private ArrayList<ItemCategory> categories = new ArrayList<ItemCategory>(Arrays.asList(
-			new ItemCategory(1, "Vegetables"),
-			new ItemCategory(2, "Meats"),
-			new ItemCategory(3, "Fishes"),
-			new ItemCategory(4, "Fruites"),
-			new ItemCategory(5, "Dairy")
-	));
-	private ArrayList<Item> items = new ArrayList<Item>(Arrays.asList(
-			new Item("1", "Carrots", 2.5, units.get(1), categories.get(0)),
-			new Item("2", "Chicken breast", 4.5, units.get(0), categories.get(1)),
-			new Item("3", "Salmon", 7.5, units.get(0), categories.get(2)),
-			new Item("4", "Apple", 13.2, units.get(2), categories.get(3)),
-			new Item("5", "Milk", 3.0, units.get(6), categories.get(4))
-	));
 	
 	private Connection con;
 
@@ -101,14 +76,14 @@ public class DBItem implements IFDBItem {
 			+ "ON i.unit = u.abbreviation "
 			+ "INNER JOIN [Item_Category] AS c "
 			+ "ON i.category_id = c.id "
-			+ "WHERE i.barcode LIKE '%?%' "
-			+ "OR i.name LIKE '%?%' ";
+			+ "WHERE i.barcode LIKE ? "
+			+ "OR i.name LIKE ?";
 		
 		try {
 			PreparedStatement ps = con.prepareStatement(query);
 			ps.setQueryTimeout(5);
-			ps.setString(1, keyword);
-			ps.setString(2, keyword);
+			ps.setString(1, "%" + keyword + "%");
+			ps.setString(2, "%" + keyword + "%");
 			
 			Item item;
 			ResultSet results = ps.executeQuery();
@@ -167,41 +142,28 @@ public class DBItem implements IFDBItem {
 	@Override
 	public String insertItem(Item item) {
 		String barcode = "";
-		String query = "";
 		
+		String query =
+				  "INSERT INTO [Item] "
+				+ "(barcode, name, quantity, unit, category_id) "
+				+ "VALUES (?, ?, ?, ?, ?)";
 		try {
 			DBConnection.startTransaction();
 			
-			PreparedStatement ps;
-			ResultSet generatedKeys;
-			
+			//Create new ItemCategory if needed
 			if (item.getCategory().getId() < 1) {
 				int id = -1;
 				
-				//ItemCategory
-				query =   "INSERT INTO [Item_Category] "
-						+ "(name) "
-						+ "VALUES (?)";
+				DBItemCategory dbCategory = new DBItemCategory();
+				if ((id = dbCategory.insertCategory(item.getCategory())) < 0) {
+					throw new SQLException("ItemCategory was not inserted!");
+				}
 				
-				ps = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-				ps.setQueryTimeout(5);
-				ps.setString(1, item.getCategory().getName());
-				
-				ps.executeUpdate();
-				generatedKeys = ps.getGeneratedKeys();
-	            generatedKeys.next();
-				
-				id = generatedKeys.getInt(1);
-	            item.getCategory().setId(id);
-				ps.close();
+				item.getCategory().setId(id);
 			}
 			
 			//Item
-			query =   "INSERT INTO [Item] "
-					+ "(barcode, name, quantity, unit, category_id) "
-					+ "VALUES (?, ?, ?, ?, ?)";
-			
-			ps = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+			PreparedStatement ps = con.prepareStatement(query);
 			ps.setQueryTimeout(5);
 			ps.setString(1, item.getBarcode());
 			ps.setString(2, item.getName());
@@ -209,12 +171,9 @@ public class DBItem implements IFDBItem {
 			ps.setString(4, item.getUnit().getAbbr());
 			ps.setInt(5, item.getCategory().getId());
 			
-			ps.executeUpdate();
-			generatedKeys = ps.getGeneratedKeys();
-            generatedKeys.next();
-            
-            barcode = generatedKeys.getString(1);
-            item.setBarcode(barcode);
+			if (ps.executeUpdate() > 0) {
+				barcode = item.getBarcode();
+			}
 			ps.close();
 			
 			DBConnection.commitTransaction();
@@ -233,53 +192,28 @@ public class DBItem implements IFDBItem {
 	@Override
 	public boolean updateItem(Item item) {
 		boolean success = false;
-		String query = "";
 		
+		String query =
+				"UPDATE [Item] "
+			  + "SET name = ?, "
+			  + "quantity = ?, "
+			  + "unit = ?, "
+			  + "category_id = ? "
+			  + "WHERE barcode = ?";
 		try {
-			PreparedStatement ps;
-			
+			//Create new ItemCategory if needed
 			if (item.getCategory().getId() < 1) {
 				int id = -1;
 				
-				//New ItemCategory
-				query =   "INSERT INTO [Item_Category] AS c "
-						+ "(name) "
-						+ "VALUES (?)";
+				DBItemCategory dbCategory = new DBItemCategory();
+				if ((id = dbCategory.insertCategory(item.getCategory())) < 0) {
+					throw new SQLException("ItemCategory was not inserted!");
+				}
 				
-				ps = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-				ps.setQueryTimeout(5);
-				ps.setString(1, item.getCategory().getName());
-				
-				ps.executeUpdate();
-				ResultSet generatedKeys = ps.getGeneratedKeys();
-	            generatedKeys.next();
-				
-				id = generatedKeys.getInt(1);
-	            item.getCategory().setId(id);
-				ps.close();
-				
-				//Empty ItemCategory
-				query =	  "DELETE c FROM [Item_Category] c "
-						+ "LEFT JOIN [Item] AS i "
-						+ "ON c.id = i.category_id "
-						+ "WHERE c.id IS NULL";
-				
-				Statement st = con.createStatement();
-				st.setQueryTimeout(5);
-				
-				success = st.executeUpdate(query) > 0;
-				st.close();
+				item.getCategory().setId(id);
 			}
-				
-			query =
-				    "UPDATE [Item] "
-				  + "SET name = ?, "
-				  + "quantity = ?, "
-				  + "unit = ?, "
-				  + "category_id = ? "
-				  + "WHERE barcode = ?";
-			
-			ps = con.prepareStatement(query);
+		
+			PreparedStatement ps = con.prepareStatement(query);
 			ps.setQueryTimeout(5);
 			ps.setString(1, item.getName());
 			ps.setDouble(2, item.getQuantity());
@@ -303,26 +237,15 @@ public class DBItem implements IFDBItem {
 	public boolean deleteItem(Item item) {
 		boolean success = false;
 		
-		String query = "DELETE FROM [Item] WHERE id = ?";
+		String query = "DELETE FROM [Item] WHERE barcode = ?";
 		try {
+			
 			PreparedStatement ps = con.prepareStatement(query);
 			ps.setQueryTimeout(5);
 			ps.setString(1, item.getBarcode());
 			
 			success = ps.executeUpdate() > 0;
 			ps.close();
-			
-			//Empty ItemCategory
-			query =	  "DELETE c FROM [Item_Category] c "
-					+ "LEFT JOIN [Item] AS i "
-					+ "ON c.id = i.category_id "
-					+ "WHERE c.id IS NULL";
-			
-			Statement st = con.createStatement();
-			st.setQueryTimeout(5);
-			
-			success = st.executeUpdate(query) > 0;
-			st.close();
 		}
 		catch (SQLException e) {
 			System.out.println("Item was not deleted!");
@@ -358,7 +281,7 @@ public class DBItem implements IFDBItem {
 			item.setCategory(category);
 		}
 		catch (SQLException e) {
-			System.out.println("Item was not found!");
+			System.out.println("Item was not built!");
 			System.out.println(e.getMessage());
 			System.out.println(query);
 		}

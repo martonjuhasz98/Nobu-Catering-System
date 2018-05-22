@@ -67,11 +67,6 @@ public class ItemController {
 		
 		return success;
 	}
-	public boolean deleteItemCategory(ItemCategory category) {
-		boolean success = dbCategory.deleteCategory(category);
-		
-		return success;
-	}
 
 	//Units
 	public ArrayList<Unit> getUnits() {
