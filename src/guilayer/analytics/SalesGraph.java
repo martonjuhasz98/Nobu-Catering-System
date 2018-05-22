@@ -27,7 +27,7 @@ import ctrllayer.AnalyticsController;
 import ctrllayer.ItemController;
 import java.awt.BorderLayout;
 
-public class DailyWasteGraph extends JPanel {
+public class SalesGraph extends JPanel {
 	private ItemController ic = new ItemController(); // TODO: replace with MenuItemController
 	private AnalyticsController ac = new AnalyticsController();
 	// private String datePattern = "yyyy-MM-dd";
@@ -36,7 +36,7 @@ public class DailyWasteGraph extends JPanel {
 	/**
 	 * Create the panel.
 	 */
-	public DailyWasteGraph() {
+	public SalesGraph() {
 
 		setToolTipText("from");
 		setBounds(new Rectangle(0, 0, 800, 450));
@@ -74,22 +74,40 @@ public class DailyWasteGraph extends JPanel {
 
 		// chart.addSeries("c", new double[] { 0, 1, 3, 8, 9 }, new double[] { -2, -1,
 		// 1, 0, 1 });
-		// chartPanel.revalidate();
 		JButton fetch = new JButton("Fetch");
 		fetch.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				DateFormat format = new SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH);
 				try {
-					String[][] data = ac.getDailyWaste(
+					String[][] data = ac.getSales(
 							new java.sql.Date(format.parse(fromDatePicker.getFormattedTextField().getText()).getTime()),
 							new java.sql.Date(format.parse(toDatePicker.getFormattedTextField().getText()).getTime()));
+					
 					ArrayList<java.util.Date> xData = new ArrayList();
 					for (String s : data[0])
 						xData.add(format.parse(s));
-					ArrayList<Double> yData = new ArrayList<Double>();
-					for (String s : data[0])
-						yData.add(Double.valueOf(s));
+					
+					ArrayList<Double> revenue = new ArrayList();
+					for (String s : data[1])
+						revenue.add(Double.valueOf((s.equals("NULL"))?"0":s));
+					chart.addSeries("Revenue", xData,revenue );
+					
+					ArrayList<Double> costs = new ArrayList();
+					for (String s : data[1])
+						costs.add(Double.valueOf((s.equals("NULL"))?"0":s));
+					chart.addSeries("Costs", xData,costs );
+					
+					ArrayList<Double> profit = new ArrayList();
+					for (String s : data[1])
+						profit.add(Double.valueOf((s.equals("NULL"))?"0":s));
+					chart.addSeries("Profit", xData,profit );
+					
 
+					 chartPanel.revalidate();
+//					results.getString("date"),
+//					results.getString("revenue"),
+//					results.getString("costs"),
+//					results.getString("profit")
 				} catch (Exception e1) {
 					JOptionPane.showMessageDialog(null, "Please pick dates");
 				}

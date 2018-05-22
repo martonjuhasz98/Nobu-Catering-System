@@ -22,7 +22,7 @@ import org.jdatepicker.JDatePicker;
 import ctrllayer.AnalyticsController;
 import ctrllayer.ItemController;
 
-public class WasteTab extends JPanel {
+public class WeeklyUsageTab extends JPanel {
 	private JTable table;
 	private ItemController ic = new ItemController();
 	private AnalyticsController ac = new AnalyticsController();
@@ -33,7 +33,7 @@ public class WasteTab extends JPanel {
 	/**
 	 * Create the panel.
 	 */
-	public WasteTab() {
+	public WeeklyUsageTab() {
 		
 		setToolTipText("from");
 		setBounds(new Rectangle(0, 0, 800, 450));
@@ -71,10 +71,8 @@ public class WasteTab extends JPanel {
 				//java.util.Date dd = new java.util.Date(fromDatePicker.getFormattedTextField().getText());
 				DateFormat format = new SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH);
 				try {
-					model.setData(ac.getWaste(
-							new java.sql.Date(format.parse(fromDatePicker.getFormattedTextField().getText()).getTime()), 
-							new java.sql.Date(format.parse(toDatePicker.getFormattedTextField().getText()).getTime())));
-				} catch (ParseException e1) {
+					model.setData(ac.getWeeklyAverage());
+				} catch (Exception e1) {
 					// TODO Auto-generated catch block
 					JOptionPane.showMessageDialog(null,"Please pick dates");
 					}
@@ -86,8 +84,9 @@ public class WasteTab extends JPanel {
 
 	private class SalesTableModel extends AbstractTableModel {
 
-		private String[] columns = new String[] { "Barcode", "Name", "unit", "Used","Wasted","% Wasted" };
+		private String[] columns = new String[] { "Barcode", "Name", "unit", "Average","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday" };
 		private String[][] data = new String[0][0];
+
 		
 		public SalesTableModel() {
 		}

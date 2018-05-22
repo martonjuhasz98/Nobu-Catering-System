@@ -9,15 +9,20 @@ public class AnalyticsController {
 
 
 	IFDBAnalytics dba = new DBAnalytics();
-	public String[][] getSalesData(Date from, Date to) {
-		return dba.getDailySales(from, to);
+	public String[][] getSalesBbreakdown(Date from, Date to) {
+		return dba.getSalesBbreakdown(from, to);
 	}
 	
-	public String[][] getWasteData(Date from, Date to) {
+	public String[][] getWaste(Date from, Date to) {
 		return dba.getWaste(from, to);
 	}
 	
-	public String[][] getDailyWaste(Date from, Date to) {
-		return dba.getWaste(from, to);
+	public String[][] getSales(Date from, Date to) {
+		return dba.getSales(from, to);
 	}
+	public String[][] getWeeklyAverage() {
+		return dba.getWeeklyAverage();
+	}
+
+
 }

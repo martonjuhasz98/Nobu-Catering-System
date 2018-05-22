@@ -29,7 +29,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 
-public class SalesTab extends JPanel {
+public class SalesBreakdownTab extends JPanel {
 	private JTable table;
 	private ItemController ic = new ItemController(); // TODO: replace with MenuItemController
 	private AnalyticsController ac = new AnalyticsController();
@@ -40,7 +40,7 @@ public class SalesTab extends JPanel {
 	/**
 	 * Create the panel.
 	 */
-	public SalesTab() {
+	public SalesBreakdownTab() {
 
 		setToolTipText("from");
 		setBounds(new Rectangle(0, 0, 800, 450));
@@ -81,7 +81,7 @@ public class SalesTab extends JPanel {
 				// java.util.Date(fromDatePicker.getFormattedTextField().getText());
 				DateFormat format = new SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH);
 				try {
-					model.setData(ac.getSalesData(
+					model.setData(ac.getSalesBbreakdown(
 							new java.sql.Date(format.parse(fromDatePicker.getFormattedTextField().getText()).getTime()),
 							new java.sql.Date(format.parse(toDatePicker.getFormattedTextField().getText()).getTime())));
 				} catch (ParseException e1) {
@@ -99,7 +99,7 @@ public class SalesTab extends JPanel {
 
 	private class SalesTableModel extends AbstractTableModel {
 
-		private String[] columns = new String[] { "Date", "Revenue", "Costs", "Profit" };
+		private String[] columns = new String[] { "id", "name", "category", "price","sold" };
 		private String[][] data = new String[0][0];
 
 		public SalesTableModel() {
