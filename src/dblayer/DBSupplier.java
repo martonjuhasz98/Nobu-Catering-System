@@ -56,7 +56,7 @@ public class DBSupplier implements IFDBSupplier {
 		String query =
 			    "SELECT * FROM [Supplier]"
 			  + "WHERE cvr LIKE ? "
-			  + "AND name LIKE ?";
+			  + "OR name LIKE ?";
 		
 		try {
 			PreparedStatement ps = con.prepareStatement(query);
