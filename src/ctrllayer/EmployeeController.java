@@ -53,7 +53,7 @@ public class EmployeeController {
 		
 		return success;
 	}
-	private String hash(String text) {
+	public static String hash(String text) {
 		try {
 	        java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
 	        byte[] array = md.digest(text.getBytes(Charset.forName("UTF8")));

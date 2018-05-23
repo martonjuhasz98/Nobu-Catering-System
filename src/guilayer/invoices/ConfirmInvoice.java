@@ -1,25 +1,16 @@
 package guilayer.invoices;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.function.Consumer;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableCellEditor;
-import javax.swing.table.TableColumnModel;
 
-import ctrllayer.ItemController;
-import guilayer.MainWindow;
-import guilayer.interfaces.ButtonColumn;
-import guilayer.interfaces.EditListener;
-import guilayer.inventory.ListInventory;
-import modlayer.Employee;
+import ctrllayer.InvoiceController;
+import modlayer.Invoice;
+import modlayer.InvoiceItem;
 import modlayer.Item;
-import modlayer.ItemCategory;
-import modlayer.Unit;
 
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
@@ -30,39 +21,28 @@ import javax.swing.JButton;
 import javax.swing.JOptionPane;
 
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.text.DecimalFormat;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextField;
-import javax.swing.JComboBox;
-import javax.swing.JFormattedTextField;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JRadioButton;
-import javax.swing.JList;
-import javax.swing.AbstractAction;
-import javax.swing.AbstractListModel;
-import javax.swing.Action;
-import javax.swing.DefaultCellEditor;
 import javax.swing.event.CaretListener;
 import javax.swing.event.CaretEvent;
 
 public class ConfirmInvoice extends JPanel implements ActionListener, CaretListener, ListSelectionListener, TableModelListener {
 
-	private ItemController itemCtrl;
+	private InvoiceController invoiceCtrl;
+	private Invoice invoice;
 	private JTextField txt_search;
 	private JButton btn_search;
-	private JTable tbl_inventory;
-	private InventoryTableModel mdl_inventory;
+	private JTable tbl_ordered;
+	private OrderedTableModel mdl_ordered;
 	private JButton btn_add;
 	private JButton btn_remove;
-	private JTable tbl_stocktaking;
-	private StocktakingTableModel mdl_stocktaking;
+	private JTable tbl_delivered;
+	private DeliveredTableModel mdl_delivered;
 	private JButton btn_confirm;
 	
-	public ConfirmInvoice() {
-		itemCtrl = new ItemController();
+	public ConfirmInvoice(Invoice invoice) {
+		this.invoice = invoice;
+		invoiceCtrl = new InvoiceController();
 		
 		initialize();
 	}
@@ -72,8 +52,8 @@ public class ConfirmInvoice extends JPanel implements ActionListener, CaretListe
 		setLayout(null);
 		setBounds(0, 0, 801, 500);
 		
-		mdl_inventory = new InventoryTableModel();
-		mdl_stocktaking = new StocktakingTableModel();
+		mdl_ordered = new OrderedTableModel();
+		mdl_delivered = new DeliveredTableModel();
 		
 		txt_search = new JTextField();
 		txt_search.setBounds(10, 4, 179, 20);
@@ -88,16 +68,16 @@ public class ConfirmInvoice extends JPanel implements ActionListener, CaretListe
 		btn_confirm.setBounds(718, 3, 73, 23);
 		add(btn_confirm);
 		
-		JScrollPane scrlPane_inventory = new JScrollPane();
-		scrlPane_inventory.setBounds(10, 28, 300, 461);
-		add(scrlPane_inventory);
+		JScrollPane scrlPane_ordered = new JScrollPane();
+		scrlPane_ordered.setBounds(10, 28, 300, 461);
+		add(scrlPane_ordered);
 		
-		tbl_inventory = new JTable();
-		tbl_inventory.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-		tbl_inventory.getTableHeader().setReorderingAllowed(false);
-		tbl_inventory.setAutoCreateRowSorter(true);
-		tbl_inventory.setModel(mdl_inventory);
-		scrlPane_inventory.setViewportView(tbl_inventory);
+		tbl_ordered = new JTable();
+		tbl_ordered.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+		tbl_ordered.getTableHeader().setReorderingAllowed(false);
+		tbl_ordered.setAutoCreateRowSorter(true);
+		tbl_ordered.setModel(mdl_ordered);
+		scrlPane_ordered.setViewportView(tbl_ordered);
 		
 		btn_add = new JButton("Add");
 		btn_add.setBounds(320, 236, 73, 23);
@@ -107,67 +87,74 @@ public class ConfirmInvoice extends JPanel implements ActionListener, CaretListe
 		btn_remove.setBounds(320, 270, 73, 23);
 		add(btn_remove);
 		
-		JScrollPane scrlPane_stocktaking = new JScrollPane();
-		scrlPane_stocktaking.setBounds(400, 28, 391, 461);
-		add(scrlPane_stocktaking);
+		JScrollPane scrlPane_delivered = new JScrollPane();
+		scrlPane_delivered.setBounds(400, 28, 391, 461);
+		add(scrlPane_delivered);
 		
-		tbl_stocktaking = new JTable();
-		tbl_stocktaking.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-		tbl_stocktaking.getTableHeader().setReorderingAllowed(false);
-		tbl_stocktaking.setAutoCreateRowSorter(true);
-		tbl_stocktaking.setModel(mdl_stocktaking);
-		scrlPane_stocktaking.setViewportView(tbl_stocktaking);
+		tbl_delivered = new JTable();
+		tbl_delivered.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+		tbl_delivered.getTableHeader().setReorderingAllowed(false);
+		tbl_delivered.setAutoCreateRowSorter(true);
+		tbl_delivered.setModel(mdl_delivered);
+		scrlPane_delivered.setViewportView(tbl_delivered);
 		
 		txt_search.addCaretListener(this);
 		btn_search.addActionListener(this);
 		btn_confirm.addActionListener(this);
-		tbl_inventory.getSelectionModel().addListSelectionListener(this);
-		tbl_stocktaking.getSelectionModel().addListSelectionListener(this);
+		tbl_ordered.getSelectionModel().addListSelectionListener(this);
+		tbl_delivered.getSelectionModel().addListSelectionListener(this);
 		btn_add.addActionListener(this);
 		btn_remove.addActionListener(this);
-		mdl_stocktaking.addTableModelListener(this);
+		mdl_delivered.addTableModelListener(this);
 		
 		resetForm();
 	}
 	private void resetForm() {
-		mdl_inventory.setItems(itemCtrl.getItems());
-		mdl_stocktaking.setItems(new ArrayList<Item>());
+		mdl_ordered.setItems(invoice.getItems());
+		mdl_delivered.setItems(new ArrayList<InvoiceItem>());
 		
 		btn_add.setEnabled(false);
 		btn_remove.setEnabled(false);
 		btn_confirm.setEnabled(false);
 	}
-	private void searchInventory() {
+	private void searchOrdered() {
 		String keyword = txt_search.getText().trim();
-		mdl_inventory.setItems(itemCtrl.searchItems(keyword));
+		ArrayList<InvoiceItem> results = new ArrayList<InvoiceItem>();
+		for (InvoiceItem invoiceItem : invoice.getItems()) {
+			Item item = invoiceItem.getItem(); 
+			if (item.getBarcode().contains(keyword) ||
+					item.getName().contains(keyword)) {
+				results.add(invoiceItem);
+			}
+		}
+		mdl_ordered.setItems(results);
 	}
-	private void addToStocktaking() {
-		int[] selection = tbl_inventory.getSelectedRows();
-		ArrayList<Item> items = new ArrayList<Item>(selection.length);
+	private void addToDelivered() {
+		int[] selection = tbl_ordered.getSelectedRows();
+		ArrayList<InvoiceItem> items = new ArrayList<InvoiceItem>(selection.length);
 		
 		for (int i = 0; i < selection.length; i++) {
-			selection[i] = tbl_inventory.convertRowIndexToModel(selection[i]);
-			items.add(mdl_inventory.getItemAt(selection[i]));
+			selection[i] = tbl_ordered.convertRowIndexToModel(selection[i]);
+			items.add(mdl_ordered.getItemAt(selection[i]));
 		}
 		
-		mdl_stocktaking.addItems(items);
+		mdl_delivered.addItems(items);
 	}
-	private void removeFromStocktaking() {
-		int[] selection = tbl_stocktaking.getSelectedRows();
-		ArrayList<Item> items = new ArrayList<Item>(selection.length);
+	private void removeFromDelivered() {
+		int[] selection = tbl_delivered.getSelectedRows();
+		ArrayList<InvoiceItem> items = new ArrayList<InvoiceItem>(selection.length);
 		
 		for (int i = 0; i < selection.length; i++) {
-			selection[i] = tbl_stocktaking.convertRowIndexToModel(selection[i]);
-			items.add(mdl_stocktaking.getItemAt(selection[i]));
+			selection[i] = tbl_delivered.convertRowIndexToModel(selection[i]);
+			items.add(mdl_delivered.getItemAt(selection[i]));
 		}
 		
-		mdl_stocktaking.removeItems(items);
+		mdl_delivered.removeItems(items);
 	}
-	private void createStocktaking() {
-		Employee employee = new Employee();
-		employee.setCpr("100298-0612");
+	private void confirmInvoice() {
+		invoice.setItems(mdl_delivered.getItems());
 		
-		if (!itemCtrl.createStocktaking(employee, mdl_stocktaking.getItems())) {
+		if (!invoiceCtrl.confirmInvoice(invoice)) {
 			JOptionPane.showMessageDialog(this,
 				    "An error occured while creating the Stock-taking!",
 				    "Error!",
@@ -185,7 +172,7 @@ public class ConfirmInvoice extends JPanel implements ActionListener, CaretListe
 	@Override
 	public void caretUpdate(CaretEvent e) {
 		if (e.getSource() == txt_search) {
-			searchInventory();
+			searchOrdered();
 		}
 	}
 	@Override
@@ -193,42 +180,42 @@ public class ConfirmInvoice extends JPanel implements ActionListener, CaretListe
 		ListSelectionModel source = (ListSelectionModel)e.getSource();
 		boolean empty = source.isSelectionEmpty();
 		
-		if (source == tbl_inventory.getSelectionModel()) {
+		if (source == tbl_ordered.getSelectionModel()) {
 			btn_add.setEnabled(!empty);
-		} else if (source == tbl_stocktaking.getSelectionModel()) {
+		} else if (source == tbl_delivered.getSelectionModel()) {
 			btn_remove.setEnabled(!empty);
 		}
 	}
 	@Override
 	public void tableChanged(TableModelEvent e) {
-		if (e.getSource() == mdl_stocktaking) {
-			boolean empty = mdl_stocktaking.getItems().isEmpty();
+		if (e.getSource() == mdl_delivered) {
+			boolean empty = mdl_delivered.getItems().isEmpty();
 			btn_confirm.setEnabled(!empty);
 		}
 	}
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == btn_search) {
-			searchInventory();
+			searchOrdered();
 		} else if (e.getSource() == btn_add) {
-			addToStocktaking();
+			addToDelivered();
 		} else if (e.getSource() == btn_remove) {
-			removeFromStocktaking();
+			removeFromDelivered();
 		} else if (e.getSource() == btn_confirm) {
-			createStocktaking();
+			confirmInvoice();
 		}
 	}
 	
 	
-	private class InventoryTableModel extends AbstractTableModel {
+	private class OrderedTableModel extends AbstractTableModel {
 		
-		private String[] columns = new String[] { "Name", "Quantity", "Unit", "Category" };
-		protected ArrayList<Item> items;
+		private String[] columns = new String[] { "Barcode", "Name", "Quantity", "Unit", "Unit price", "Category" };
+		protected ArrayList<InvoiceItem> items;
 		
-		public InventoryTableModel() {
-			this(new ArrayList<Item>());
+		public OrderedTableModel() {
+			this(new ArrayList<InvoiceItem>());
 		}
-		public InventoryTableModel(ArrayList<Item> items) {
+		public OrderedTableModel(ArrayList<InvoiceItem> items) {
 			this.items = items;
 			update();
 		}
@@ -244,16 +231,21 @@ public class ConfirmInvoice extends JPanel implements ActionListener, CaretListe
 		@Override
 		public Object getValueAt(int rowIndex, int columnIndex) {
 			
-			Item item = items.get(rowIndex);
+			InvoiceItem invoiceItem = items.get(rowIndex);
+			Item item = invoiceItem.getItem();
 			
 			switch(columnIndex) {
 				case 0:
-					return item.getName();
+					return item.getBarcode();
 				case 1:
-					return item.getQuantity();
+					return item.getName();
 				case 2:
-					return item.getUnit().getAbbr();
+					return invoiceItem.getQuantity();
 				case 3:
+					return item.getUnit().getAbbr();
+				case 4:
+					return invoiceItem.getUnitPrice();
+				case 5:
 					return item.getCategory().getName();
 			}
 			
@@ -269,14 +261,17 @@ public class ConfirmInvoice extends JPanel implements ActionListener, CaretListe
 				case 0:
 					return String.class;
 				case 1:
-					return Double.class;
+					return String.class;
 				case 2:
-					return Unit.class;
+					return int.class;
 				case 3:
-					return ItemCategory.class;
-		}
-		
-		return null;
+					return String.class;
+				case 4:
+					return double.class;
+				case 5:
+					return String.class;
+			}
+			return null;
 		}
 		@Override
 		public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -285,33 +280,33 @@ public class ConfirmInvoice extends JPanel implements ActionListener, CaretListe
 		public void update() {
 			fireTableDataChanged();
 		}
-		public Item getItemAt(int rowIndex) {
+		public InvoiceItem getItemAt(int rowIndex) {
 			return items.get(rowIndex);
 		}
-		public void setItems(ArrayList<Item> items) {
+		public void setItems(ArrayList<InvoiceItem> items) {
 			this.items = items;
 			update();
 		}
-		public void addItems(ArrayList<Item> items) {
-			for (Item item : items) {
+		public void addItems(ArrayList<InvoiceItem> items) {
+			for (InvoiceItem item : items) {
 				if (this.items.indexOf(item) < 0)
 					this.items.add(item);
 			}
 			update();
 		}
-		public void removeItems(ArrayList<Item> items) {
-			for (Item item : items) {
+		public void removeItems(ArrayList<InvoiceItem> items) {
+			for (InvoiceItem item : items) {
 				this.items.remove(item);
 			}
 			update();
 		}
 	}
-	private class StocktakingTableModel extends InventoryTableModel {
+	private class DeliveredTableModel extends OrderedTableModel {
 		
-		public StocktakingTableModel() {
+		public DeliveredTableModel() {
 			super();
 		}
-		public StocktakingTableModel(ArrayList<Item> items) {
+		public DeliveredTableModel(ArrayList<InvoiceItem> items) {
 			super(items);
 		}
 		
@@ -322,11 +317,11 @@ public class ConfirmInvoice extends JPanel implements ActionListener, CaretListe
 		@Override
 		public void setValueAt(Object value, int rowIndex, int columnIndex) {
 			try {
-				double quantity = (double)value;
+				int quantity = (int)value;
 				super.items.get(rowIndex).setQuantity(quantity);
 			} catch(Exception e) {}
 		}
-		public ArrayList<Item> getItems() {
+		public ArrayList<InvoiceItem> getItems() {
 			return super.items;
 		}
 	}
