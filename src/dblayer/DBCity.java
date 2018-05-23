@@ -6,84 +6,85 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Arrays;
 
-import dblayer.interfaces.IFDBUnit;
-import modlayer.Unit;
+import dblayer.interfaces.IFDBCity;
+import modlayer.City;
 
-public class DBUnit implements IFDBUnit {
-	
+public class DBCity implements IFDBCity {
+
 	private Connection con;
 	
-	public DBUnit() {
+	public DBCity() {
 		con = DBConnection.getConnection();
 	}
 	
 	@Override
-	public ArrayList<Unit> getUnits() {
-		ArrayList<Unit> units = new ArrayList<>();
+	public ArrayList<City> getCities() {
+		ArrayList<City> cities = new ArrayList<>();
 		
-		String query = "SELECT * FROM [Unit]";
+		String query = "SELECT * FROM [City]";
 		try {
 			
 			Statement st = con.createStatement();
 			st.setQueryTimeout(5);
 			
-			Unit unit;
+			City city;
 			ResultSet results = st.executeQuery(query);
 			while (results.next()) {
-				unit = buildUnit(results);
-				units.add(unit);
+				city = buildCity(results);
+				cities.add(city);
 			}
 			st.close();
 		} catch (SQLException e) {
-			System.out.println("Units were not found!");
+			System.out.println("Citys were not found!");
 			System.out.println(e.getMessage());
 			System.out.println(query);
 		}
 		
-		return units;
+		return cities;
 	}
+	
 	@Override
-	public Unit selectUnit(String abbr) {
-		Unit unit = null;
+	public City selectCity(String zipCode) {
+		City city = null;
 		
-		String query = "SELECT * FROM [Unit] WHERE abbreviation = ?";
+		String query = "SELECT * FROM [City] WHERE zip_code = ?";
 		try {
 			
 			PreparedStatement ps = con.prepareStatement(query);
 			ps.setQueryTimeout(5);
-			ps.setString(1, abbr);
+			ps.setString(1, zipCode);
 			
 			ResultSet results = ps.executeQuery();
 			if (results.next()) {
-				unit = buildUnit(results);
+				city = buildCity(results);
 			}
 			ps.close();
 		} catch (SQLException e) {
-			System.out.println("Unit was not found!");
+			System.out.println("City was not found!");
 			System.out.println(e.getMessage());
 			System.out.println(query);
 		}
 		
-		return unit;
+		return city;
 	}
-	private Unit buildUnit(ResultSet results) throws SQLException {
-		Unit unit = null;
+	
+	private City buildCity(ResultSet results) throws SQLException {
+		City city = null;
 		
 		String query = "";
 		try {
 			
-			unit = new Unit();
-			unit.setAbbr(results.getString("abbreviation"));
-			unit.setName(results.getString("name"));
+			city = new City();
+			city.setZipCode(results.getString("zip_code"));
+			city.setName(results.getString("name"));
 		}
 		catch (SQLException e) {
-			System.out.println("Unit was not built!");
+			System.out.println("City was not built!");
 			System.out.println(e.getMessage());
 			System.out.println(query);
 		}
 		
-		return unit;
+		return city;
 	}
 }
