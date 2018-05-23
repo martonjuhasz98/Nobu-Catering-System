@@ -1,4 +1,4 @@
-package guilayer.inventory;
+package guilayer.invoices;
 
 import java.awt.Font;
 import java.awt.Label;
@@ -34,7 +34,7 @@ import javax.swing.SwingConstants;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 
-public class ItemEditor extends EditPanel implements ActionListener, CaretListener, ItemListener {
+public class ShowInvoice extends EditPanel implements ActionListener, CaretListener, ItemListener {
 
 	private ItemController itemCtrl;
 	private Item item;
@@ -52,7 +52,7 @@ public class ItemEditor extends EditPanel implements ActionListener, CaretListen
 	private boolean creatingCategory;
 	private boolean creatingItem;
 	
-	public ItemEditor() {
+	public ShowInvoice() {
 		itemCtrl = new ItemController();
 		
 		initialize();

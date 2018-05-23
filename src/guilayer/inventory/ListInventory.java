@@ -41,7 +41,7 @@ import javax.swing.event.CaretEvent;
 
 public class ListInventory extends JPanel implements ActionListener, MouseListener, EditListener, CaretListener {
 
-	private ItemEditor itemEditor;
+	private EditItem itemEditor;
 	private ItemController itemCtrl;
 	private JTable table;
 	private ItemTableModel model;
@@ -49,7 +49,7 @@ public class ListInventory extends JPanel implements ActionListener, MouseListen
 	private JButton btn_create;
 	private JTextField txt_search;
 	
-	public ListInventory(ItemEditor editInv) {
+	public ListInventory(EditItem editInv) {
 		this.itemEditor = editInv;
 		itemCtrl = new ItemController();
 		

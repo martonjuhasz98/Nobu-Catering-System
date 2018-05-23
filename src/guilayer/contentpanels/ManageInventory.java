@@ -19,7 +19,7 @@ public class ManageInventory extends JPanel {
 		
 		setLayout(null);
 		
-		ItemEditor itemEditor = new ItemEditor();
+		EditItem itemEditor = new EditItem();
 		add(itemEditor);
 		
 		ListInventory listInv = new ListInventory(itemEditor);
