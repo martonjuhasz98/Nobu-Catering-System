@@ -94,7 +94,7 @@ public class MainWindow {
 		content.add(new AnalyticsTabbedPane(), "0");
 		content.add(new ManageInventory(), "1");
 		content.add(new Stocktaking(), "2");
-		//content.add(new ManageInvoices(), "3");
+		content.add(new ManageInvoices(), "3");
 		content.add(new ManageSuppliers(), "4");
 		//content.add(new ManageMenuItems(), "5");
 		//content.add(new ManageEmployees(), "6");

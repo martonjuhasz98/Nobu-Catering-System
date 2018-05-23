@@ -18,9 +18,9 @@ public class ManageInvoices extends JTabbedPane {
 
 	private void initalize() {
 		
-		setLayout(null);
 		
 		add(new ListPendingInvoices(), "Pending");
-		add(new ListInvoiceHistory(), "History");
+		add(new InvoicePaneManager(), "History");
+
 	}
 }

@@ -11,9 +11,11 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
+import ctrllayer.InvoiceController;
 import ctrllayer.ItemController;
 import guilayer.MainWindow;
 import guilayer.interfaces.EditPanel;
+import modlayer.Invoice;
 import modlayer.Item;
 import modlayer.ItemCategory;
 import modlayer.Unit;
@@ -33,27 +35,24 @@ import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
+import javax.swing.JScrollPane;
 
-public class ShowInvoice extends EditPanel implements ActionListener, CaretListener, ItemListener {
+public class ShowInvoice extends EditPanel {
 
-	private ItemController itemCtrl;
-	private Item item;
-	private JTextField txt_barcode;
-	private JTextField txt_name;
-	private JButton btn_submit;
+	private InvoiceController invCtrl;
+	private Invoice invoice;
+	
+	private JTextField txt_supplier_cvrname;
+	private JTextField txt_suppPhone;
+	private JTextField txt_suppEmail;
+	private JTextField txt_empPhone;
+	private JTextField txt_empName;
+	private JTextField txt_orderDate;
+	private JTextField txt_deliverDate;
 	private JButton btn_cancel;
-	private SpinnerNumberModel sprm_quantity;
-	private JComboBox<Unit> cmb_unit;
-	private JComboBox<ItemCategory> cmb_category;
-	private JTextField txt_category;
-	private JRadioButton rdbtn_selectCategory;
-	private JRadioButton rdbtn_createCategory;
-	private ButtonGroup rdbtn_group;
-	private boolean creatingCategory;
-	private boolean creatingItem;
 	
 	public ShowInvoice() {
-		itemCtrl = new ItemController();
+		invCtrl = new InvoiceController();
 		
 		initialize();
 	}
@@ -64,233 +63,147 @@ public class ShowInvoice extends EditPanel implements ActionListener, CaretListe
 		setVisible(false);
 		setBounds(0, 0, MainWindow.contentWidth, MainWindow.totalHeight);
 		
-		Label lbl_barcode = new Label("Barcode *");
-		lbl_barcode.setFont(new Font("Dialog", Font.PLAIN, 15));
-		lbl_barcode.setBounds(16, 16, 129, 22);
-		add(lbl_barcode);
+		Label lbl_supplier = new Label("Supplier");
+		lbl_supplier.setFont(new Font("Dialog", Font.PLAIN, 15));
+		lbl_supplier.setBounds(16, 16, 129, 22);
+		add(lbl_supplier);
 		
-		txt_barcode = new JTextField();
-		txt_barcode.setColumns(10);
-		txt_barcode.setBounds(16, 44, 376, 20);
-		add(txt_barcode);
+		Label lbl_orderDate = new Label("Ordered");
+		lbl_orderDate.setFont(new Font("Dialog", Font.PLAIN, 15));
+		lbl_orderDate.setBounds(16, 198, 170, 22);
+		add(lbl_orderDate);
 		
-		Label lbl_name = new Label("Name *");
-		lbl_name.setFont(new Font("Dialog", Font.PLAIN, 15));
-		lbl_name.setBounds(16, 75, 129, 22);
-		add(lbl_name);
+		Label lbl_deliverDate = new Label("Delivered");
+		lbl_deliverDate.setFont(new Font("Dialog", Font.PLAIN, 15));
+		lbl_deliverDate.setBounds(222, 198, 170, 22);
+		add(lbl_deliverDate);
 		
-		txt_name = new JTextField();
-		txt_name.setColumns(10);
-		txt_name.setBounds(16, 103, 376, 20);
-		add(txt_name);
+		Label lbl_empPlacedBy = new Label("Placed by");
+		lbl_empPlacedBy.setFont(new Font("Dialog", Font.PLAIN, 15));
+		lbl_empPlacedBy.setBounds(16, 134, 170, 22);
+		add(lbl_empPlacedBy);
 		
-		Label lbl_quantity = new Label("Quantity");
-		lbl_quantity.setFont(new Font("Dialog", Font.PLAIN, 15));
-		lbl_quantity.setBounds(16, 134, 197, 22);
-		add(lbl_quantity);
+		Label lbl_suppPhone = new Label("Phone");
+		lbl_suppPhone.setFont(new Font("Dialog", Font.PLAIN, 15));
+		lbl_suppPhone.setBounds(16, 75, 170, 22);
+		add(lbl_suppPhone);
 		
-		JSpinner spr_quantity = new JSpinner();
-		sprm_quantity = new SpinnerNumberModel(new Double(0), new Double(0), null, new Double(1));
-		spr_quantity.setModel(sprm_quantity);
-		spr_quantity.setBounds(16, 162, 310, 20);
-		add(spr_quantity);
+		Label lbl_suppEmail = new Label("Email");
+		lbl_suppEmail.setFont(new Font("Dialog", Font.PLAIN, 15));
+		lbl_suppEmail.setBounds(222, 75, 170, 22);
+		add(lbl_suppEmail);
 		
-		Label lbl_unit = new Label("Unit *");
-		lbl_unit.setFont(new Font("Dialog", Font.PLAIN, 15));
-		lbl_unit.setBounds(333, 134, 59, 22);
-		add(lbl_unit);
+		Label lbl_empPhone = new Label("Phone");
+		lbl_empPhone.setFont(new Font("Dialog", Font.PLAIN, 15));
+		lbl_empPhone.setBounds(222, 134, 170, 22);
+		add(lbl_empPhone);
 		
-		cmb_unit = new JComboBox<Unit>();
-		cmb_unit.setBounds(333, 162, 59, 20);
-		add(cmb_unit);
+		txt_supplier_cvrname = new JTextField();
+		txt_supplier_cvrname.setEnabled(false);
+		txt_supplier_cvrname.setEditable(false);
+		txt_supplier_cvrname.setColumns(10);
+		txt_supplier_cvrname.setBounds(16, 44, 376, 20);
+		add(txt_supplier_cvrname);
 		
-		Label lbl_category = new Label("Category *");
-		lbl_category.setFont(new Font("Dialog", Font.PLAIN, 15));
-		lbl_category.setBounds(16, 193, 197, 22);
-		add(lbl_category);
-		
-		rdbtn_group = new ButtonGroup();
-		
-		rdbtn_selectCategory = new JRadioButton("Select from existing");
-		rdbtn_selectCategory.setBounds(16, 221, 376, 19);
-		rdbtn_group.add(rdbtn_selectCategory);
-		add(rdbtn_selectCategory);
-		
-		cmb_category = new JComboBox<ItemCategory>();
-		cmb_category.setBounds(16, 247, 376, 20);
-		add(cmb_category);
-		
-		rdbtn_createCategory = new JRadioButton("Create new");
-		rdbtn_createCategory.setBounds(16, 274, 376, 20);
-		rdbtn_group.add(rdbtn_createCategory);
-		add(rdbtn_createCategory);
-		
-		txt_category = new JTextField();
-		txt_category.setEnabled(false);
-		txt_category.setBounds(16, 301, 376, 20);
-		add(txt_category);
-		txt_category.setColumns(10);
-		
-		btn_submit = new JButton("Create");
-		btn_submit.setBounds(536, 457, 122, 32);
-		add(btn_submit);
+		txt_suppPhone = new JTextField();
+		txt_suppPhone.setEnabled(false);
+		txt_suppPhone.setEditable(false);
+		txt_suppPhone.setColumns(10);
+		txt_suppPhone.setBounds(16, 103, 170, 20);
+		add(txt_suppPhone);
 		
 		btn_cancel = new JButton("Cancel");
-		btn_cancel.setBounds(668, 457, 122, 32);
+		btn_cancel.setBounds(654, 420, 122, 32);
 		add(btn_cancel);
 		
+		txt_suppEmail = new JTextField();
+		txt_suppEmail.setEditable(false);
+		txt_suppEmail.setEnabled(false);
+		txt_suppEmail.setText("");
+		txt_suppEmail.setColumns(10);
+		txt_suppEmail.setBounds(222, 103, 170, 20);
+		add(txt_suppEmail);
+		
+		txt_empPhone = new JTextField();
+		txt_empPhone.setEditable(false);
+		txt_empPhone.setEnabled(false);
+		txt_empPhone.setText("");
+		txt_empPhone.setColumns(10);
+		txt_empPhone.setBounds(222, 162, 170, 20);
+		add(txt_empPhone);
+		
+		txt_empName = new JTextField();
+		txt_empName.setEditable(false);
+		txt_empName.setEnabled(false);
+		txt_empName.setText("");
+		txt_empName.setColumns(10);
+		txt_empName.setBounds(16, 162, 170, 20);
+		add(txt_empName);
+		
+		txt_orderDate = new JTextField();
+		txt_orderDate.setEnabled(false);
+		txt_orderDate.setEditable(false);
+		txt_orderDate.setText("");
+		txt_orderDate.setColumns(10);
+		txt_orderDate.setBounds(16, 226, 170, 20);
+		add(txt_orderDate);
+		
+		txt_deliverDate = new JTextField();
+		txt_deliverDate.setEditable(false);
+		txt_deliverDate.setEnabled(false);
+		txt_deliverDate.setText("");
+		txt_deliverDate.setColumns(10);
+		txt_deliverDate.setBounds(222, 226, 170, 20);
+		add(txt_deliverDate);
+		
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setBounds(16, 257, 760, 152);
+		add(scrollPane);
+		
 		reset();
-		txt_barcode.addCaretListener(this);
-		txt_name.addCaretListener(this);
-		txt_category.addCaretListener(this);
-		cmb_unit.addItemListener(this);
-		cmb_category.addItemListener(this);
-		rdbtn_selectCategory.addItemListener(this);
-		rdbtn_createCategory.addItemListener(this);
-		btn_submit.addActionListener(this);
-		btn_cancel.addActionListener(this);
 	}
-	private void fill(Item item) {
-		this.item = item;
-		creatingCategory = false;
-		creatingItem = false;
+	
+	
+	
+	private void fill(Invoice invoice) {
+		this.invoice = invoice;
 		
-		txt_barcode.setText(item.getBarcode());
-		txt_name.setText(item.getName());
-		sprm_quantity.setValue(item.getQuantity());
-		cmb_unit.setSelectedItem(item.getUnit());
-		cmb_category.setSelectedItem(item.getCategory());
-		
-		btn_submit.setText("Update");
-		btn_submit.setEnabled(true);
-	}
-	private void reset() {
-		item = null;
-		creatingCategory = false;
-		creatingItem = true;
-		
-		txt_barcode.setText("");
-		txt_name.setText("");
-		sprm_quantity.setValue(new Double(0.0));
-		cmb_unit.setSelectedIndex(-1);
-		rdbtn_selectCategory.setSelected(true);
-		cmb_category.setSelectedIndex(-1);
-		txt_category.setText("");
-		
-		btn_submit.setText("Create");
-		btn_submit.setEnabled(false);
-	}
-	public void createItem() {
-		open();
-	}
-	public void updateItem(Item item) {
-		open();
-		fill(item);
-	}
-	private void open() {
-		cmb_unit.setModel(new DefaultComboBoxModel(itemCtrl.getUnits().toArray()));
-		cmb_unit.setSelectedIndex(-1);
-		cmb_category.setModel(new DefaultComboBoxModel(itemCtrl.getCategories().toArray()));
-		cmb_category.setSelectedIndex(-1);
+		txt_supplier_cvrname.setText(invoice.getSupplier().getCvr() +" - "+ invoice.getSupplier().getName());
+		txt_suppPhone.setText(invoice.getSupplier().getPhone());
+		txt_suppEmail.setText(invoice.getSupplier().getEmail());
+		txt_empName.setText("");
+		txt_empPhone.setText("");
+		txt_orderDate.setText(invoice.getTimestamp().toString());
+		txt_deliverDate.setText(invoice.getDateDelivered().toString());
 		setVisible(true);
 	}
+	
+	
+	
+	private void reset() {
+		invoice = null;
+		
+		txt_supplier_cvrname.setText("");
+		txt_suppPhone.setText("");
+		txt_suppEmail.setText("");
+		txt_empName.setText("");
+		txt_empPhone.setText("");
+		txt_orderDate.setText("");
+		txt_deliverDate.setText("");
+	}
+	
+	
+	
+	
+	public void createItem() {
+		
+	}
+	public void details(Invoice invoice) {
+		fill(invoice);
+	}
+
 	private void close() {
 		setVisible(false);
 		reset();
-	}
-	private boolean isFilled() {
-		if (txt_barcode.getText().trim().isEmpty())
-			return false;
-		if (txt_name.getText().trim().isEmpty())
-			return false;
-		if (cmb_unit.getSelectedIndex() < 0)
-			return false;
-		if (!creatingCategory) {
-			if (cmb_category.getSelectedIndex() < 0)
-				return false;
-		} else {
-			if (txt_category.getText().trim().isEmpty())
-				return false;
-		}
-		
-		
-		return true;
-	}
-	
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		if (e.getSource() == btn_submit) {
-			String barcode = txt_barcode.getText().trim();
-			String name = txt_name.getText().trim();
-			double quantity = (Double)sprm_quantity.getValue();
-			Unit unit = (Unit)cmb_unit.getSelectedItem();
-			ItemCategory category;
-			if (!creatingCategory) {
-				category = (ItemCategory)cmb_category.getSelectedItem();
-			} else {
-				category = new ItemCategory();
-				category.setName(txt_category.getText().trim());
-			}
-			
-			if (creatingItem) {
-				if (!itemCtrl.createItem(barcode, name, quantity, unit, category)) {
-					JOptionPane.showMessageDialog(this,
-						    "An error occured while creating the Item!",
-						    "Error!",
-						    JOptionPane.ERROR_MESSAGE);
-					return;
-				}
-				
-				JOptionPane.showMessageDialog(this,
-					    "The Item was successfully created!",
-					    "Success!",
-					    JOptionPane.INFORMATION_MESSAGE);
-				
-				triggerCreateListeners();
-			} else {
-				item.setBarcode(txt_barcode.getText().trim());
-				item.setName(txt_name.getText().trim());
-				item.setQuantity((Double)sprm_quantity.getValue());
-				item.setUnit((Unit)cmb_unit.getSelectedItem());
-				item.setCategory(category);
-				
-				if (!itemCtrl.updateItem(item)) {
-					JOptionPane.showMessageDialog(this,
-						    "An error occured while creating the Item!",
-						    "Error!",
-						    JOptionPane.ERROR_MESSAGE);
-					return;
-				}
-				
-				JOptionPane.showMessageDialog(this,
-					    "The Item was successfully edited!",
-					    "Success!",
-					    JOptionPane.INFORMATION_MESSAGE);
-				
-				triggerUpdateListeners();
-			}
-			close();
-		} else if (e.getSource() == btn_cancel) {
-			triggerCancelListeners();
-			close();
-		}
-	}
-	@Override
-	public void itemStateChanged(ItemEvent e) {
-		if (e.getSource() == rdbtn_selectCategory || e.getSource() == rdbtn_createCategory) {
-			creatingCategory = rdbtn_createCategory.isSelected();
-			cmb_category.setEnabled(!creatingCategory);
-			txt_category.setEnabled(creatingCategory);
-			
-			btn_submit.setEnabled(isFilled());
-		} else if (e.getSource() == cmb_unit || e.getSource() == cmb_category) {
-			btn_submit.setEnabled(isFilled());
-		}
-	}
-	@Override
-	public void caretUpdate(CaretEvent e) {
-		if (e.getSource() == txt_barcode || e.getSource() == txt_name || e.getSource() == txt_category) {
-			btn_submit.setEnabled(isFilled());
-		}
 	}
 }
