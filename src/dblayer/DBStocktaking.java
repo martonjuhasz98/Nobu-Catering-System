@@ -39,10 +39,10 @@ public class DBStocktaking implements IFDBStocktaking {
 			}
 			ps.close();
 			
+			//Discrepancies
 			String itemBarcode;
 			double quantity;
 			
-			//Discrepancies
 			for (Discrepancy discrepancy : stocktaking.getDiscrepancies()) {
 				itemBarcode = discrepancy.getItem().getBarcode();
 				quantity = discrepancy.getQuantity();
@@ -61,7 +61,9 @@ public class DBStocktaking implements IFDBStocktaking {
 					ps.setDouble(3, quantity);
 					ps.setString(4, itemBarcode);
 					
-					ps.executeUpdate();
+					if (ps.executeUpdate() < 1) {
+						throw new SQLException();
+					}
 					ps.close();
 				}
 				catch (SQLException e) {

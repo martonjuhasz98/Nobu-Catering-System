@@ -56,7 +56,7 @@ public class DBItemCategory implements IFDBItemCategory {
 			
 			PreparedStatement ps = con.prepareStatement(query);
 			ps.setQueryTimeout(5);
-			ps.setInt(0, id);
+			ps.setInt(1, id);
 			
 			ResultSet results = ps.executeQuery();
 			if (results.next()) {

@@ -2,7 +2,7 @@ package modlayer;
 
 public enum TransactionType {
 
-	CASH(0), CREDITCARD(1), VOUCHER(2);
+	CASH(1), CREDITCARD(2), VOUCHER(3), ACCOUNT(4);
 	
 	private int id;
 	
