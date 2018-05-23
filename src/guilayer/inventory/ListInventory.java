@@ -1,4 +1,4 @@
-package guilayer.inventorypanels;
+package guilayer.inventory;
 
 import java.util.ArrayList;
 import java.util.function.Consumer;
@@ -12,7 +12,7 @@ import ctrllayer.ItemController;
 import guilayer.MainWindow;
 import guilayer.interfaces.ButtonColumn;
 import guilayer.interfaces.EditListener;
-import guilayer.inventorypanels.ListInventory;
+import guilayer.inventory.ListInventory;
 import modlayer.Item;
 import modlayer.ItemCategory;
 import modlayer.Unit;
@@ -122,7 +122,7 @@ public class ListInventory extends JPanel implements ActionListener, MouseListen
 		btn_create.addActionListener(this);
 		table.addMouseListener(this);
 	}
-	private void search() {
+	private void searchInventory() {
 
 		String keyword = txt_search.getText().trim();
 		model.setItems(itemCtrl.searchItems(keyword));
@@ -131,13 +131,13 @@ public class ListInventory extends JPanel implements ActionListener, MouseListen
 	@Override
 	public void caretUpdate(CaretEvent e) {
 		if (e.getSource() == txt_search) {
-			search();
+			searchInventory();
 		}
 	}
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == btn_search) {
-			search();
+			searchInventory();
 		} if (e.getSource() == btn_create) {
 			setVisible(false);
 			itemEditor.createItem();

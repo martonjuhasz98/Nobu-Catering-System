@@ -1,4 +1,4 @@
-package guilayer.inventorypanels;
+package guilayer.inventory;
 
 import java.awt.Font;
 import java.awt.Label;

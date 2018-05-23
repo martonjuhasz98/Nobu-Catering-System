@@ -5,7 +5,7 @@ import java.util.function.Consumer;
 
 import javax.swing.JPanel;
 
-import guilayer.inventorypanels.*;
+import guilayer.inventory.*;
 
 public class ManageInventory extends JPanel {
 	

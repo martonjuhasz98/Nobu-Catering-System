@@ -10,11 +10,13 @@ public class ItemController {
 	private DBItem dbItem;
 	private DBItemCategory dbCategory;
 	private DBUnit dbUnit;
+	private DBStocktaking dbStocktaking;
 
 	public ItemController() {
 		dbItem = new DBItem();
 		dbCategory = new DBItemCategory();
 		dbUnit = new DBUnit();
+		dbStocktaking = new DBStocktaking();
 	}
 
 	//Items
@@ -74,5 +76,27 @@ public class ItemController {
 	}
 	public Unit getUnit(String abbr) {
 		return dbUnit.selectUnit(abbr);
+	}
+	
+	//Stocktaking
+	public boolean createStocktaking(Employee employee, ArrayList<Item> items) {
+		ArrayList<Discrepancy> discrepancies = new ArrayList<Discrepancy>();
+		for (Item item : items) {
+			Discrepancy discrepancy = new Discrepancy();
+			discrepancy.setItem(item);
+			discrepancy.setQuantity(item.getQuantity());
+		}
+		
+		Stocktaking stocktaking = new Stocktaking();
+		stocktaking.setEmployee(employee);
+		stocktaking.setDescrepancies(discrepancies);
+		
+		int id = dbStocktaking.insertStocktaking(stocktaking);
+		boolean success = id > 0;
+		if (success) {
+			stocktaking.setId(id);
+		}
+		
+		return success;
 	}
 }

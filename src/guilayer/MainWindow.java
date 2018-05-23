@@ -10,7 +10,7 @@ import java.awt.Color;
 import java.awt.Font;
 
 import guilayer.contentpanels.*;
-import guilayer.inventorypanels.ListInventory;
+import guilayer.inventory.ListInventory;
 import guilayer.menu.Menu;
 import guilayer.menu.MenuItemListener;
 
@@ -75,6 +75,8 @@ public class MainWindow {
 		menu.setCurrentColour(activeMenuItemSignColour);
 		menu.add("Analytics");
 		menu.add("Inventory");
+		menu.add("Stock-taking");
+		menu.add("Invoices");
 		menu.add("Suppliers");
 		menu.add("Menu Items");
 		menu.add("Employees");
@@ -91,9 +93,11 @@ public class MainWindow {
 		
 		content.add(new AnalyticsTabbedPane(), "0");
 		content.add(new ManageInventory(), "1");
-		//content.add(new ManageSuppliers(), "2");
-		//content.add(new ManageMenuItems(), "3");
-		//content.add(new ManageEmployees(), "4");
+		content.add(new Stocktaking(), "2");
+		//content.add(new ManageInvoices(), "3");
+		//content.add(new ManageSuppliers(), "4");
+		//content.add(new ManageMenuItems(), "5");
+		//content.add(new ManageEmployees(), "6");
 		
 		menu.addMenuItemListener(new MenuItemListener() {
 			@Override
@@ -113,6 +117,12 @@ public class MainWindow {
 						break;
 					case 4:
 						layout.show(content, "4");
+						break;
+					case 5:
+						layout.show(content, "5");
+						break;
+					case 6:
+						layout.show(content, "6");
 						break;
 				}
 			}
