@@ -1,5 +1,6 @@
 package modlayer;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 public class Invoice {
@@ -11,6 +12,7 @@ public class Invoice {
 	private Employee createdBy;
 	private Supplier supplier;
 	private Transaction transaction;
+	private ArrayList<InvoiceItem> items;
 	
 	public Invoice() {
 		id = -1;
@@ -37,6 +39,9 @@ public class Invoice {
 	public Transaction getTransaction() {
 		return transaction;
 	}
+	public ArrayList<InvoiceItem> getItems() {
+		return items;
+	} 
 	public void setId(int id) {
 		this.id = id;
 	}
@@ -57,6 +62,9 @@ public class Invoice {
 	}
 	public void setTransaction(Transaction transaction) {
 		this.transaction = transaction;
+	}
+	public void setItems(ArrayList<InvoiceItem> items) {
+		this.items = items;
 	}
 	
 	@Override

@@ -255,7 +255,7 @@ public class DBItem implements IFDBItem {
 			
 		return success;
 	}
-
+	
 	private Item buildItem(ResultSet results) throws SQLException {
 		Item item = null;
 		
