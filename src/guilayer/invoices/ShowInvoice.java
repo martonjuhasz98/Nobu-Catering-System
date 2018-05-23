@@ -14,7 +14,7 @@ import javax.swing.JTextField;
 import ctrllayer.InvoiceController;
 import ctrllayer.ItemController;
 import guilayer.MainWindow;
-import guilayer.interfaces.EditPanel;
+import guilayer.interfaces.PerformPanel;
 import modlayer.Invoice;
 import modlayer.Item;
 import modlayer.ItemCategory;
@@ -37,7 +37,7 @@ import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.JScrollPane;
 
-public class ShowInvoice extends EditPanel {
+public class ShowInvoice extends PerformPanel {
 
 	private InvoiceController invCtrl;
 	private Invoice invoice;

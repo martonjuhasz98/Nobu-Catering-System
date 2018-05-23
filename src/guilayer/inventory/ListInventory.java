@@ -11,7 +11,7 @@ import javax.swing.table.AbstractTableModel;
 import ctrllayer.ItemController;
 import guilayer.MainWindow;
 import guilayer.interfaces.ButtonColumn;
-import guilayer.interfaces.EditListener;
+import guilayer.interfaces.PerformListener;
 import guilayer.inventory.ListInventory;
 import modlayer.Item;
 import modlayer.ItemCategory;
@@ -39,7 +39,7 @@ import javax.swing.Action;
 import javax.swing.event.CaretListener;
 import javax.swing.event.CaretEvent;
 
-public class ListInventory extends JPanel implements ActionListener, MouseListener, EditListener, CaretListener {
+public class ListInventory extends JPanel implements ActionListener, MouseListener, PerformListener, CaretListener {
 
 	private EditItem itemEditor;
 	private ItemController itemCtrl;
@@ -53,7 +53,7 @@ public class ListInventory extends JPanel implements ActionListener, MouseListen
 		this.itemEditor = editInv;
 		itemCtrl = new ItemController();
 		
-		editInv.addEditListener(this);
+		editInv.addPerformListener(this);
 		
 		initialize();
 	}
@@ -155,12 +155,7 @@ public class ListInventory extends JPanel implements ActionListener, MouseListen
 		}
 	}
 	@Override
-	public void created() {
-		model.setItems(itemCtrl.getItems());
-		setVisible(true);
-	}
-	@Override
-	public void updated() {
+	public void performed() {
 		model.setItems(itemCtrl.getItems());
 		setVisible(true);
 	}

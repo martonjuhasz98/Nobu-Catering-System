@@ -13,7 +13,7 @@ import javax.swing.JTextField;
 
 import ctrllayer.SupplierController;
 import guilayer.MainWindow;
-import guilayer.interfaces.EditPanel;
+import guilayer.interfaces.PerformPanel;
 import modlayer.Supplier;
 import modlayer.Unit;
 
@@ -34,7 +34,7 @@ import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import java.awt.Color;
 
-public class EditSupplier extends EditPanel implements ActionListener, CaretListener, ItemListener {
+public class EditSupplier extends PerformPanel implements ActionListener, CaretListener, ItemListener {
 
 	private SupplierController supplierCtrl;
 	private Supplier supplier;
@@ -180,7 +180,7 @@ public class EditSupplier extends EditPanel implements ActionListener, CaretList
 					    "Success!",
 					    JOptionPane.INFORMATION_MESSAGE);
 				
-				triggerCreateListeners();
+				triggerPerformListeners();
 			} else {
 //				supplier.setBarcode(txt_barcode.getText().trim());
 				supplier.setName(txt_name.getText().trim());
@@ -200,7 +200,7 @@ public class EditSupplier extends EditPanel implements ActionListener, CaretList
 					    "Success!",
 					    JOptionPane.INFORMATION_MESSAGE);
 				
-				triggerUpdateListeners();
+				triggerPerformListeners();
 			}
 			close();
 		} else if (e.getSource() == btn_cancel) {

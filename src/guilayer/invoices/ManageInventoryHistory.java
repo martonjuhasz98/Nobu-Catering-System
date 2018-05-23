@@ -2,9 +2,9 @@ package guilayer.invoices;
 
 import javax.swing.JPanel;
 
-public class InvoicePaneManager extends JPanel {
+public class ManageInventoryHistory extends JPanel {
 	
-	public InvoicePaneManager() {
+	public ManageInventoryHistory() {
 
 		
 		initalize();

@@ -14,7 +14,6 @@ import javax.swing.table.TableColumnModel;
 import ctrllayer.ItemController;
 import guilayer.MainWindow;
 import guilayer.interfaces.ButtonColumn;
-import guilayer.interfaces.EditListener;
 import guilayer.inventory.ListInventory;
 import modlayer.Employee;
 import modlayer.Item;

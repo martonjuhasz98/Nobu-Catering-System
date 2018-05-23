@@ -13,7 +13,7 @@ import javax.swing.JTextField;
 
 import ctrllayer.ItemController;
 import guilayer.MainWindow;
-import guilayer.interfaces.EditPanel;
+import guilayer.interfaces.PerformPanel;
 import modlayer.Item;
 import modlayer.ItemCategory;
 import modlayer.Unit;
@@ -34,7 +34,7 @@ import javax.swing.SwingConstants;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 
-public class EditItem extends EditPanel implements ActionListener, CaretListener, ItemListener {
+public class EditItem extends PerformPanel implements ActionListener, CaretListener, ItemListener {
 
 	private ItemController itemCtrl;
 	private Item item;
@@ -246,7 +246,7 @@ public class EditItem extends EditPanel implements ActionListener, CaretListener
 					    "Success!",
 					    JOptionPane.INFORMATION_MESSAGE);
 				
-				triggerCreateListeners();
+				triggerPerformListeners();
 			} else {
 				item.setBarcode(txt_barcode.getText().trim());
 				item.setName(txt_name.getText().trim());
@@ -267,7 +267,7 @@ public class EditItem extends EditPanel implements ActionListener, CaretListener
 					    "Success!",
 					    JOptionPane.INFORMATION_MESSAGE);
 				
-				triggerUpdateListeners();
+				triggerPerformListeners();
 			}
 			close();
 		} else if (e.getSource() == btn_cancel) {

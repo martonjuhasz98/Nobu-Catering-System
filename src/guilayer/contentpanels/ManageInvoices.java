@@ -11,16 +11,14 @@ import guilayer.invoices.*;
 public class ManageInvoices extends JTabbedPane {
 	
 	public ManageInvoices() {
-
 		
 		initalize();
 	}
 
 	private void initalize() {
 		
-		
-		add(new ListPendingInvoices(), "Pending");
-		add(new InvoicePaneManager(), "History");
+		add(new ManagePendingInvoices(), "Pending");
+		add(new ManageInventoryHistory(), "History");
 
 	}
 }

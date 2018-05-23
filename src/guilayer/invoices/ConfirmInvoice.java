@@ -8,6 +8,7 @@ import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
 import ctrllayer.InvoiceController;
+import guilayer.interfaces.PerformPanel;
 import modlayer.Invoice;
 import modlayer.InvoiceItem;
 import modlayer.Item;
@@ -26,7 +27,7 @@ import javax.swing.JTextField;
 import javax.swing.event.CaretListener;
 import javax.swing.event.CaretEvent;
 
-public class ConfirmInvoice extends JPanel implements ActionListener, CaretListener, ListSelectionListener, TableModelListener {
+public class ConfirmInvoice extends PerformPanel implements ActionListener, CaretListener, ListSelectionListener, TableModelListener {
 
 	private InvoiceController invoiceCtrl;
 	private Invoice invoice;
@@ -40,8 +41,7 @@ public class ConfirmInvoice extends JPanel implements ActionListener, CaretListe
 	private DeliveredTableModel mdl_delivered;
 	private JButton btn_confirm;
 	
-	public ConfirmInvoice(Invoice invoice) {
-		this.invoice = invoice;
+	public ConfirmInvoice() {
 		invoiceCtrl = new InvoiceController();
 		
 		initialize();
@@ -110,13 +110,22 @@ public class ConfirmInvoice extends JPanel implements ActionListener, CaretListe
 		resetForm();
 	}
 	private void resetForm() {
-		mdl_ordered.setItems(invoice.getItems());
+		mdl_ordered.setItems(new ArrayList<InvoiceItem>());
 		mdl_delivered.setItems(new ArrayList<InvoiceItem>());
 		
 		btn_add.setEnabled(false);
 		btn_remove.setEnabled(false);
 		btn_confirm.setEnabled(false);
 	}
+	public void confirm(Invoice invoice) {
+		resetForm();
+		
+		this.invoice = invoice;
+		mdl_ordered.setItems(invoice.getItems());
+		
+		setVisible(true);
+	}
+	
 	private void searchOrdered() {
 		String keyword = txt_search.getText().trim();
 		ArrayList<InvoiceItem> results = new ArrayList<InvoiceItem>();
@@ -167,6 +176,7 @@ public class ConfirmInvoice extends JPanel implements ActionListener, CaretListe
 			    "Success!",
 			    JOptionPane.INFORMATION_MESSAGE);
 		resetForm();
+		triggerPerformListeners();
 	}
 	
 	@Override

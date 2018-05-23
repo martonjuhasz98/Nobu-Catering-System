@@ -14,10 +14,10 @@ import javax.swing.table.AbstractTableModel;
 
 import ctrllayer.InvoiceController;
 import guilayer.MainWindow;
-import guilayer.interfaces.EditListener;
+import guilayer.interfaces.PerformListener;
 import modlayer.Invoice;
 
-public class ListInvoiceHistory extends JPanel implements ActionListener, MouseListener,EditListener{
+public class ListInvoiceHistory extends JPanel implements ActionListener, MouseListener, PerformListener{
 	
 	private JTable table;
 	private JButton btn_create;
@@ -25,14 +25,11 @@ public class ListInvoiceHistory extends JPanel implements ActionListener, MouseL
 	private InvoiceController invoiceCtrl;
 	private ShowInvoice showInvoice;
 	
-	/**
-	 * Create the panel.
-	 */
 	public ListInvoiceHistory(ShowInvoice showInvoice) {
 		this.showInvoice = showInvoice;
 		invoiceCtrl = new InvoiceController();
 		
-		showInvoice.addEditListener(this);
+		showInvoice.addPerformListener(this);
 		
 		initialize();
 	}
@@ -165,12 +162,7 @@ public class ListInvoiceHistory extends JPanel implements ActionListener, MouseL
 
 	
 	@Override
-	public void created() {
-		model.setInvoices(invoiceCtrl.getInvoiceHistory());
-		setVisible(true);
-	}
-	@Override
-	public void updated() {
+	public void performed() {
 		model.setInvoices(invoiceCtrl.getInvoiceHistory());
 		setVisible(true);
 	}

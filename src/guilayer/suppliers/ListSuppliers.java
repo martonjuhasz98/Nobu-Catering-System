@@ -11,7 +11,7 @@ import javax.swing.table.AbstractTableModel;
 import ctrllayer.SupplierController;
 import guilayer.MainWindow;
 import guilayer.interfaces.ButtonColumn;
-import guilayer.interfaces.EditListener;
+import guilayer.interfaces.PerformListener;
 import guilayer.inventory.ListInventory;
 import modlayer.Supplier;
 import modlayer.Unit;
@@ -38,7 +38,7 @@ import javax.swing.Action;
 import javax.swing.event.CaretListener;
 import javax.swing.event.CaretEvent;
 
-public class ListSuppliers extends JPanel implements ActionListener, MouseListener, EditListener, CaretListener {
+public class ListSuppliers extends JPanel implements ActionListener, MouseListener, PerformListener, CaretListener {
 
 	private EditSupplier supplierEditor;
 	private SupplierController supplierCtrl;
@@ -52,7 +52,7 @@ public class ListSuppliers extends JPanel implements ActionListener, MouseListen
 		this.supplierEditor = editSupplier;
 		supplierCtrl = new SupplierController();
 
-		editSupplier.addEditListener(this);
+		editSupplier.addPerformListener(this);
 
 		initialize();
 	}
@@ -151,15 +151,8 @@ public class ListSuppliers extends JPanel implements ActionListener, MouseListen
 			supplierEditor.updateSupplier(supplier);
 		}
 	}
-
 	@Override
-	public void created() {
-		model.setSuppliers(supplierCtrl.getSuppliers());
-		setVisible(true);
-	}
-
-	@Override
-	public void updated() {
+	public void performed() {
 		model.setSuppliers(supplierCtrl.getSuppliers());
 		setVisible(true);
 	}
