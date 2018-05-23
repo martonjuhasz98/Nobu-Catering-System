@@ -85,11 +85,12 @@ public class ItemController {
 			Discrepancy discrepancy = new Discrepancy();
 			discrepancy.setItem(item);
 			discrepancy.setQuantity(item.getQuantity());
+			discrepancies.add(discrepancy);
 		}
 		
 		Stocktaking stocktaking = new Stocktaking();
 		stocktaking.setEmployee(employee);
-		stocktaking.setDescrepancies(discrepancies);
+		stocktaking.setDiscrepancies(discrepancies);
 		
 		int id = dbStocktaking.insertStocktaking(stocktaking);
 		boolean success = id > 0;

@@ -5,17 +5,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Arrays;
 
-import dblayer.interfaces.IFDBItem;
-import dblayer.interfaces.IFDBItemCategory;
 import dblayer.interfaces.IFDBStocktaking;
 import modlayer.Discrepancy;
-import modlayer.Item;
-import modlayer.ItemCategory;
 import modlayer.Stocktaking;
-import modlayer.Unit;
 
 public class DBStocktaking implements IFDBStocktaking {
 	
@@ -46,10 +39,13 @@ public class DBStocktaking implements IFDBStocktaking {
 			}
 			ps.close();
 			
+			String itemBarcode;
+			double quantity;
+			
 			//Discrepancies
 			for (Discrepancy discrepancy : stocktaking.getDiscrepancies()) {
-				String itemBarcode = discrepancy.getItem().getBarcode();
-				double quantity = discrepancy.getQuantity();
+				itemBarcode = discrepancy.getItem().getBarcode();
+				quantity = discrepancy.getQuantity();
 				
 				query =   "INSERT INTO [Discrepancy] "
 						+ "(stocktaking_id, item_barcode, quantity) "
@@ -75,7 +71,7 @@ public class DBStocktaking implements IFDBStocktaking {
 				}
 			}
 			
-			DBConnection.closeConnection();
+			DBConnection.commitTransaction();
 		}
 		catch (SQLException e) {
 			System.out.println("Stocktaking was not inserted!");

@@ -16,6 +16,7 @@ import guilayer.MainWindow;
 import guilayer.interfaces.ButtonColumn;
 import guilayer.interfaces.EditListener;
 import guilayer.inventory.ListInventory;
+import modlayer.Employee;
 import modlayer.Item;
 import modlayer.ItemCategory;
 import modlayer.Unit;
@@ -163,7 +164,10 @@ public class CheckInventory extends JPanel implements ActionListener, CaretListe
 		mdl_stocktaking.removeItems(items);
 	}
 	private void createStocktaking() {
-		if (!itemCtrl.createStocktaking(mdl_stocktaking.getItems())) {
+		Employee employee = new Employee();
+		employee.setCpr("100298-0612");
+		
+		if (!itemCtrl.createStocktaking(employee, mdl_stocktaking.getItems())) {
 			JOptionPane.showMessageDialog(this,
 				    "An error occured while creating the Stock-taking!",
 				    "Error!",
