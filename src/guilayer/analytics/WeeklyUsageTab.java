@@ -38,24 +38,6 @@ public class WeeklyUsageTab extends JPanel {
 		setToolTipText("from");
 		setBounds(new Rectangle(0, 0, 800, 450));
 		setLayout(null);
-		JDatePicker fromDatePicker = new JDatePicker();
-		fromDatePicker.getFormattedTextField().setText("from");
-		fromDatePicker.setSize(150, 30);
-		fromDatePicker.setLocation(10, 0);
-		add(fromDatePicker);
-		
-		JLabel dash = new JLabel("-");
-		dash.setBounds(170, 6, 61, 16);
-		add(dash);
-		
-		JDatePicker toDatePicker = new JDatePicker();
-		toDatePicker.getFormattedTextField().setText("to");
-		toDatePicker.setBounds(195, 0, 150, 30);
-		add(toDatePicker);
-		
-		JComboBox filterBox = new JComboBox(ic.getCategories().toArray());
-		filterBox.setBounds(360, 0, 150, 30);
-		add(filterBox);
 		
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setBounds(0, 30, 778, 425);
