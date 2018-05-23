@@ -37,7 +37,7 @@ import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.JScrollPane;
 
-public class ShowInvoice extends PerformPanel {
+public class ShowInvoice extends PerformPanel implements ActionListener{
 
 	private InvoiceController invCtrl;
 	private Invoice invoice;
@@ -99,14 +99,12 @@ public class ShowInvoice extends PerformPanel {
 		add(lbl_empPhone);
 		
 		txt_supplier_cvrname = new JTextField();
-		txt_supplier_cvrname.setEnabled(false);
 		txt_supplier_cvrname.setEditable(false);
 		txt_supplier_cvrname.setColumns(10);
 		txt_supplier_cvrname.setBounds(16, 44, 376, 20);
 		add(txt_supplier_cvrname);
 		
 		txt_suppPhone = new JTextField();
-		txt_suppPhone.setEnabled(false);
 		txt_suppPhone.setEditable(false);
 		txt_suppPhone.setColumns(10);
 		txt_suppPhone.setBounds(16, 103, 170, 20);
@@ -118,7 +116,6 @@ public class ShowInvoice extends PerformPanel {
 		
 		txt_suppEmail = new JTextField();
 		txt_suppEmail.setEditable(false);
-		txt_suppEmail.setEnabled(false);
 		txt_suppEmail.setText("");
 		txt_suppEmail.setColumns(10);
 		txt_suppEmail.setBounds(222, 103, 170, 20);
@@ -126,7 +123,6 @@ public class ShowInvoice extends PerformPanel {
 		
 		txt_empPhone = new JTextField();
 		txt_empPhone.setEditable(false);
-		txt_empPhone.setEnabled(false);
 		txt_empPhone.setText("");
 		txt_empPhone.setColumns(10);
 		txt_empPhone.setBounds(222, 162, 170, 20);
@@ -134,14 +130,12 @@ public class ShowInvoice extends PerformPanel {
 		
 		txt_empName = new JTextField();
 		txt_empName.setEditable(false);
-		txt_empName.setEnabled(false);
 		txt_empName.setText("");
 		txt_empName.setColumns(10);
 		txt_empName.setBounds(16, 162, 170, 20);
 		add(txt_empName);
 		
 		txt_orderDate = new JTextField();
-		txt_orderDate.setEnabled(false);
 		txt_orderDate.setEditable(false);
 		txt_orderDate.setText("");
 		txt_orderDate.setColumns(10);
@@ -150,7 +144,6 @@ public class ShowInvoice extends PerformPanel {
 		
 		txt_deliverDate = new JTextField();
 		txt_deliverDate.setEditable(false);
-		txt_deliverDate.setEnabled(false);
 		txt_deliverDate.setText("");
 		txt_deliverDate.setColumns(10);
 		txt_deliverDate.setBounds(222, 226, 170, 20);
@@ -161,6 +154,7 @@ public class ShowInvoice extends PerformPanel {
 		add(scrollPane);
 		
 		reset();
+		btn_cancel.addActionListener(this);
 	}
 	
 	
@@ -171,8 +165,8 @@ public class ShowInvoice extends PerformPanel {
 		txt_supplier_cvrname.setText(invoice.getSupplier().getCvr() +" - "+ invoice.getSupplier().getName());
 		txt_suppPhone.setText(invoice.getSupplier().getPhone());
 		txt_suppEmail.setText(invoice.getSupplier().getEmail());
-		txt_empName.setText("");
-		txt_empPhone.setText("");
+		txt_empName.setText(invoice.getPlacedBy().getName());
+		txt_empPhone.setText(invoice.getPlacedBy().getPhone());
 		txt_orderDate.setText(invoice.getTimestamp().toString());
 		txt_deliverDate.setText(invoice.getDateDelivered().toString());
 		setVisible(true);
@@ -205,5 +199,13 @@ public class ShowInvoice extends PerformPanel {
 	private void close() {
 		setVisible(false);
 		reset();
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if (e.getSource() == btn_cancel) {
+			triggerCancelListeners();
+			close();
+		}
 	}
 }

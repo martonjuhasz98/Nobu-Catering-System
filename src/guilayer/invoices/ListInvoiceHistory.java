@@ -101,7 +101,7 @@ public class ListInvoiceHistory extends JPanel implements ActionListener, MouseL
 				case 2:
 					return invoice.getDateDelivered();
 				case 3:
-					return invoice.getPlacedBy();
+					return invoice.getPlacedBy().getName();
 			}
 		
 			return null;
