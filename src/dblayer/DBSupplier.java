@@ -9,10 +9,7 @@ import java.util.ArrayList;
 
 import dblayer.interfaces.IFDBSupplier;
 import modlayer.City;
-import modlayer.Item;
-import modlayer.ItemCategory;
 import modlayer.Supplier;
-import modlayer.Unit;
 
 public class DBSupplier implements IFDBSupplier {
 

@@ -8,13 +8,9 @@ import java.sql.Statement;
 import java.util.ArrayList;
 
 import dblayer.interfaces.IFDBInvoice;
-import modlayer.Item;
-import modlayer.ItemCategory;
 import modlayer.Supplier;
 import modlayer.Transaction;
 import modlayer.TransactionType;
-import modlayer.Unit;
-import modlayer.Discrepancy;
 import modlayer.Employee;
 import modlayer.Invoice;
 import modlayer.InvoiceItem;

@@ -13,4 +13,12 @@ public enum TransactionType {
 	public int getId() {
 		return id;
 	}
+	
+	public static TransactionType getType(int id) {
+		for (TransactionType type : values()) {
+			if (type.getId() == id)
+				return type;
+		}
+		return null;
+	}
 }

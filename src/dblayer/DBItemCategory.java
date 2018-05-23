@@ -6,13 +6,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Arrays;
 
-import dblayer.interfaces.IFDBItem;
 import dblayer.interfaces.IFDBItemCategory;
-import modlayer.Item;
 import modlayer.ItemCategory;
-import modlayer.Unit;
 
 public class DBItemCategory implements IFDBItemCategory {
 	
