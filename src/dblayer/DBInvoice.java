@@ -299,6 +299,15 @@ public class DBInvoice implements IFDBInvoice {
 			DBTransaction dbTransaction = new DBTransaction();
 			Transaction transaction = dbTransaction.selectTransaction(results.getInt("id"));
 			
+			//Invoice
+			invoice.setId(results.getInt("id"));
+			invoice.setDelivered(results.getBoolean("is_delivered"));
+			invoice.setTimestamp(results.getDate("timestamp"));
+			invoice.setDateDelivered(results.getDate("date_delivered"));
+			invoice.setPlacedBy(employee);
+			invoice.setSupplier(supplier);
+			invoice.setTransaction(transaction);
+			
 			//InvoiceItem
 			ArrayList<InvoiceItem> items = new ArrayList<InvoiceItem>();
 			query =   "SELECT item_barcode, quantity, unit_price "
@@ -320,15 +329,6 @@ public class DBInvoice implements IFDBInvoice {
 				items.add(item);
 			}
 			ps.close();
-			
-			//Invoice
-			invoice.setId(results.getInt("id"));
-			invoice.setDelivered(results.getBoolean("is_delivered"));
-			invoice.setTimestamp(results.getDate("timestamp"));
-			invoice.setDateDelivered(results.getDate("date_delivered"));
-			invoice.setPlacedBy(employee);
-			invoice.setSupplier(supplier);
-			invoice.setTransaction(transaction);
 			invoice.setItems(items);
 		}
 		catch (SQLException e) {
