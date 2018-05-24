@@ -50,6 +50,7 @@ public class ConfirmInvoice extends PerformPanel implements ActionListener, Care
 	private void initialize() {
 		
 		setLayout(null);
+		setVisible(false);
 		setBounds(0, 0, 801, 500);
 		
 		mdl_ordered = new OrderedTableModel();
@@ -66,6 +67,7 @@ public class ConfirmInvoice extends PerformPanel implements ActionListener, Care
 		
 		btn_confirm = new JButton("Confirm");
 		btn_confirm.setBounds(718, 3, 73, 23);
+		btn_confirm.setEnabled(true);
 		add(btn_confirm);
 		
 		JScrollPane scrlPane_ordered = new JScrollPane();
@@ -115,7 +117,6 @@ public class ConfirmInvoice extends PerformPanel implements ActionListener, Care
 		
 		btn_add.setEnabled(false);
 		btn_remove.setEnabled(false);
-		btn_confirm.setEnabled(false);
 	}
 	public void confirm(Invoice invoice) {
 		resetForm();

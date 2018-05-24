@@ -48,10 +48,12 @@ public class ListInventory extends JPanel implements ActionListener, MouseListen
 	private JButton btn_search;
 	private JButton btn_create;
 	private JTextField txt_search;
+	private boolean searching;
 	
 	public ListInventory(EditItem editInv) {
 		this.itemEditor = editInv;
 		itemCtrl = new ItemController();
+		searching = false;
 		
 		editInv.addPerformListener(this);
 		
@@ -94,6 +96,10 @@ public class ListInventory extends JPanel implements ActionListener, MouseListen
 		{
 		    public void actionPerformed(ActionEvent e)
 		    {
+		        if (JOptionPane.showConfirmDialog(ListInventory.this, "Are you sure?") != JOptionPane.YES_OPTION) {
+		        	return;
+		        }
+		    	
 		        JTable table = (JTable)e.getSource();
 		        int modelRowIndex = Integer.valueOf(e.getActionCommand());
 		        Item item = model.getItemAt(modelRowIndex);
@@ -123,9 +129,13 @@ public class ListInventory extends JPanel implements ActionListener, MouseListen
 		table.addMouseListener(this);
 	}
 	private void searchInventory() {
-
+		if (searching) return;
+		searching = true;
+		
 		String keyword = txt_search.getText().trim();
 		model.setItems(itemCtrl.searchItems(keyword));
+		
+		searching = false;
 	}
 	
 	@Override

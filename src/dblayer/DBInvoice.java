@@ -61,16 +61,18 @@ public class DBInvoice implements IFDBInvoice {
 			+ "ON i.employee_cpr = e.cpr "
 			+ "INNER JOIN [Supplier] AS s "
 			+ "ON i.supplier_cvr = s.cvr "
-			+ "WHERE i.id LIKE ? "
+			+ "WHERE i.is_delivered = ? "
+			+ "AND (i.id LIKE ? "
 			+ "OR e.name LIKE ? "
-			+ "OR s.name LIKE ?";
+			+ "OR s.name LIKE ?)";
 		
 		try {
 			PreparedStatement ps = con.prepareStatement(query);
 			ps.setQueryTimeout(5);
-			ps.setString(1, "%" + keyword + "%");
+			ps.setBoolean(1, delivered);
 			ps.setString(2, "%" + keyword + "%");
 			ps.setString(3, "%" + keyword + "%");
+			ps.setString(4, "%" + keyword + "%");
 			
 			Invoice invoice;
 			ResultSet results = ps.executeQuery();

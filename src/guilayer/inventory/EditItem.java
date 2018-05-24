@@ -156,6 +156,7 @@ public class EditItem extends PerformPanel implements ActionListener, CaretListe
 		creatingItem = false;
 		
 		txt_barcode.setText(item.getBarcode());
+		txt_barcode.setEnabled(false);
 		txt_name.setText(item.getName());
 		sprm_quantity.setValue(item.getQuantity());
 		cmb_unit.setSelectedItem(item.getUnit());
@@ -170,6 +171,7 @@ public class EditItem extends PerformPanel implements ActionListener, CaretListe
 		creatingItem = true;
 		
 		txt_barcode.setText("");
+		txt_barcode.setEnabled(true);
 		txt_name.setText("");
 		sprm_quantity.setValue(new Double(0.0));
 		cmb_unit.setSelectedIndex(-1);
