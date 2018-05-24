@@ -140,7 +140,7 @@ public class DBItem implements IFDBItem {
 
 	@Override
 	public String insertItem(Item item) {
-		String barcode = "";
+		String barcode = null;
 		
 		String query =
 				  "INSERT INTO [Item] "

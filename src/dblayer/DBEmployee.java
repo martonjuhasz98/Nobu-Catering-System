@@ -108,7 +108,7 @@ public class DBEmployee implements IFDBEmployee{
 
 	@Override
 	public String insertEmployee(Employee employee) {
-		String cpr = "";
+		String cpr = null;
 		
 		String query =
 				  "INSERT INTO [Employee] "

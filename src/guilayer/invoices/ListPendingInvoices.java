@@ -254,7 +254,7 @@ public class ListPendingInvoices extends JPanel implements ActionListener, Mouse
 		}
 		@Override
 		public boolean isCellEditable(int rowIndex, int columnIndex) {
-			return columnIndex == getColumnCount() - 1;
+			return columnIndex >= getColumnCount() - 2;
 		}
 		public void update() {
 			fireTableDataChanged();

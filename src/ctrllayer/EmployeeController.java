@@ -4,11 +4,12 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 
 import dblayer.*;
+import dblayer.interfaces.IFDBEmployee;
 import modlayer.*;
 
 public class EmployeeController {
 
-	private DBEmployee dbEmployee;
+	private IFDBEmployee dbEmployee;
 
 	public EmployeeController() {
 		dbEmployee = new DBEmployee();

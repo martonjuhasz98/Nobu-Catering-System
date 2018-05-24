@@ -106,7 +106,7 @@ public class DBSupplier implements IFDBSupplier {
 
 	@Override
 	public String insertSupplier(Supplier supplier) {
-		String cvr = "";
+		String cvr = null;
 		
 		String query =
 				  "INSERT INTO [Supplier] "
@@ -156,6 +156,7 @@ public class DBSupplier implements IFDBSupplier {
 			ps.setString(3, supplier.getCity().getZipCode());
 			ps.setString(4, supplier.getPhone());
 			ps.setString(5, supplier.getEmail());
+			ps.setString(6, supplier.getCvr());
 			
 			success = ps.executeUpdate() > 0;
 			ps.close();

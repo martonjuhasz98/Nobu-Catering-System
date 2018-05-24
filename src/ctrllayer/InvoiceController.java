@@ -3,11 +3,12 @@ package ctrllayer;
 import java.util.ArrayList;
 
 import dblayer.*;
+import dblayer.interfaces.IFDBInvoice;
 import modlayer.*;
 
 public class InvoiceController {
 
-	private DBInvoice dbInvoice;
+	private IFDBInvoice dbInvoice;
 
 	public InvoiceController() {
 		dbInvoice = new DBInvoice();

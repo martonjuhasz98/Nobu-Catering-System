@@ -3,14 +3,15 @@ package ctrllayer;
 import java.util.ArrayList;
 
 import dblayer.*;
+import dblayer.interfaces.*;
 import modlayer.*;
 
 public class ItemController {
 
-	private DBItem dbItem;
-	private DBItemCategory dbCategory;
-	private DBUnit dbUnit;
-	private DBStocktaking dbStocktaking;
+	private IFDBItem dbItem;
+	private IFDBItemCategory dbCategory;
+	private IFDBUnit dbUnit;
+	private IFDBStocktaking dbStocktaking;
 
 	public ItemController() {
 		dbItem = new DBItem();
