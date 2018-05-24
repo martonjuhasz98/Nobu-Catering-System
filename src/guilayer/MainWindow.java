@@ -55,7 +55,7 @@ public class MainWindow {
 		frame = new JFrame();
 		frame.setBounds(100, 100, totalWidth + 4, totalHeight + 28);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setTitle("Western Style Ltd.");
+		frame.setTitle("Nobu inventory system");
 		frame.setFont(contentFont);
 		frame.setResizable(false);
 		
