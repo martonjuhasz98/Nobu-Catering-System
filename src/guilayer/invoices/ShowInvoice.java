@@ -3,38 +3,20 @@ package guilayer.invoices;
 import java.awt.Font;
 import java.awt.Label;
 
-import javax.swing.ButtonGroup;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
 import ctrllayer.InvoiceController;
-import ctrllayer.ItemController;
 import guilayer.MainWindow;
 import guilayer.interfaces.PerformPanel;
 import modlayer.Invoice;
-import modlayer.Item;
-import modlayer.ItemCategory;
-import modlayer.Unit;
+import modlayer.InvoiceItem;
 
 import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.util.function.Consumer;
+import java.util.ArrayList;
 import java.awt.event.ActionEvent;
-import javax.swing.JFormattedTextField;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.SwingConstants;
-import javax.swing.event.CaretEvent;
-import javax.swing.event.CaretListener;
+import javax.swing.JTable;
+import javax.swing.JButton;
+import javax.swing.table.AbstractTableModel;
 import javax.swing.JScrollPane;
 
 public class ShowInvoice extends PerformPanel implements ActionListener{
@@ -50,6 +32,9 @@ public class ShowInvoice extends PerformPanel implements ActionListener{
 	private JTextField txt_orderDate;
 	private JTextField txt_deliverDate;
 	private JButton btn_cancel;
+	private JTable table;
+	
+	private InvoiceTable model;
 	
 	public ShowInvoice() {
 		invCtrl = new InvoiceController();
@@ -62,6 +47,7 @@ public class ShowInvoice extends PerformPanel implements ActionListener{
 		setLayout(null);
 		setVisible(false);
 		setBounds(0, 0, MainWindow.contentWidth, MainWindow.totalHeight);
+		model = new InvoiceTable();
 		
 		Label lbl_supplier = new Label("Supplier");
 		lbl_supplier.setFont(new Font("Dialog", Font.PLAIN, 15));
@@ -153,6 +139,10 @@ public class ShowInvoice extends PerformPanel implements ActionListener{
 		scrollPane.setBounds(16, 257, 760, 152);
 		add(scrollPane);
 		
+		table = new JTable(model);
+		table.setAutoCreateRowSorter(true);
+		scrollPane.setViewportView(table);
+		
 		reset();
 		btn_cancel.addActionListener(this);
 	}
@@ -169,6 +159,7 @@ public class ShowInvoice extends PerformPanel implements ActionListener{
 		txt_empPhone.setText(invoice.getPlacedBy().getPhone());
 		txt_orderDate.setText(invoice.getTimestamp().toString());
 		txt_deliverDate.setText(invoice.getDateDelivered().toString());
+		model.setInvoiceItems(invoice.getItems());
 		setVisible(true);
 	}
 	
@@ -206,6 +197,82 @@ public class ShowInvoice extends PerformPanel implements ActionListener{
 		if (e.getSource() == btn_cancel) {
 			triggerCancelListeners();
 			close();
+		}
+	}
+	
+	private class InvoiceTable extends AbstractTableModel {
+
+		private String[] columns = new String[] { "Barcode", "Name", "Quantity", "Unit", "Price" };
+		private ArrayList<InvoiceItem> invItems;
+		
+		public InvoiceTable() {
+			this(new ArrayList<InvoiceItem>());
+		}
+
+		public InvoiceTable(ArrayList<InvoiceItem> invItems) {
+			this.invItems = invItems;
+			update();
+		}
+
+		@Override
+		public Class getColumnClass(int columnIndex) {
+			try {
+			return getValueAt(0, columnIndex).getClass();
+			} catch (Exception ignored) {
+				return new Object().getClass();
+			}
+		}
+
+		@Override
+		public int getRowCount() {
+			return invItems.size();
+		}
+		@Override
+		public int getColumnCount() {
+			return columns.length;
+		}
+
+		@Override
+		public Object getValueAt(int rowIndex, int columnIndex) {
+			InvoiceItem invItem = invItems.get(rowIndex);
+			
+			switch(columnIndex) {
+				case 0:
+					return invItem.getItem().getBarcode();
+				case 1:
+					return invItem.getItem().getName();
+				case 2:
+					return invItem.getQuantity();
+				case 3:
+					return invItem.getItem().getUnit().getAbbr();
+				case 4:
+					return invItem.getUnitPrice() +" kr";
+			}
+		
+			return null;
+		}
+		
+		@Override
+		public String getColumnName(int columnIndex) {
+			return columns[columnIndex];
+		}
+		
+		@Override
+		public boolean isCellEditable(int rowIndex, int columnIndex) {
+			return false;
+		}
+		
+		public InvoiceItem getInvoiceAt(int rowIndex) {
+			return invItems.get(rowIndex);
+		}
+		
+		public void setInvoiceItems(ArrayList<InvoiceItem> invItems) {
+			this.invItems = invItems;
+			update();
+		}
+		
+		public void update() {
+			fireTableDataChanged();
 		}
 	}
 }
