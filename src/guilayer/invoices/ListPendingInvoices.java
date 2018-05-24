@@ -34,6 +34,7 @@ import javax.swing.JTable;
 public class ListPendingInvoices extends JPanel implements ActionListener, MouseListener, PerformListener, CaretListener {
 
 	private InvoiceController invoiceCtrl;
+	private CreateInvoice createInvoice;
 	private ShowInvoice showInvoice;
 	private ConfirmInvoice confirmInvoice;
 	private JTextField txt_search;
@@ -43,9 +44,10 @@ public class ListPendingInvoices extends JPanel implements ActionListener, Mouse
 	private InvoiceTableModel model;
 	private boolean searching;
 	
-	public ListPendingInvoices(ShowInvoice showInvoice, ConfirmInvoice confirmInvoice) {
-		this.showInvoice = showInvoice;
+	public ListPendingInvoices(ConfirmInvoice confirmInvoice, CreateInvoice createInvoice, ShowInvoice showInvoice) {
 		this.confirmInvoice = confirmInvoice;
+		this.createInvoice = createInvoice;
+		this.showInvoice = showInvoice;
 		invoiceCtrl = new InvoiceController();
 		searching = false;
 		
@@ -152,8 +154,8 @@ public class ListPendingInvoices extends JPanel implements ActionListener, Mouse
 		if (e.getSource() == btn_search) {
 			searchInventory();
 		} if (e.getSource() == btn_create) {
-			//setVisible(false);
-			//showInvoice.create();
+			setVisible(false);
+			createInvoice.create();
 		}
 	}
 	@Override

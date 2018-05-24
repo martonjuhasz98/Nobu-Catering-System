@@ -36,7 +36,7 @@ public abstract class ItemTableModel<T> extends AbstractTableModel {
 		try {
 			result = getValueAt(0, columnIndex).getClass();
 		} catch (Exception e) {
-			result =  null;
+			result = Object.class;
 		}
 		
 		return result;
@@ -49,6 +49,9 @@ public abstract class ItemTableModel<T> extends AbstractTableModel {
 	}
 	public T getItemAt(int rowIndex) {
 		return items.get(rowIndex);
+	}
+	public ArrayList<T> getItems() {
+		return items;
 	}
 	public void setItems(ArrayList<T> items) {
 		this.items = items;

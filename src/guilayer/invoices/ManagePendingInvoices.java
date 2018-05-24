@@ -14,13 +14,16 @@ public class ManagePendingInvoices extends JPanel {
 		
 		setLayout(null);
 		
-		ShowInvoice showInvoice = new ShowInvoice();
-		add(showInvoice);
-		
 		ConfirmInvoice confirmInvoice = new ConfirmInvoice();
 		add(confirmInvoice);
 		
-		ListPendingInvoices listInvoice = new ListPendingInvoices(showInvoice, confirmInvoice);
+		CreateInvoice createInvoice = new CreateInvoice();
+		add(createInvoice);	
+		
+		ShowInvoice showInvoice = new ShowInvoice();
+		add(showInvoice);
+		
+		ListPendingInvoices listInvoice = new ListPendingInvoices(confirmInvoice, createInvoice, showInvoice);
 		add(listInvoice);
 	}
 }
