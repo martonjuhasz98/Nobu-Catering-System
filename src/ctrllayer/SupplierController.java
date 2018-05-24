@@ -3,14 +3,18 @@ package ctrllayer;
 import java.util.ArrayList;
 
 import dblayer.*;
+import dblayer.interfaces.IFDBCity;
+import dblayer.interfaces.IFDBSupplier;
 import modlayer.*;
 
 public class SupplierController {
 
-	private DBSupplier dbSupplier;
+	private IFDBSupplier dbSupplier;
+	private IFDBCity dbCity;
 
 	public SupplierController() {
 		dbSupplier = new DBSupplier();
+		dbCity = new DBCity();
 	}
 
 	// Suppliers
@@ -47,6 +51,11 @@ public class SupplierController {
 	public boolean deleteSupplier(Supplier supplier) {
 		boolean success = dbSupplier.deleteSupplier(supplier);
 		return success;
+	}
+	
+	public City getCity(String zipCode)
+	{
+		return dbCity.selectCity(zipCode);
 	}
 
 }

@@ -180,7 +180,7 @@ public class ListSuppliers extends JPanel implements ActionListener, MouseListen
 
 	private class SupplierTableModel extends AbstractTableModel {
 
-		private String[] columns = new String[] { "CVR", "Name", "Address", "Zip code", "Name", "Phone", "Email", "" };
+		private String[] columns = new String[] { "CVR", "Name", "Address", "Zip code", "Citt", "Phone", "Email", "" };
 		private ArrayList<Supplier> suppliers;
 
 		public SupplierTableModel() {
