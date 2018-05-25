@@ -105,6 +105,33 @@ public class DBEmployee implements IFDBEmployee{
 		
 		return employee;
 	}
+	
+	@Override
+	public Employee selectEmployee(String username,String password) {
+		Employee employee = null;
+		
+		String query =
+				  "SELECT * FROM [Employee]"
+				+ "WHERE username = ? AND password = ? ";
+		try {
+			
+			PreparedStatement ps = con.prepareStatement(query);
+			ps.setQueryTimeout(5);
+			ps.setString(1, username);
+			ps.setString(2, password);
+			
+			ResultSet results = ps.executeQuery();
+			if (results.next()) {
+				employee = buildEmployee(results);
+			}
+		} catch (SQLException e) {
+			System.out.println("Employee was not found!");
+			System.out.println(e.getMessage());
+			System.out.println(query);
+		}
+		
+		return employee;
+	}
 
 	@Override
 	public String insertEmployee(Employee employee) {

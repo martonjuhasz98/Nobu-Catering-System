@@ -21,8 +21,11 @@ public class EmployeeController {
 	public ArrayList<Employee> searchEmployees(String keyword) {
 		return dbEmployee.searchEmployees(keyword);
 	}
-	public Employee getEmployee(String barcode) {
-		return dbEmployee.selectEmployee(barcode);
+	public Employee getEmployee(String cpr) {
+		return dbEmployee.selectEmployee(cpr);
+	}
+	public Employee getEmployee(String username,String password) {
+		return dbEmployee.selectEmployee(username,hash(password));
 	}
 	public boolean createEmployee(String cpr, String name, String username, String password, String address, City city,
 			String phone, String email, int accessLevel) {
