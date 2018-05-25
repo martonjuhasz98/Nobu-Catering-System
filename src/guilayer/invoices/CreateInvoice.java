@@ -5,6 +5,7 @@ import java.awt.Label;
 
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.ListSelectionEvent;
@@ -15,7 +16,7 @@ import javax.swing.event.TableModelListener;
 import ctrllayer.InvoiceController;
 import ctrllayer.ItemController;
 import ctrllayer.SupplierController;
-import guilayer.MainWindow;
+import guilayer.ManagerWindow;
 import guilayer.interfaces.ItemTableModel;
 import guilayer.interfaces.PerformPanel;
 import modlayer.Employee;
@@ -68,7 +69,7 @@ public class CreateInvoice extends PerformPanel implements ActionListener, Caret
 		
 		setLayout(null);
 		setVisible(false);
-		setBounds(0, 0, MainWindow.contentWidth, MainWindow.totalHeight);
+		setBounds(0, 0, ManagerWindow.contentWidth, ManagerWindow.totalHeight);
 		
 		mdl_inventory = new InventoryTableModel();
 		mdl_invoiceItem = new InvoiceTableModel();
@@ -186,8 +187,8 @@ public class CreateInvoice extends PerformPanel implements ActionListener, Caret
 			invoiceItem = new InvoiceItem();
 			invoiceItem.setInvoice(new Invoice());
 			invoiceItem.setItem(mdl_inventory.getItemAt(selection[i]));
-			invoiceItem.setQuantity(0.0);
-			invoiceItem.setUnitPrice(0.0);
+			invoiceItem.setQuantity(1.0);
+			invoiceItem.setUnitPrice(1.0);
 			items.add(invoiceItem);
 		}
 		
@@ -213,8 +214,7 @@ public class CreateInvoice extends PerformPanel implements ActionListener, Caret
 		Supplier supplier = (Supplier)cmb_supplier.getSelectedItem();
 		
 		//Employee
-		Employee employee = new Employee();
-		employee.setCpr("100298-0612");
+		Employee employee = ((ManagerWindow)SwingUtilities.getWindowAncestor(this)).getUser();
 		
 		//Items
 		ArrayList<InvoiceItem> items = mdl_invoiceItem.getItems();

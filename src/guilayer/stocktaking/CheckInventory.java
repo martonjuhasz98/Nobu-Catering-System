@@ -12,7 +12,7 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableColumnModel;
 
 import ctrllayer.ItemController;
-import guilayer.MainWindow;
+import guilayer.ManagerWindow;
 import guilayer.interfaces.ButtonColumn;
 import guilayer.inventory.ListInventory;
 import modlayer.Employee;

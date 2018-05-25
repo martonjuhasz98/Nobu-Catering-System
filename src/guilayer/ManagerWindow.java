@@ -2,19 +2,17 @@ package guilayer;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.UIManager;
 
-import java.awt.EventQueue;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Font;
 
 import guilayer.contentpanels.*;
-import guilayer.inventory.ListInventory;
 import guilayer.menu.Menu;
 import guilayer.menu.MenuItemListener;
+import modlayer.Employee;
 
-public class MainWindow {
+public class ManagerWindow extends JFrame {
 	
 	public static final int totalWidth = 1000;
 	public static final int totalHeight = 500;
@@ -29,40 +27,28 @@ public class MainWindow {
 	public static final Color contentBackgroundColour = Color.WHITE;
 	public static final Font menuFont = new Font("Segoe UI", Font.BOLD, 16);
 	public static final Font contentFont = new Font("Segoe UI", Font.PLAIN, 14);
-	private JFrame frame;
 	private JPanel contentPane;
-
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-					MainWindow window = new MainWindow();
-					window.frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
+	private Employee user;
 	
-	public MainWindow() {		
+	public ManagerWindow(Employee user) {
+		super();
+		this.user = user;
+		
 		initialize();
 	}
 
 	private void initialize() {
 		
-		frame = new JFrame();
-		frame.setBounds(100, 100, totalWidth + 4, totalHeight + 28);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setTitle("Nobu inventory system");
-		frame.setFont(contentFont);
-		frame.setResizable(false);
+		setBounds(100, 100, totalWidth + 4, totalHeight + 28);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setTitle("Nobu inventory system");
+		setFont(contentFont);
+		setResizable(false);
 		
 		contentPane = new JPanel();
 		contentPane.setBounds(0, 0, totalWidth, totalHeight);
 		contentPane.setLayout(null);
-		frame.setContentPane(contentPane);
+		setContentPane(contentPane);
 		
 		Menu menu = new Menu();
 		menu.setLayout(null);
@@ -127,5 +113,11 @@ public class MainWindow {
 				}
 			}
 		});
+		
+		setVisible(true);
+	}
+	
+	public Employee getUser() {
+		return user;
 	}
 }

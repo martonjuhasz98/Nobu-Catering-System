@@ -202,7 +202,8 @@ public class DBInvoice implements IFDBInvoice {
 		
 		String query =
 				"UPDATE [Invoice] "
-			  + "SET is_delivered = ?, "
+			  + "SET is_delivered = ?,"
+			  + "date_delivered = GETDATE() "
 			  + "WHERE id = ?";
 		try {
 			DBConnection.startTransaction();
@@ -210,7 +211,7 @@ public class DBInvoice implements IFDBInvoice {
 			PreparedStatement ps = con.prepareStatement(query);
 			ps.setQueryTimeout(5);
 			ps.setBoolean(1, true);
-			ps.setInt(1, invoice.getId());
+			ps.setInt(2, invoice.getId());
 			
 			success = ps.executeUpdate() > 0;
 			ps.close();
@@ -226,7 +227,7 @@ public class DBInvoice implements IFDBInvoice {
 				
 				query =   "UPDATE [Item] "
 						+ "SET quantity = quantity + ? "
-						+ "WHERE barcode = ?))";
+						+ "WHERE barcode = ?";
 				try {
 					ps = con.prepareStatement(query);
 					ps.setQueryTimeout(5);

@@ -9,7 +9,7 @@ import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
 import ctrllayer.SupplierController;
-import guilayer.MainWindow;
+import guilayer.ManagerWindow;
 import guilayer.interfaces.ButtonColumn;
 import guilayer.interfaces.PerformListener;
 import guilayer.inventory.ListInventory;
@@ -60,7 +60,7 @@ public class ListSuppliers extends JPanel implements ActionListener, MouseListen
 	private void initialize() {
 
 		setLayout(null);
-		setBounds(0, 0, MainWindow.contentWidth, MainWindow.totalHeight);
+		setBounds(0, 0, ManagerWindow.contentWidth, ManagerWindow.totalHeight);
 
 		model = new SupplierTableModel();
 

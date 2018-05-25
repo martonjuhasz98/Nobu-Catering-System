@@ -3,7 +3,7 @@ package guilayer.invoices;
 import javax.swing.JPanel;
 
 import ctrllayer.InvoiceController;
-import guilayer.MainWindow;
+import guilayer.ManagerWindow;
 import guilayer.interfaces.ButtonColumn;
 import guilayer.interfaces.PerformListener;
 import guilayer.inventory.ListInventory;
@@ -60,7 +60,7 @@ public class ListPendingInvoices extends JPanel implements ActionListener, Mouse
 	
 	private void initialize() {
 		setLayout(null);
-		setBounds(0, 0, MainWindow.contentWidth, MainWindow.totalHeight);
+		setBounds(0, 0, ManagerWindow.contentWidth, ManagerWindow.totalHeight);
 		
 		model = new InvoiceTableModel();
 		
@@ -129,10 +129,10 @@ public class ListPendingInvoices extends JPanel implements ActionListener, Mouse
 		    }
 		};
 		
-		ButtonColumn btnColumn = new ButtonColumn(table, confirm, model.getColumnCount()-2);
-		btnColumn.setMnemonic(KeyEvent.VK_ACCEPT);
-		btnColumn = new ButtonColumn(table, cancel, model.getColumnCount()-1);
-		btnColumn.setMnemonic(KeyEvent.VK_CANCEL);
+		ButtonColumn confirmColumn = new ButtonColumn(table, confirm, model.getColumnCount()-2);
+		confirmColumn.setMnemonic(KeyEvent.VK_ACCEPT);
+		ButtonColumn cancelColumn = new ButtonColumn(table, cancel, model.getColumnCount()-1);
+		cancelColumn.setMnemonic(KeyEvent.VK_CANCEL);
 		
 		confirmInvoice.addPerformListener(this);
 		txt_search.addCaretListener(this);

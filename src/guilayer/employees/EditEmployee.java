@@ -10,7 +10,7 @@ import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 
 import ctrllayer.EmployeeController;
-import guilayer.MainWindow;
+import guilayer.ManagerWindow;
 import guilayer.interfaces.PerformPanel;
 import javafx.scene.control.PasswordField;
 import modlayer.City;
@@ -54,7 +54,7 @@ public class EditEmployee extends PerformPanel implements ActionListener, CaretL
 
 		setLayout(null);
 		setVisible(false);
-		setBounds(0, 0, MainWindow.contentWidth, MainWindow.totalHeight);
+		setBounds(0, 0, ManagerWindow.contentWidth, ManagerWindow.totalHeight);
 
 		Label lbl_barcode = new Label("Barcode *");
 		lbl_barcode.setFont(new Font("Dialog", Font.PLAIN, 15));

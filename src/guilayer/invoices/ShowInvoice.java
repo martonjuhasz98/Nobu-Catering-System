@@ -6,7 +6,7 @@ import java.awt.Label;
 import javax.swing.JTextField;
 
 import ctrllayer.InvoiceController;
-import guilayer.MainWindow;
+import guilayer.ManagerWindow;
 import guilayer.interfaces.PerformPanel;
 import modlayer.Invoice;
 import modlayer.InvoiceItem;
@@ -47,7 +47,7 @@ public class ShowInvoice extends PerformPanel implements ActionListener{
 		
 		setLayout(null);
 		setVisible(false);
-		setBounds(0, 0, MainWindow.contentWidth, MainWindow.totalHeight);
+		setBounds(0, 0, ManagerWindow.contentWidth, ManagerWindow.totalHeight);
 		model = new InvoiceTable();
 		
 		Label lbl_supplier = new Label("Supplier");

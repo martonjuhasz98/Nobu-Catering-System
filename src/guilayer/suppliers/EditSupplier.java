@@ -9,7 +9,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
 import ctrllayer.SupplierController;
-import guilayer.MainWindow;
+import guilayer.ManagerWindow;
 import guilayer.interfaces.PerformPanel;
 import modlayer.City;
 import modlayer.Supplier;
@@ -45,7 +45,7 @@ public class EditSupplier extends PerformPanel implements ActionListener, CaretL
 
 		setLayout(null);
 		setVisible(false);
-		setBounds(0, 0, MainWindow.contentWidth, MainWindow.totalHeight);
+		setBounds(0, 0, ManagerWindow.contentWidth, ManagerWindow.totalHeight);
 
 		Label lbl_barcode = new Label("Barcode *");
 		lbl_barcode.setFont(new Font("Dialog", Font.PLAIN, 15));

@@ -12,7 +12,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
 import ctrllayer.ItemController;
-import guilayer.MainWindow;
+import guilayer.ManagerWindow;
 import guilayer.interfaces.PerformPanel;
 import modlayer.Item;
 import modlayer.ItemCategory;
@@ -62,7 +62,7 @@ public class EditItem extends PerformPanel implements ActionListener, CaretListe
 		
 		setLayout(null);
 		setVisible(false);
-		setBounds(0, 0, MainWindow.contentWidth, MainWindow.totalHeight);
+		setBounds(0, 0, ManagerWindow.contentWidth, ManagerWindow.totalHeight);
 		
 		Label lbl_barcode = new Label("Barcode *");
 		lbl_barcode.setFont(new Font("Dialog", Font.PLAIN, 15));

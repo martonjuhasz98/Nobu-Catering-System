@@ -13,7 +13,7 @@ import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
 import ctrllayer.InvoiceController;
-import guilayer.MainWindow;
+import guilayer.ManagerWindow;
 import guilayer.interfaces.PerformListener;
 import modlayer.Invoice;
 
@@ -36,7 +36,7 @@ public class ListInvoiceHistory extends JPanel implements ActionListener, MouseL
 	
 	private void initialize() {
 		setLayout(null);
-		setBounds(0, 0, MainWindow.contentWidth, MainWindow.totalHeight);
+		setBounds(0, 0, ManagerWindow.contentWidth, ManagerWindow.totalHeight);
 		
 		model = new HistoryTableModel();
 		

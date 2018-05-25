@@ -8,6 +8,7 @@ import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
 import ctrllayer.InvoiceController;
+import guilayer.interfaces.ItemTableModel;
 import guilayer.interfaces.PerformPanel;
 import modlayer.Invoice;
 import modlayer.InvoiceItem;
@@ -155,7 +156,7 @@ public class ConfirmInvoice extends PerformPanel implements ActionListener, Care
 		
 		for (int i = 0; i < selection.length; i++) {
 			selection[i] = tbl_ordered.convertRowIndexToModel(selection[i]);
-			items.add(mdl_ordered.getItemAt(selection[i]));
+			items.add((InvoiceItem)mdl_ordered.getItemAt(selection[i]));
 		}
 		
 		mdl_delivered.addItems(items);
@@ -166,7 +167,7 @@ public class ConfirmInvoice extends PerformPanel implements ActionListener, Care
 		
 		for (int i = 0; i < selection.length; i++) {
 			selection[i] = tbl_delivered.convertRowIndexToModel(selection[i]);
-			items.add(mdl_delivered.getItemAt(selection[i]));
+			items.add((InvoiceItem)mdl_delivered.getItemAt(selection[i]));
 		}
 		
 		mdl_delivered.removeItems(items);
@@ -180,14 +181,14 @@ public class ConfirmInvoice extends PerformPanel implements ActionListener, Care
 		
 		if (!invoiceCtrl.confirmInvoice(invoice)) {
 			JOptionPane.showMessageDialog(this,
-				    "An error occured while creating the Stock-taking!",
+				    "An error occured while confirming the Invoice!",
 				    "Error!",
 				    JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 		
 		JOptionPane.showMessageDialog(this,
-				"The Stock-taking was successfully created!",
+				"The Invoice was successfully confirmed!",
 			    "Success!",
 			    JOptionPane.INFORMATION_MESSAGE);
 		
@@ -232,30 +233,19 @@ public class ConfirmInvoice extends PerformPanel implements ActionListener, Care
 	}
 	
 	
-	private class OrderedTableModel extends AbstractTableModel {
-		
-		private String[] columns = new String[] { "Barcode", "Name", "Quantity", "Unit", "Unit price", "Category" };
-		protected ArrayList<InvoiceItem> items;
-		
-		public OrderedTableModel() {
-			this(new ArrayList<InvoiceItem>());
-		}
-		public OrderedTableModel(ArrayList<InvoiceItem> items) {
-			this.items = items;
-			update();
-		}
+	private class OrderedTableModel<T extends InvoiceItem> extends ItemTableModel<T> {
 
-		@Override
-		public int getRowCount() {
-			return items.size();
+		public OrderedTableModel() {
+			this(new ArrayList<T>());
 		}
-		@Override
-		public int getColumnCount() {
-			return columns.length;
+		public OrderedTableModel(ArrayList<T> items) {
+			super((ArrayList<T>)items);
+			
+			this.columns = new String[] { "Barcode", "Name", "Quantity", "Unit", "Unit price", "Category" };
 		}
+		
 		@Override
 		public Object getValueAt(int rowIndex, int columnIndex) {
-			
 			InvoiceItem invoiceItem = items.get(rowIndex);
 			Item item = invoiceItem.getItem();
 			
@@ -277,67 +267,48 @@ public class ConfirmInvoice extends PerformPanel implements ActionListener, Care
 			return null;
 		}
 		@Override
-		public String getColumnName(int columnIndex) {
-			return columns[columnIndex];
-		}
-		@Override
-		public Class getColumnClass(int columnIndex) {
-			switch(columnIndex) {
-				case 0:
-					return String.class;
+		public void setValueAt(Object value, int rowIndex, int columnIndex) {
+			switch (columnIndex) {
 				case 1:
-					return String.class;
-				case 2:
-					return int.class;
+					double quantity = (double)value;
+					if (quantity > 0) {
+						getItemAt(rowIndex).setQuantity(quantity);
+					}
+					break;
 				case 3:
-					return String.class;
-				case 4:
-					return double.class;
-				case 5:
-					return String.class;
+					double price = (double)value;
+					if (price > 0) {
+						getItemAt(rowIndex).setUnitPrice(price);
+					}
+					break;
 			}
-			return null;
-		}
-		@Override
-		public boolean isCellEditable(int rowIndex, int columnIndex) {
-			return false;
-		}
-		public void update() {
-			fireTableDataChanged();
-		}
-		public InvoiceItem getItemAt(int rowIndex) {
-			return items.get(rowIndex);
-		}
-		public void setItems(ArrayList<InvoiceItem> items) {
-			this.items = items;
-			update();
 		}
 		public void addItems(ArrayList<InvoiceItem> items) {
 			for (InvoiceItem item : items) {
-				if (this.items.indexOf(item) < 0)
-					this.items.add(item);
+				if (this.items.indexOf((T)item) < 0)
+					this.items.add((T)item);
 			}
 			update();
 		}
 		public void removeItems(ArrayList<InvoiceItem> items) {
 			for (InvoiceItem item : items) {
-				this.items.remove(item);
+				this.items.remove((T)item);
 			}
 			update();
 		}
 	}
-	private class DeliveredTableModel extends OrderedTableModel {
+	private class DeliveredTableModel<T extends InvoiceItem> extends OrderedTableModel<T> {
 		
 		public DeliveredTableModel() {
-			super();
+			this(new ArrayList<T>());
 		}
-		public DeliveredTableModel(ArrayList<InvoiceItem> items) {
-			super(items);
+		public DeliveredTableModel(ArrayList<T> items) {
+			super((ArrayList<T>)items);
 		}
 		
 		@Override
 		public boolean isCellEditable(int rowIndex, int columnIndex) {
-			return columnIndex == 1;
+			return columnIndex == 2;
 		}
 		@Override
 		public void setValueAt(Object value, int rowIndex, int columnIndex) {
@@ -348,7 +319,7 @@ public class ConfirmInvoice extends PerformPanel implements ActionListener, Care
 				}
 			} catch(Exception e) {}
 		}
-		public ArrayList<InvoiceItem> getItems() {
+		public ArrayList<T> getItems() {
 			return super.items;
 		}
 	}
