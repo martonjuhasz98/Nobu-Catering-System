@@ -12,7 +12,6 @@ import javax.swing.SpinnerNumberModel;
 import ctrllayer.EmployeeController;
 import guilayer.ManagerWindow;
 import guilayer.interfaces.PerformPanel;
-import javafx.scene.control.PasswordField;
 import modlayer.City;
 import modlayer.Employee;
 
@@ -28,7 +27,7 @@ public class EditEmployee extends PerformPanel implements ActionListener, CaretL
 
 	private EmployeeController employeeCtrl;
 	private Employee employee;
-	private boolean creatingEmployee = false;
+	private boolean creatingEmployee;
 	private JTextField txtCpr;
 	private JTextField txtAddress;
 	private JButton btn_submit;
@@ -46,6 +45,7 @@ public class EditEmployee extends PerformPanel implements ActionListener, CaretL
 
 	public EditEmployee() {
 		employeeCtrl = new EmployeeController();
+		creatingEmployee = false;
 
 		initialize();
 	}
@@ -137,7 +137,6 @@ public class EditEmployee extends PerformPanel implements ActionListener, CaretL
 		spinnerAccLvl.setBounds(16, 405, 33, 26);
 		add(spinnerAccLvl);
 		
-		reset();
 		txtCpr.addCaretListener(this);
 		txtName.addCaretListener(this);
 		txtUsername.addCaretListener(this);
@@ -148,6 +147,7 @@ public class EditEmployee extends PerformPanel implements ActionListener, CaretL
 		txtZipCode.addCaretListener(this);
 		txtPhone.addCaretListener(this);
 		txtEmail.addCaretListener(this);
+		reset();
 	}
 
 	private void fill(Employee employee) {
@@ -169,9 +169,9 @@ public class EditEmployee extends PerformPanel implements ActionListener, CaretL
 		btn_submit.setText("Update");
 		btn_submit.setEnabled(true);
 	}
-
 	private void reset() {
 		employee = null;
+		creatingEmployee = true;
 
 		txtCpr.setEnabled(true);
 		txtCpr.setText("");
@@ -186,30 +186,24 @@ public class EditEmployee extends PerformPanel implements ActionListener, CaretL
 		txtEmail.setText("");
 		spinnerAccLvl.setValue(0);
 
-		creatingEmployee = true;
 		lblUpdateTooltip.setVisible(false);
 		btn_submit.setText("Create");
 		btn_submit.setEnabled(false);
 	}
-
-	public void createEmployee() {
+	public void create() {
 		open();
 	}
-
-	public void updateEmployee(Employee employee) {
-		open();
+	public void update(Employee employee) {
 		fill(employee);
+		open();
 	}
-
 	private void open() {
 		setVisible(true);
 	}
-
 	private void close() {
 		setVisible(false);
 		reset();
 	}
-
 	private boolean isFilled() {
 		System.out.println("start");
 		if (txtCpr.getText().trim().length() != 10 || !txtCpr.getText().trim().matches("[0-9]+"))
@@ -294,22 +288,17 @@ public class EditEmployee extends PerformPanel implements ActionListener, CaretL
 				triggerPerformListeners();
 			}
 			close();
-		} else if (e.getSource() == btn_cancel)
-
-		{
+		} else if (e.getSource() == btn_cancel){
 			triggerCancelListeners();
 			close();
 		}
 	}
-
 	@Override
 	public void caretUpdate(CaretEvent e) {
 		if (e.getSource() == txtZipCode) {
 			City c = employeeCtrl.getCity(txtZipCode.getText().trim());
 			lblCity.setText((c == null) ? "City: " : "City: " + c.getName());
-		}
-
-		if (e.getSource() == txtCpr || e.getSource() == txtName || e.getSource() == txtUsername
+		} else if (e.getSource() == txtCpr || e.getSource() == txtName || e.getSource() == txtUsername
 				|| e.getSource() == passwordField || e.getSource() == passwordRepeatField || e.getSource() == txtAddress
 				|| e.getSource() == txtZipCode || e.getSource() == txtPhone || e.getSource() == txtEmail) {
 			btn_submit.setEnabled(isFilled());

@@ -25,15 +25,15 @@ public class EditSupplier extends PerformPanel implements ActionListener, CaretL
 	private SupplierController supplierCtrl;
 	private Supplier supplier;
 	private boolean creatingSupplier = false;
-	private JTextField txtCvr;
-	private JTextField txtAddress;
+	private JTextField txt_Cvr;
+	private JTextField txt_Address;
 	private JButton btn_submit;
 	private JButton btn_cancel;
-	private JTextField txtName;
-	private JTextField txtZipCode;
-	private JTextField txtPhone;
-	private JTextField txtEmail;
-	private JLabel lblCity;
+	private JTextField txt_Name;
+	private JTextField txt_ZipCode;
+	private JTextField txt_Phone;
+	private JTextField txt_Email;
+	private JLabel lbl_City;
 
 	public EditSupplier() {
 		supplierCtrl = new SupplierController();
@@ -52,10 +52,10 @@ public class EditSupplier extends PerformPanel implements ActionListener, CaretL
 		lbl_barcode.setBounds(16, 1, 129, 22);
 		add(lbl_barcode);
 
-		txtCvr = new JTextField();
-		txtCvr.setColumns(10);
-		txtCvr.setBounds(16, 45, 376, 20);
-		add(txtCvr);
+		txt_Cvr = new JTextField();
+		txt_Cvr.setColumns(10);
+		txt_Cvr.setBounds(16, 45, 376, 20);
+		add(txt_Cvr);
 
 		Label lbl_name = new Label("Name *");
 		lbl_name.setForeground(Color.BLACK);
@@ -63,36 +63,36 @@ public class EditSupplier extends PerformPanel implements ActionListener, CaretL
 		lbl_name.setBounds(16, 75, 129, 22);
 		add(lbl_name);
 
-		txtName = new JTextField();
-		txtName.setText("");
-		txtName.setColumns(10);
-		txtName.setBounds(16, 105, 376, 20);
-		add(txtName);
+		txt_Name = new JTextField();
+		txt_Name.setText("");
+		txt_Name.setColumns(10);
+		txt_Name.setBounds(16, 105, 376, 20);
+		add(txt_Name);
 
-		txtAddress = new JTextField();
-		txtAddress.setColumns(10);
-		txtAddress.setBounds(16, 165, 376, 20);
-		add(txtAddress);
+		txt_Address = new JTextField();
+		txt_Address.setColumns(10);
+		txt_Address.setBounds(16, 165, 376, 20);
+		add(txt_Address);
 
-		txtZipCode = new JTextField();
-		txtZipCode.setBounds(16, 225, 90, 26);
-		add(txtZipCode);
-		txtZipCode.setColumns(10);
+		txt_ZipCode = new JTextField();
+		txt_ZipCode.setBounds(16, 225, 90, 26);
+		add(txt_ZipCode);
+		txt_ZipCode.setColumns(10);
 
-		lblCity = new JLabel("City");
-		lblCity.setForeground(Color.DARK_GRAY);
-		lblCity.setBounds(113, 230, 279, 16);
-		add(lblCity);
+		lbl_City = new JLabel("City");
+		lbl_City.setForeground(Color.DARK_GRAY);
+		lbl_City.setBounds(113, 230, 279, 16);
+		add(lbl_City);
 
-		txtPhone = new JTextField();
-		txtPhone.setBounds(16, 285, 204, 26);
-		add(txtPhone);
-		txtPhone.setColumns(10);
+		txt_Phone = new JTextField();
+		txt_Phone.setBounds(16, 285, 204, 26);
+		add(txt_Phone);
+		txt_Phone.setColumns(10);
 
-		txtEmail = new JTextField();
-		txtEmail.setBounds(16, 345, 376, 26);
-		add(txtEmail);
-		txtEmail.setColumns(10);
+		txt_Email = new JTextField();
+		txt_Email.setBounds(16, 345, 376, 26);
+		add(txt_Email);
+		txt_Email.setColumns(10);
 
 		btn_submit = new JButton("Create");
 		btn_submit.setBounds(536, 457, 122, 32);
@@ -102,87 +102,80 @@ public class EditSupplier extends PerformPanel implements ActionListener, CaretL
 		btn_cancel = new JButton("Cancel");
 		btn_cancel.setBounds(668, 457, 122, 32);
 		add(btn_cancel);
+		
 		btn_cancel.addActionListener(this);
-
+		txt_Cvr.addCaretListener(this);
+		txt_Name.addCaretListener(this);
+		txt_Address.addCaretListener(this);
+		txt_Name.addCaretListener(this);
+		txt_ZipCode.addCaretListener(this);
+		txt_Phone.addCaretListener(this);
+		txt_Email.addCaretListener(this);
 		reset();
-		txtCvr.addCaretListener(this);
-		txtName.addCaretListener(this);
-		txtAddress.addCaretListener(this);
-		txtName.addCaretListener(this);
-		txtZipCode.addCaretListener(this);
-		txtPhone.addCaretListener(this);
-		txtEmail.addCaretListener(this);
 	}
-
 	private void fill(Supplier supplier) {
 		this.supplier = supplier;
 
-		txtCvr.setText(supplier.getCvr().trim());
-		txtCvr.setEnabled(false);
-		txtName.setText(supplier.getName().trim());
-		txtAddress.setText(supplier.getAddress().trim());
-		txtZipCode.setText(supplier.getCity().getZipCode().trim());
-		lblCity.setText("City: " + supplier.getCity().getName().trim());
-		txtPhone.setText(supplier.getPhone().trim());
-		txtEmail.setText(supplier.getEmail().trim());
+		txt_Cvr.setText(supplier.getCvr().trim());
+		txt_Cvr.setEnabled(false);
+		txt_Name.setText(supplier.getName().trim());
+		txt_Address.setText(supplier.getAddress().trim());
+		txt_ZipCode.setText(supplier.getCity().getZipCode().trim());
+		lbl_City.setText("City: " + supplier.getCity().getName().trim());
+		txt_Phone.setText(supplier.getPhone().trim());
+		txt_Email.setText(supplier.getEmail().trim());
 
 		creatingSupplier = false;
 		btn_submit.setText("Update");
 		btn_submit.setEnabled(true);
 	}
-
 	private void reset() {
 		supplier = null;
 		creatingSupplier = true;
 
-		txtCvr.setEnabled(true);
-
-		txtCvr.setText("");
-		txtName.setText("");
-		txtAddress.setText("");
-		txtZipCode.setText("");
-		lblCity.setText("City: ");
-		txtPhone.setText("");
-		txtEmail.setText("");
+		txt_Cvr.setEnabled(true);
+		txt_Cvr.setText("");
+		txt_Name.setText("");
+		txt_Address.setText("");
+		txt_ZipCode.setText("");
+		lbl_City.setText("City: ");
+		txt_Phone.setText("");
+		txt_Email.setText("");
 
 		btn_submit.setText("Create");
 		btn_submit.setEnabled(false);
 	}
-
-	public void createSupplier() {
+	public void create() {
 		open();
 	}
-
-	public void updateSupplier(Supplier supplier) {
-		open();
+	public void update(Supplier supplier) {
 		fill(supplier);
+		open();
 	}
-
 	private void open() {
 		setVisible(true);
 	}
-
 	private void close() {
 		setVisible(false);
 		reset();
 	}
 
 	private boolean isFilled() {
-		if (txtCvr.getText().trim().length() != 8 || !txtCvr.getText().trim().matches("[0-9]+"))
+		if (txt_Cvr.getText().trim().length() != 8 || !txt_Cvr.getText().trim().matches("[0-9]+"))
 			return false;
-		if (txtName.getText().trim().isEmpty())
+		if (txt_Name.getText().trim().isEmpty())
 			return false;
-		if (txtAddress.getText().trim().isEmpty())
+		if (txt_Address.getText().trim().isEmpty())
 			return false;
-		if (!txtZipCode.getText().trim().matches("[0-9]+"))
+		if (!txt_ZipCode.getText().trim().matches("[0-9]+"))
 			return false;
-		if (txtAddress.getText().trim().isEmpty())
+		if (txt_Address.getText().trim().isEmpty())
 			return false;
-		if (lblCity.getText().trim().equals("City:"))
+		if (lbl_City.getText().trim().equals("City:"))
 			return false;
-		if (txtPhone.getText().trim().isEmpty() || !txtPhone.getText().trim().matches("[0-9]+"))
+		if (txt_Phone.getText().trim().isEmpty() || !txt_Phone.getText().trim().matches("[0-9]+"))
 			return false;
-		if (txtEmail.getText().trim().isEmpty() || !txtEmail.getText().trim().contains("@"))
+		if (txt_Email.getText().trim().isEmpty() || !txt_Email.getText().trim().contains("@"))
 			return false;
 		return true;
 	}
@@ -190,12 +183,12 @@ public class EditSupplier extends PerformPanel implements ActionListener, CaretL
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == btn_submit) {
-			String cvr = txtCvr.getText().trim();
-			String name = txtName.getText().trim();
-			String address = txtAddress.getText().trim();
-			String zipCode = txtZipCode.getText().trim();
-			String phone = txtPhone.getText().trim();
-			String email = txtEmail.getText().trim();
+			String cvr = txt_Cvr.getText().trim();
+			String name = txt_Name.getText().trim();
+			String address = txt_Address.getText().trim();
+			String zipCode = txt_ZipCode.getText().trim();
+			String phone = txt_Phone.getText().trim();
+			String email = txt_Email.getText().trim();
 
 			if (creatingSupplier) {
 				if (!supplierCtrl.createSupplier(cvr, name, address, zipCode, phone, email)) {
@@ -209,11 +202,11 @@ public class EditSupplier extends PerformPanel implements ActionListener, CaretL
 
 				triggerPerformListeners();
 			} else {
-				supplier.setName(txtName.getText().trim());
-				supplier.setAddress(txtAddress.getText().trim());
-				supplier.setCity(new City(txtZipCode.getText().trim()));
-				supplier.setPhone(txtPhone.getText().trim());
-				supplier.setEmail(txtEmail.getText().trim());
+				supplier.setName(txt_Name.getText().trim());
+				supplier.setAddress(txt_Address.getText().trim());
+				supplier.setCity(new City(txt_ZipCode.getText().trim()));
+				supplier.setPhone(txt_Phone.getText().trim());
+				supplier.setEmail(txt_Email.getText().trim());
 				if (!supplierCtrl.updateSupplier(supplier)) {
 					JOptionPane.showMessageDialog(this, "An error occured while creating the Supplier!", "Error!",
 							JOptionPane.ERROR_MESSAGE);
@@ -231,16 +224,13 @@ public class EditSupplier extends PerformPanel implements ActionListener, CaretL
 			close();
 		}
 	}
-
 	@Override
 	public void caretUpdate(CaretEvent e) {
-		if (e.getSource() == txtZipCode) {
-			City c = supplierCtrl.getCity(txtZipCode.getText().trim());
-			lblCity.setText((c == null) ? "City: " : "City: " + c.getName());
-		}
-
-		if (e.getSource() == txtCvr || e.getSource() == txtName || e.getSource() == txtAddress
-				|| e.getSource() == txtZipCode || e.getSource() == txtPhone || e.getSource() == txtEmail) {
+		if (e.getSource() == txt_ZipCode) {
+			City c = supplierCtrl.getCity(txt_ZipCode.getText().trim());
+			lbl_City.setText((c == null) ? "City: " : "City: " + c.getName());
+		} else if (e.getSource() == txt_Cvr || e.getSource() == txt_Name || e.getSource() == txt_Address
+				|| e.getSource() == txt_ZipCode || e.getSource() == txt_Phone || e.getSource() == txt_Email) {
 			btn_submit.setEnabled(isFilled());
 		}
 	}

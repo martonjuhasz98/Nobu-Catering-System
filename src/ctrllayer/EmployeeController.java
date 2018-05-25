@@ -62,8 +62,12 @@ public class EmployeeController {
 
 		return success;
 	}
+	
+	public City getCity(String zipCode) {
+		return dbCity.selectCity(zipCode);
+	}
 
-	public static String hash(String text) {
+	public String hash(String text) {
 		try {
 			java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
 			byte[] array = md.digest(text.getBytes(Charset.forName("UTF8")));
@@ -76,9 +80,4 @@ public class EmployeeController {
 			return null;
 		}
 	}
-
-	public City getCity(String zipCode) {
-		return dbCity.selectCity(zipCode);
-	}
-
 }

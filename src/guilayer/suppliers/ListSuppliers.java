@@ -1,24 +1,17 @@
 package guilayer.suppliers;
 
-import java.util.ArrayList;
-import java.util.function.Consumer;
-
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.table.AbstractTableModel;
 
 import ctrllayer.SupplierController;
 import guilayer.ManagerWindow;
 import guilayer.interfaces.ButtonColumn;
+import guilayer.interfaces.ItemTableModel;
 import guilayer.interfaces.PerformListener;
-import guilayer.inventory.ListInventory;
 import modlayer.Supplier;
-import modlayer.Unit;
 
 import javax.swing.ListSelectionModel;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 
@@ -28,13 +21,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextField;
-import javax.swing.JComboBox;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JRadioButton;
-import javax.swing.JList;
 import javax.swing.AbstractAction;
-import javax.swing.AbstractListModel;
-import javax.swing.Action;
 import javax.swing.event.CaretListener;
 import javax.swing.event.CaretEvent;
 
@@ -85,15 +72,17 @@ public class ListSuppliers extends JPanel implements ActionListener, MouseListen
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		table.getTableHeader().setReorderingAllowed(false);
 		table.setAutoCreateRowSorter(true);
-		model.setSuppliers(supplierCtrl.getSuppliers());
 		table.setModel(model);
 		scrollPane.setViewportView(table);
 
 		AbstractAction delete = new AbstractAction() {
 			public void actionPerformed(ActionEvent e) {
-				JTable table = (JTable) e.getSource();
+				if (JOptionPane.showConfirmDialog(ListSuppliers.this, "Are you sure?") != JOptionPane.YES_OPTION) {
+		        	return;
+		        }
+				
 				int modelRowIndex = Integer.valueOf(e.getActionCommand());
-				Supplier supplier = model.getSupplierAt(modelRowIndex);
+				Supplier supplier = model.getItem(modelRowIndex);
 
 				if (!supplierCtrl.deleteSupplier(supplier)) {
 					JOptionPane.showMessageDialog(ListSuppliers.this, "An error occured while deleting the Supplier!",
@@ -103,7 +92,7 @@ public class ListSuppliers extends JPanel implements ActionListener, MouseListen
 
 				JOptionPane.showMessageDialog(ListSuppliers.this, "The Supplier was successfully deleted!", "Success!",
 						JOptionPane.INFORMATION_MESSAGE);
-				model.setSuppliers(supplierCtrl.getSuppliers());
+				reset();
 			}
 		};
 
@@ -114,98 +103,73 @@ public class ListSuppliers extends JPanel implements ActionListener, MouseListen
 		btn_search.addActionListener(this);
 		btn_create.addActionListener(this);
 		table.addMouseListener(this);
+		
+		reset();
 	}
-
-	private void searchInventory() {
-
+	private void reset() {
+		model.setItems(supplierCtrl.getSuppliers());
+		txt_search.setText("");
+	}
+	private void search() {
 		String keyword = txt_search.getText().trim();
-		model.setSuppliers(supplierCtrl.searchSuppliers(keyword));
+		model.setItems(supplierCtrl.searchSuppliers(keyword));
 	}
-
-	@Override
-	public void caretUpdate(CaretEvent e) {
-		if (e.getSource() == txt_search) {
-			searchInventory();
-		}
-	}
-
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == btn_search) {
-			searchInventory();
+			search();
 		}
 		if (e.getSource() == btn_create) {
+			supplierEditor.create();
 			setVisible(false);
-			supplierEditor.createSupplier();
 		}
 	}
-
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		if (e.getClickCount() == 2 && e.getSource() == table) {
 			int viewRowIndex = table.getSelectedRow();
 			int modelRowIndex = table.convertRowIndexToModel(viewRowIndex);
-			Supplier supplier = model.getSupplierAt(modelRowIndex);
+			Supplier supplier = model.getItem(modelRowIndex);
 
+			supplierEditor.update(supplier);
 			setVisible(false);
-			supplierEditor.updateSupplier(supplier);
+		}
+	}
+	@Override
+	public void caretUpdate(CaretEvent e) {
+		if (e.getSource() == txt_search) {
+			search();
 		}
 	}
 	@Override
 	public void performed() {
-		model.setSuppliers(supplierCtrl.getSuppliers());
+		model.setItems(supplierCtrl.getSuppliers());
 		setVisible(true);
 	}
-
 	@Override
 	public void cancelled() {
 		setVisible(true);
 	}
 
 	@Override
-	public void mousePressed(MouseEvent e) {
-	}
-
+	public void mousePressed(MouseEvent e) {}
 	@Override
-	public void mouseReleased(MouseEvent e) {
-	}
-
+	public void mouseReleased(MouseEvent e) {}
 	@Override
-	public void mouseEntered(MouseEvent e) {
-	}
-
+	public void mouseEntered(MouseEvent e) {}
 	@Override
-	public void mouseExited(MouseEvent e) {
-	}
+	public void mouseExited(MouseEvent e) {}
 
-	private class SupplierTableModel extends AbstractTableModel {
-
-		private String[] columns = new String[] { "CVR", "Name", "Address", "Zip code", "Citt", "Phone", "Email", "" };
-		private ArrayList<Supplier> suppliers;
+	private class SupplierTableModel extends ItemTableModel<Supplier> {
 
 		public SupplierTableModel() {
-			this(new ArrayList<Supplier>());
+			super();
+			
+			columns = new String[] { "CVR", "Name", "Address", "Zip code", "Citt", "Phone", "Email", "" };
 		}
-
-		public SupplierTableModel(ArrayList<Supplier> suppliers) {
-			this.suppliers = suppliers;
-			update();
-		}
-
-		@Override
-		public int getRowCount() {
-			return suppliers.size();
-		}
-
-		@Override
-		public int getColumnCount() {
-			return columns.length;
-		}
-
 		@Override
 		public Object getValueAt(int rowIndex, int columnIndex) {
-
-			Supplier supplier = suppliers.get(rowIndex);
+			Supplier supplier = items.get(rowIndex);
 
 			switch (columnIndex) {
 			case 0:
@@ -228,52 +192,9 @@ public class ListSuppliers extends JPanel implements ActionListener, MouseListen
 
 			return null;
 		}
-
-		@Override
-		public String getColumnName(int columnIndex) {
-			return columns[columnIndex];
-		}
-
-		@Override
-		public Class getColumnClass(int columnIndex) {
-			switch (columnIndex) {
-			case 0:
-				return String.class;
-			case 1:
-				return String.class;
-			case 2:
-				return String.class;
-			case 3:
-				return String.class;
-			case 4:
-				return String.class;
-			case 5:
-				return String.class;
-			case 6:
-				return String.class;
-			case 7:
-				return JButton.class;
-			}
-
-			return null;
-		}
-
 		@Override
 		public boolean isCellEditable(int rowIndex, int columnIndex) {
 			return columnIndex == getColumnCount() - 1;
-		}
-
-		public void update() {
-			fireTableDataChanged();
-		}
-
-		public Supplier getSupplierAt(int rowIndex) {
-			return suppliers.get(rowIndex);
-		}
-
-		public void setSuppliers(ArrayList<Supplier> suppliers) {
-			this.suppliers = suppliers;
-			update();
 		}
 	}
 }
