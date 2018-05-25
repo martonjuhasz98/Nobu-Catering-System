@@ -33,7 +33,7 @@ public class EmployeeController {
 		employee.setCpr(cpr);
 		employee.setName(name);
 		employee.setUsername(username);
-		employee.setPassword(hash(password));
+		employee.setPassword(password);
 		employee.setAddress(address);
 		employee.setCity(city);
 		employee.setPhone(phone);
@@ -45,9 +45,6 @@ public class EmployeeController {
 		return success;
 	}
 	public boolean updateEmployee(Employee employee) {
-		String password = employee.getPassword();
-		employee.setPassword(hash(password));
-		
 		boolean success = dbEmployee.updateEmployee(employee);
 		
 		return success;

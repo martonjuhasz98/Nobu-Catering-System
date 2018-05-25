@@ -13,6 +13,7 @@ import modlayer.InvoiceItem;
 
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Date;
 import java.awt.event.ActionEvent;
 import javax.swing.JTable;
 import javax.swing.JButton;
@@ -31,7 +32,7 @@ public class ShowInvoice extends PerformPanel implements ActionListener{
 	private JTextField txt_empName;
 	private JTextField txt_orderDate;
 	private JTextField txt_deliverDate;
-	private JButton btn_cancel;
+	private JButton btn_ok;
 	private JTable table;
 	
 	private InvoiceTable model;
@@ -96,9 +97,9 @@ public class ShowInvoice extends PerformPanel implements ActionListener{
 		txt_suppPhone.setBounds(16, 103, 170, 20);
 		add(txt_suppPhone);
 		
-		btn_cancel = new JButton("Cancel");
-		btn_cancel.setBounds(654, 420, 122, 32);
-		add(btn_cancel);
+		btn_ok = new JButton("Ok");
+		btn_ok.setBounds(654, 420, 122, 32);
+		add(btn_ok);
 		
 		txt_suppEmail = new JTextField();
 		txt_suppEmail.setEditable(false);
@@ -144,13 +145,14 @@ public class ShowInvoice extends PerformPanel implements ActionListener{
 		scrollPane.setViewportView(table);
 		
 		reset();
-		btn_cancel.addActionListener(this);
+		btn_ok.addActionListener(this);
 	}
 	
 	
 	
 	private void fill(Invoice invoice) {
 		this.invoice = invoice;
+		Date delivered = invoice.getDateDelivered();
 		
 		txt_supplier_cvrname.setText(invoice.getSupplier().getCvr() +" - "+ invoice.getSupplier().getName());
 		txt_suppPhone.setText(invoice.getSupplier().getPhone());
@@ -158,7 +160,7 @@ public class ShowInvoice extends PerformPanel implements ActionListener{
 		txt_empName.setText(invoice.getPlacedBy().getName());
 		txt_empPhone.setText(invoice.getPlacedBy().getPhone());
 		txt_orderDate.setText(invoice.getTimestamp().toString());
-		txt_deliverDate.setText(invoice.getDateDelivered().toString());
+		txt_deliverDate.setText(delivered == null ? "" : delivered.toString());
 		model.setInvoiceItems(invoice.getItems());
 		setVisible(true);
 	}
@@ -194,7 +196,7 @@ public class ShowInvoice extends PerformPanel implements ActionListener{
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if (e.getSource() == btn_cancel) {
+		if (e.getSource() == btn_ok) {
 			triggerCancelListeners();
 			close();
 		}

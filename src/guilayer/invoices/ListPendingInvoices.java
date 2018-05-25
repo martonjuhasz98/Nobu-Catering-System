@@ -115,14 +115,14 @@ public class ListPendingInvoices extends JPanel implements ActionListener, Mouse
 		        
 				if (!invoiceCtrl.cancelInvoice(invoice)) {
 					JOptionPane.showMessageDialog(ListPendingInvoices.this,
-						    "An error occured while confirmed the Invoice!",
+						    "An error occured while canceled the Invoice!",
 						    "Error!",
 						    JOptionPane.ERROR_MESSAGE);
 					return;
 				}
 				
 				JOptionPane.showMessageDialog(ListPendingInvoices.this,
-					"The Invoice was successfully confirmed!",
+					"The Invoice was successfully canceled!",
 				    "Success!",
 				    JOptionPane.INFORMATION_MESSAGE);
 				model.setInvoices(invoiceCtrl.getPendingInvoices());
@@ -143,7 +143,7 @@ public class ListPendingInvoices extends JPanel implements ActionListener, Mouse
 	private void searchInventory() {
 		if (searching) return;
 		searching = true;
-		
+
 		String keyword = txt_search.getText().trim();
 		model.setInvoices(invoiceCtrl.searchPendingInvoices(keyword));
 		

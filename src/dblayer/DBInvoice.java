@@ -11,6 +11,7 @@ import dblayer.interfaces.IFDBInvoice;
 import modlayer.Supplier;
 import modlayer.Transaction;
 import modlayer.TransactionType;
+import modlayer.City;
 import modlayer.Employee;
 import modlayer.Invoice;
 import modlayer.InvoiceItem;
@@ -27,7 +28,8 @@ public class DBInvoice implements IFDBInvoice {
 	public ArrayList<Invoice> getInvoices(boolean delivered) {
 		ArrayList<Invoice> invoices = new ArrayList<>();
 		
-		String query = "SELECT * FROM [Invoice] WHERE is_delivered = ?";
+		String query = "SELECT * FROM [Invoice_View] "
+					+ "WHERE invoiceIsDelivered = ?";
 		try {
 			
 			PreparedStatement ps = con.prepareStatement(query);
@@ -54,17 +56,11 @@ public class DBInvoice implements IFDBInvoice {
 	public ArrayList<Invoice> searchInvoices(String keyword, boolean delivered) {
 		ArrayList<Invoice> invoices = new ArrayList<Invoice>();
 
-		String query =
-			  "SELECT i.* "
-			+ "FROM [Invoice] AS i "
-			+ "INNER JOIN [Employee] AS e "
-			+ "ON i.employee_cpr = e.cpr "
-			+ "INNER JOIN [Supplier] AS s "
-			+ "ON i.supplier_cvr = s.cvr "
-			+ "WHERE i.is_delivered = ? "
-			+ "AND (i.id LIKE ? "
-			+ "OR e.name LIKE ? "
-			+ "OR s.name LIKE ?)";
+		String query = "SELECT * FROM [Invoice_View] "
+						+ "WHERE invoiceIsDelivered = ? "
+						+ "AND (invoiceId LIKE ? "
+						+ "OR employeeName LIKE ? "
+						+ "OR supplierName LIKE ?)";
 		
 		try {
 			PreparedStatement ps = con.prepareStatement(query);
@@ -95,7 +91,8 @@ public class DBInvoice implements IFDBInvoice {
 	public Invoice selectInvoice(int id) {
 		Invoice invoice = null;
 		
-		String query = "SELECT * FROM [Invoice] WHERE id = ?";
+		String query = "SELECT * FROM [Invoice_View] "
+						+ "WHERE invoiceId = ?";
 		try {
 			
 			PreparedStatement ps = con.prepareStatement(query);
@@ -161,7 +158,7 @@ public class DBInvoice implements IFDBInvoice {
 					ps.setDouble(3, quantity);
 					ps.setDouble(4, unitPrice);
 					
-					boolean success = ps.executeUpdate() < 0;
+					boolean success = ps.executeUpdate() > 0;
 					ps.close();
 					if (!success) {
 						throw new SQLException();
@@ -318,23 +315,49 @@ public class DBInvoice implements IFDBInvoice {
 		try {
 			invoice = new Invoice();
 			
-			//Employee
-			DBEmployee dbEmployee = new DBEmployee();
-			Employee employee = dbEmployee.selectEmployee(results.getString("employee_cpr"));
+			//City
+			City city = new City();
+			city.setZipCode(results.getString("employeeCityZipCode"));
+			city.setName(results.getString("employeeCityName"));
 			
+			//Employee
+			Employee employee = new Employee();
+			employee.setCpr(results.getString("employeeCpr"));
+			employee.setName(results.getString("employeeName"));
+			employee.setUsername(results.getString("employeeUsername"));
+			employee.setPassword(results.getString("employeePassword"));
+			employee.setAddress(results.getString("employeeAddress"));
+			employee.setCity(city);
+			employee.setPhone(results.getString("employeePhone"));
+			employee.setEmail(results.getString("employeeEmail"));
+			employee.setAccessLevel(results.getInt("employeeAccessLevel"));
+			
+			//City
+			city = new City();
+			city.setZipCode(results.getString("supplierCityZipCode"));
+			city.setName(results.getString("supplierCityName"));
+
 			//Supplier
-			DBSupplier dbSupplier = new DBSupplier();
-			Supplier supplier = dbSupplier.selectSupplier(results.getString("supplier_cvr"));
+			Supplier supplier = new Supplier();
+			supplier.setCvr(results.getString("supplierCvr"));
+			supplier.setName(results.getString("supplierName"));
+			supplier.setAddress(results.getString("supplierAddress"));
+			supplier.setCity(city);
+			supplier.setPhone(results.getString("supplierPhone"));
+			supplier.setEmail(results.getString("supplierEmail"));
 				
 			//Transaction
-			DBTransaction dbTransaction = new DBTransaction();
-			Transaction transaction = dbTransaction.selectTransaction(results.getInt("id"));
+			Transaction transaction = new Transaction();
+			transaction.setId(results.getInt("invoiceId"));
+			transaction.setAmount(results.getDouble("transactionAmount"));
+			transaction.setType(TransactionType.getType(results.getInt("transactionTransactionType")));
+			transaction.setTimestamp(results.getDate("transactionTimestamp"));
 			
 			//Invoice
-			invoice.setId(results.getInt("id"));
-			invoice.setDelivered(results.getBoolean("is_delivered"));
-			invoice.setTimestamp(results.getDate("timestamp"));
-			invoice.setDateDelivered(results.getDate("date_delivered"));
+			invoice.setId(results.getInt("invoiceId"));
+			invoice.setDelivered(results.getBoolean("invoiceIsDelivered"));
+			invoice.setTimestamp(results.getDate("invoiceTimestamp"));
+			invoice.setDateDelivered(results.getDate("invoiceDateDelivered"));
 			invoice.setPlacedBy(employee);
 			invoice.setSupplier(supplier);
 			invoice.setTransaction(transaction);
