@@ -106,6 +106,7 @@ public class EditSupplier extends PerformPanel implements ActionListener, CaretL
 
 		reset();
 		txtCvr.addCaretListener(this);
+		txtName.addCaretListener(this);
 		txtAddress.addCaretListener(this);
 		txtName.addCaretListener(this);
 		txtZipCode.addCaretListener(this);

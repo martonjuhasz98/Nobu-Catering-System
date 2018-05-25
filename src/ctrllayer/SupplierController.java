@@ -30,7 +30,7 @@ public class SupplierController {
 		return dbSupplier.selectSupplier(barcode);
 	}
 
-	public boolean createSupplier(String cvr, String name, String address, String zipCode, String phone ,String email) {
+	public boolean createSupplier(String cvr, String name, String address, String zipCode, String phone, String email) {
 		Supplier supplier = new Supplier();
 		supplier.setCvr(cvr);
 		supplier.setName(name);
@@ -38,9 +38,9 @@ public class SupplierController {
 		supplier.setCity(new City(zipCode));
 		supplier.setPhone(phone);
 		supplier.setEmail(email);
-		
+
 		boolean success = dbSupplier.insertSupplier(supplier) != null;
-		
+
 		return success;
 	}
 
@@ -52,9 +52,8 @@ public class SupplierController {
 		boolean success = dbSupplier.deleteSupplier(supplier);
 		return success;
 	}
-	
-	public City getCity(String zipCode)
-	{
+
+	public City getCity(String zipCode) {
 		return dbCity.selectCity(zipCode);
 	}
 

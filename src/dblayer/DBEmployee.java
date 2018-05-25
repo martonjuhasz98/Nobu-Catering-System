@@ -140,7 +140,7 @@ public class DBEmployee implements IFDBEmployee{
 		String query =
 				  "INSERT INTO [Employee] "
 				+ "(cpr, name, username, password, address, zip_code, phone, email, access_level) "
-				+ "VALUES (?, ?, ?, ?, ?, ?)";
+				+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 		try {
 			PreparedStatement ps = con.prepareStatement(query);
 			ps.setQueryTimeout(5);
@@ -196,6 +196,7 @@ public class DBEmployee implements IFDBEmployee{
 			ps.setString(6, employee.getPhone());
 			ps.setString(7, employee.getEmail());
 			ps.setInt(8, employee.getAccessLevel());
+			ps.setString(9, employee.getCpr());
 			
 			success = ps.executeUpdate() > 0;
 			ps.close();

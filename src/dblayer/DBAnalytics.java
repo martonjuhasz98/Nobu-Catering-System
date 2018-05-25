@@ -298,81 +298,81 @@ public class DBAnalytics implements IFDBAnalytics {
 		// LEFT JOIN Item_usage ON Item_usage.barcode = Item_usage.barcode
 		// GROUP BY Item.barcode
 
-		// SELECT
-		// item.barcode AS barcode,
-		// MIN(item.name) AS name,
-		// MIN(item.unit) AS unit,
-		// SUM(Item_usage.quantity)/MIN(weekday.total) AS Average,
-		// SUM(case when DATEPART(dw,Item_usage.date) = 2 then Item_usage.quantity else
-		// NULL end)/MIN(weekday.Monday) AS Monday,
-		// SUM(case when DATEPART(dw,Item_usage.date) = 3 then Item_usage.quantity else
-		// NULL end)/MIN(weekday.Tuesday) AS Tuesday,
-		// SUM(case when DATEPART(dw,Item_usage.date) = 4 then Item_usage.quantity else
-		// NULL end)/MIN(weekday.Wednesday) AS Wednesday,
-		// SUM(case when DATEPART(dw,Item_usage.date) = 5 then Item_usage.quantity else
-		// NULL end)/MIN(weekday.Thursday) AS Thursday,
-		// SUM(case when DATEPART(dw,Item_usage.date) = 6 then Item_usage.quantity else
-		// NULL end)/MIN(weekday.Friday) AS Friday,
-		// SUM(case when DATEPART(dw,Item_usage.date) = 7 then Item_usage.quantity else
-		// NULL end)/MIN(weekday.Saturday) AS Saturday,
-		// SUM(case when DATEPART(dw,Item_usage.date) = 1 then Item_usage.quantity else
-		// NULL end)/MIN(weekday.Sunday) AS Sunday
-		// FROM
-		// (SELECT
-		// COUNT(d.date) AS total,
-		// COUNT(case when DATEPART(dw,d.date) = 2 then 1 else NULL end) AS monday,
-		// COUNT(case when DATEPART(dw,d.date) = 3 then 1 else NULL end) AS tuesday,
-		// COUNT(case when DATEPART(dw,d.date) = 4 then 1 else NULL end) AS wednesday,
-		// COUNT(case when DATEPART(dw,d.date) = 5 then 1 else NULL end) AS thursday,
-		// COUNT(case when DATEPART(dw,d.date) = 6 then 1 else NULL end) AS friday,
-		// COUNT(case when DATEPART(dw,d.date) = 7 then 1 else NULL end) AS saturday,
-		// COUNT(case when DATEPART(dw,d.date) = 1 then 1 else NULL end) AS sunday
-		// FROM
-		// (SELECT
-		// DISTINCT (CASE WHEN CAST([Order].timestamp AS DATE) IS NULL THEN
-		// CAST(Stocktaking.timestamp AS DATE) ELSE CAST([Order].timestamp AS DATE) END)
-		// AS date
-		// FROM [Order]
-		// FULL JOIN Stocktaking ON CAST([Order].timestamp AS DATE) =
-		// CAST(Stocktaking.timestamp AS DATE)) as d) weekday, item
-		//
-		// LEFT JOIN
-		// (SELECT
-		// Ingredient_usage.barcode AS barcode,
-		// CASE WHEN Ingredient_usage.date IS NULL THEN Discrepancy_total.date ELSE
-		// Ingredient_usage.date END AS date,
-		// Ingredient_usage.quantity+Discrepancy_total.quantity AS quantity
-		// FROM
-		// (SELECT
-		// Ingredient.item_barcode AS barcode,
-		// Menu_item_usage.date AS date,
-		// SUM(Ingredient.quantity+Menu_item_usage.quantity) AS quantity
-		// FROM Ingredient
-		// INNER JOIN (SELECT
-		// Order_menu_item.menu_item_id AS menu_item_id,
-		// CAST([Order].timestamp AS DATE) AS date,/*CAST(Order.timestamp AS DATE) AS
-		// date*/
-		// SUM(Order_menu_item.quantity) AS quantity
-		// FROM Order_menu_item
-		// INNER JOIN [Order] ON Order_menu_item.order_id = [Order].id
-		// WHERE Order_menu_item.is_finished = 1
-		// GROUP BY [Order_menu_item].[menu_item_id], CAST([Order].timestamp AS DATE))
-		// AS Menu_item_usage
-		// ON Ingredient.menu_item_id = Menu_item_usage.menu_item_id
-		// GROUP BY Ingredient.item_barcode, Menu_item_usage.date) AS Ingredient_usage
-		// FULL JOIN
-		// (SELECT
-		// Discrepancy.item_barcode AS barcode,
-		// CAST(Stocktaking.timestamp AS DATE) AS date,
-		// SUM(Discrepancy.quantity) AS quantity
-		// FROM Discrepancy
-		// INNER JOIN Stocktaking ON Discrepancy.stocktaking_id = stocktaking.id
-		// GROUP BY Discrepancy.item_barcode, CAST(stocktaking.timestamp AS DATE)) AS
-		// discrepancy_total
-		// ON Ingredient_usage.barcode = Discrepancy_total.barcode AND
-		// Ingredient_usage.date = Discrepancy_total.date
-		// ) AS Item_usage ON Item.barcode = Item_usage.barcode
-		// GROUP BY Item.barcode
+//		 SELECT
+//		 item.barcode AS barcode,
+//		 MIN(item.name) AS name,
+//		 MIN(item.unit) AS unit,
+//		 SUM(Item_usage.quantity)/MIN(weekday.total) AS Average,
+//		 SUM(case when DATEPART(dw,Item_usage.date) = 2 then Item_usage.quantity else
+//		 NULL end)/MIN(weekday.Monday) AS Monday,
+//		 SUM(case when DATEPART(dw,Item_usage.date) = 3 then Item_usage.quantity else
+//		 NULL end)/MIN(weekday.Tuesday) AS Tuesday,
+//		 SUM(case when DATEPART(dw,Item_usage.date) = 4 then Item_usage.quantity else
+//		 NULL end)/MIN(weekday.Wednesday) AS Wednesday,
+//		 SUM(case when DATEPART(dw,Item_usage.date) = 5 then Item_usage.quantity else
+//		 NULL end)/MIN(weekday.Thursday) AS Thursday,
+//		 SUM(case when DATEPART(dw,Item_usage.date) = 6 then Item_usage.quantity else
+//		 NULL end)/MIN(weekday.Friday) AS Friday,
+//		 SUM(case when DATEPART(dw,Item_usage.date) = 7 then Item_usage.quantity else
+//		 NULL end)/MIN(weekday.Saturday) AS Saturday,
+//		 SUM(case when DATEPART(dw,Item_usage.date) = 1 then Item_usage.quantity else
+//		 NULL end)/MIN(weekday.Sunday) AS Sunday
+//		 FROM
+//		 (SELECT
+//		 COUNT(d.date) AS total,
+//		 COUNT(case when DATEPART(dw,d.date) = 2 then 1 else NULL end) AS monday,
+//		 COUNT(case when DATEPART(dw,d.date) = 3 then 1 else NULL end) AS tuesday,
+//		 COUNT(case when DATEPART(dw,d.date) = 4 then 1 else NULL end) AS wednesday,
+//		 COUNT(case when DATEPART(dw,d.date) = 5 then 1 else NULL end) AS thursday,
+//		 COUNT(case when DATEPART(dw,d.date) = 6 then 1 else NULL end) AS friday,
+//		 COUNT(case when DATEPART(dw,d.date) = 7 then 1 else NULL end) AS saturday,
+//		 COUNT(case when DATEPART(dw,d.date) = 1 then 1 else NULL end) AS sunday
+//		 FROM
+//		 (SELECT
+//		 DISTINCT (CASE WHEN CAST([Order].timestamp AS DATE) IS NULL THEN
+//		 CAST(Stocktaking.timestamp AS DATE) ELSE CAST([Order].timestamp AS DATE) END)
+//		 AS date
+//		 FROM [Order]
+//		 FULL JOIN Stocktaking ON CAST([Order].timestamp AS DATE) =
+//		 CAST(Stocktaking.timestamp AS DATE)) as d) weekday, item
+//		
+//		 LEFT JOIN
+//		 (SELECT
+//		 Ingredient_usage.barcode AS barcode,
+//		 CASE WHEN Ingredient_usage.date IS NULL THEN Discrepancy_total.date ELSE
+//		 Ingredient_usage.date END AS date,
+//		 Ingredient_usage.quantity+Discrepancy_total.quantity AS quantity
+//		 FROM
+//		 (SELECT
+//		 Ingredient.item_barcode AS barcode,
+//		 Menu_item_usage.date AS date,
+//		 SUM(Ingredient.quantity+Menu_item_usage.quantity) AS quantity
+//		 FROM Ingredient
+//		 INNER JOIN (SELECT
+//		 Order_menu_item.menu_item_id AS menu_item_id,
+//		 CAST([Order].timestamp AS DATE) AS date,/*CAST(Order.timestamp AS DATE) AS
+//		 date*/
+//		 SUM(Order_menu_item.quantity) AS quantity
+//		 FROM Order_menu_item
+//		 INNER JOIN [Order] ON Order_menu_item.order_id = [Order].id
+//		 WHERE Order_menu_item.is_finished = 1
+//		 GROUP BY [Order_menu_item].[menu_item_id], CAST([Order].timestamp AS DATE))
+//		 AS Menu_item_usage
+//		 ON Ingredient.menu_item_id = Menu_item_usage.menu_item_id
+//		 GROUP BY Ingredient.item_barcode, Menu_item_usage.date) AS Ingredient_usage
+//		 FULL JOIN
+//		 (SELECT
+//		 Discrepancy.item_barcode AS barcode,
+//		 CAST(Stocktaking.timestamp AS DATE) AS date,
+//		 SUM(Discrepancy.quantity) AS quantity
+//		 FROM Discrepancy
+//		 INNER JOIN Stocktaking ON Discrepancy.stocktaking_id = stocktaking.id
+//		 GROUP BY Discrepancy.item_barcode, CAST(stocktaking.timestamp AS DATE)) AS
+//		 discrepancy_total
+//		 ON Ingredient_usage.barcode = Discrepancy_total.barcode AND
+//		 Ingredient_usage.date = Discrepancy_total.date
+//		 ) AS Item_usage ON Item.barcode = Item_usage.barcode
+//		 GROUP BY Item.barcode
 		ArrayList<String[]> data = new ArrayList<String[]>();
 
 		String query = "	SELECT \n" 
