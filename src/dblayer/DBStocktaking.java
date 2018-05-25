@@ -81,6 +81,7 @@ public class DBStocktaking implements IFDBStocktaking {
 			System.out.println(query);
 			
 			DBConnection.rollbackTransaction();
+			return -1;
 		}
 		
 		return id;

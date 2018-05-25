@@ -183,6 +183,7 @@ public class DBItem implements IFDBItem {
 			System.out.println(query);
 			
 			DBConnection.rollbackTransaction();
+			return null;
 		}
 		
 		return barcode;

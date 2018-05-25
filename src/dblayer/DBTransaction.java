@@ -52,7 +52,7 @@ public class DBTransaction implements IFDBTransaction {
 				+ "(id, amount, transaction_type) "
 				+ "VALUES (?, ?, ?)";
 		try {
-			PreparedStatement ps = con.prepareStatement(query);
+			PreparedStatement ps = con.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
 			ps.setQueryTimeout(5);
 			ps.setInt(1, transaction.getId());
 			ps.setDouble(2, transaction.getAmount());
@@ -71,6 +71,8 @@ public class DBTransaction implements IFDBTransaction {
 			System.out.println("Transaction was not inserted!");
 			System.out.println(e.getMessage());
 			System.out.println(query);
+			
+			return -1;
 		}
 		
 		return id;

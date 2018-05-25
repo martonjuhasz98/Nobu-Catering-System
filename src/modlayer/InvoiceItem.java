@@ -4,7 +4,7 @@ public class InvoiceItem {
 
 	private Invoice invoice;
 	private Item item;
-	private int quantity;
+	private double quantity;
 	private double unitPrice;
 	
 	public InvoiceItem() {
@@ -18,7 +18,7 @@ public class InvoiceItem {
 	public Item getItem() {
 		return item;
 	}
-	public int getQuantity() {
+	public double getQuantity() {
 		return quantity;
 	}
 	public double getUnitPrice() {
@@ -30,7 +30,7 @@ public class InvoiceItem {
 	public void setItem(Item item) {
 		this.item = item;
 	}
-	public void setQuantity(int quantity) {
+	public void setQuantity(double quantity) {
 		this.quantity = quantity;
 	}
 	public void setUnitPrice(double unitPrice) {

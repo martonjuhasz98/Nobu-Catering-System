@@ -163,6 +163,8 @@ public class DBEmployee implements IFDBEmployee{
 			System.out.println("Employee was not inserted!");
 			System.out.println(e.getMessage());
 			System.out.println(query);
+			
+			return null;
 		}
 		
 		return cpr;

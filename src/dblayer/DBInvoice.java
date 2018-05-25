@@ -118,11 +118,12 @@ public class DBInvoice implements IFDBInvoice {
 	@Override
 	public int insertInvoice(Invoice invoice) {
 		int id = -1;
+		String query = "";
 		
-		String query = "INSERT INTO [Invoice] (employee_cpr, supplier_cvr) VALUES (?, ?)";
 		try {
 			DBConnection.startTransaction();
 			
+			query = "INSERT INTO [Invoice] (employee_cpr, supplier_cvr) VALUES (?, ?)";
 			PreparedStatement ps = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 			ps.setQueryTimeout(5);
 			ps.setString(1, invoice.getPlacedBy().getCpr());
@@ -160,8 +161,11 @@ public class DBInvoice implements IFDBInvoice {
 					ps.setDouble(3, quantity);
 					ps.setDouble(4, unitPrice);
 					
-					ps.executeUpdate();
+					boolean success = ps.executeUpdate() < 0;
 					ps.close();
+					if (!success) {
+						throw new SQLException();
+					}
 				}
 				catch (SQLException e) {
 					System.out.println("InvoiceItem was not inserted!");
@@ -189,6 +193,7 @@ public class DBInvoice implements IFDBInvoice {
 			System.out.println(query);
 			
 			DBConnection.rollbackTransaction();
+			return -1;
 		}
 		
 		return id;
@@ -220,6 +225,7 @@ public class DBInvoice implements IFDBInvoice {
 			for (InvoiceItem item : invoice.getItems()) {
 				itemBarcode = item.getItem().getBarcode();
 				quantity = item.getQuantity();
+				if (quantity == 0) continue;
 				
 				query =   "UPDATE [Item] "
 						+ "SET quantity = quantity + ? "
@@ -258,11 +264,38 @@ public class DBInvoice implements IFDBInvoice {
 	@Override
 	public boolean cancelInvoice(Invoice invoice) {
 		boolean success = false;
+		String query = "";
 		
-		String query = "DELETE FROM [Invoice] WHERE id = ?";
 		try {
+			PreparedStatement ps;
 			
-			PreparedStatement ps = con.prepareStatement(query);
+			//InvoiceItems
+			query = "DELETE FROM [Invoice_Item] WHERE invoice_id = ?";
+			ps = con.prepareStatement(query);
+			ps.setQueryTimeout(5);
+			ps.setInt(1, invoice.getId());
+			
+			success = ps.executeUpdate() > 0;
+			ps.close();
+			if (!success) {
+				throw new SQLException("InvoiceItems were not deleted!");
+			}
+			
+			//Transaction
+			query = "DELETE FROM [Transaction] WHERE id = ?";
+			ps = con.prepareStatement(query);
+			ps.setQueryTimeout(5);
+			ps.setInt(1, invoice.getId());
+			
+			success = ps.executeUpdate() > 0;
+			ps.close();
+			if (!success) {
+				throw new SQLException("Transaction was not deleted!");
+			}
+			
+			//Invoice
+			query = "DELETE FROM [Invoice] WHERE id = ?";
+			ps = con.prepareStatement(query);
 			ps.setQueryTimeout(5);
 			ps.setInt(1, invoice.getId());
 			

@@ -5,7 +5,6 @@ import javax.swing.table.AbstractTableModel;
 
 public abstract class ItemTableModel<T> extends AbstractTableModel {
 
-	private static final long serialVersionUID = 1L;
 	protected String[] columns;
 	protected ArrayList<T> items;
 	

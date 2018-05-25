@@ -27,7 +27,7 @@ import javax.swing.JTextField;
 import javax.swing.event.CaretListener;
 import javax.swing.event.CaretEvent;
 
-public class ConfirmInvoice extends PerformPanel implements ActionListener, CaretListener, ListSelectionListener, TableModelListener {
+public class ConfirmInvoice extends PerformPanel implements ActionListener, CaretListener, ListSelectionListener {
 
 	private InvoiceController invoiceCtrl;
 	private Invoice invoice;
@@ -40,6 +40,7 @@ public class ConfirmInvoice extends PerformPanel implements ActionListener, Care
 	private JTable tbl_delivered;
 	private DeliveredTableModel mdl_delivered;
 	private JButton btn_confirm;
+	private JButton btn_cancel;
 	
 	public ConfirmInvoice() {
 		invoiceCtrl = new InvoiceController();
@@ -64,11 +65,6 @@ public class ConfirmInvoice extends PerformPanel implements ActionListener, Care
 		btn_search = new JButton("Search");
 		btn_search.setBounds(199, 4, 73, 20);
 		add(btn_search);
-		
-		btn_confirm = new JButton("Confirm");
-		btn_confirm.setBounds(718, 3, 73, 23);
-		btn_confirm.setEnabled(true);
-		add(btn_confirm);
 		
 		JScrollPane scrlPane_ordered = new JScrollPane();
 		scrlPane_ordered.setBounds(10, 28, 300, 461);
@@ -100,14 +96,25 @@ public class ConfirmInvoice extends PerformPanel implements ActionListener, Care
 		tbl_delivered.setModel(mdl_delivered);
 		scrlPane_delivered.setViewportView(tbl_delivered);
 		
+		btn_confirm = new JButton("Confirm");
+		btn_confirm.setBounds(636, 3, 73, 23);
+		btn_confirm.setEnabled(true);
+		add(btn_confirm);
+		btn_confirm.addActionListener(this);
+		
+		btn_cancel = new JButton("Cancel");
+		btn_cancel.setEnabled(true);
+		btn_cancel.setBounds(718, 3, 73, 23);
+		add(btn_cancel);
+		
 		txt_search.addCaretListener(this);
 		btn_search.addActionListener(this);
-		btn_confirm.addActionListener(this);
 		tbl_ordered.getSelectionModel().addListSelectionListener(this);
 		tbl_delivered.getSelectionModel().addListSelectionListener(this);
 		btn_add.addActionListener(this);
 		btn_remove.addActionListener(this);
-		mdl_delivered.addTableModelListener(this);
+		btn_confirm.addActionListener(this);
+		btn_cancel.addActionListener(this);
 		
 		resetForm();
 	}
@@ -125,6 +132,9 @@ public class ConfirmInvoice extends PerformPanel implements ActionListener, Care
 		mdl_ordered.setItems(invoice.getItems());
 		
 		setVisible(true);
+	}
+	private void close() {
+		setVisible(false);
 	}
 	
 	private void searchOrdered() {
@@ -162,6 +172,10 @@ public class ConfirmInvoice extends PerformPanel implements ActionListener, Care
 		mdl_delivered.removeItems(items);
 	}
 	private void confirmInvoice() {
+		if (JOptionPane.showConfirmDialog(this, "Are you sure?") != JOptionPane.YES_OPTION) {
+        	return;
+        }
+		
 		invoice.setItems(mdl_delivered.getItems());
 		
 		if (!invoiceCtrl.confirmInvoice(invoice)) {
@@ -176,8 +190,13 @@ public class ConfirmInvoice extends PerformPanel implements ActionListener, Care
 				"The Stock-taking was successfully created!",
 			    "Success!",
 			    JOptionPane.INFORMATION_MESSAGE);
-		resetForm();
+		
 		triggerPerformListeners();
+		close();
+	}
+	private void cancel() {
+		triggerCancelListeners();
+		close();
 	}
 	
 	@Override
@@ -198,13 +217,6 @@ public class ConfirmInvoice extends PerformPanel implements ActionListener, Care
 		}
 	}
 	@Override
-	public void tableChanged(TableModelEvent e) {
-		if (e.getSource() == mdl_delivered) {
-			boolean empty = mdl_delivered.getItems().isEmpty();
-			btn_confirm.setEnabled(!empty);
-		}
-	}
-	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == btn_search) {
 			searchOrdered();
@@ -214,6 +226,8 @@ public class ConfirmInvoice extends PerformPanel implements ActionListener, Care
 			removeFromDelivered();
 		} else if (e.getSource() == btn_confirm) {
 			confirmInvoice();
+		} else if (e.getSource() == btn_cancel) {
+			cancel();
 		}
 	}
 	
@@ -328,8 +342,10 @@ public class ConfirmInvoice extends PerformPanel implements ActionListener, Care
 		@Override
 		public void setValueAt(Object value, int rowIndex, int columnIndex) {
 			try {
-				int quantity = (int)value;
-				super.items.get(rowIndex).setQuantity(quantity);
+				double quantity = (double)value;
+				if (quantity >= 0) {
+					super.items.get(rowIndex).setQuantity(quantity);
+				}
 			} catch(Exception e) {}
 		}
 		public ArrayList<InvoiceItem> getItems() {

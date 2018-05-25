@@ -52,6 +52,7 @@ public class ListPendingInvoices extends JPanel implements ActionListener, Mouse
 		searching = false;
 		
 		showInvoice.addPerformListener(this);
+		createInvoice.addPerformListener(this);
 		confirmInvoice.addPerformListener(this);
 		
 		initialize();
@@ -92,10 +93,6 @@ public class ListPendingInvoices extends JPanel implements ActionListener, Mouse
 		{
 		    public void actionPerformed(ActionEvent e)
 		    {
-		        if (JOptionPane.showConfirmDialog(ListPendingInvoices.this, "Are you sure?") != JOptionPane.YES_OPTION) {
-		        	return;
-		        }
-		    	
 		        JTable table = (JTable)e.getSource();
 		        int modelRowIndex = Integer.valueOf(e.getActionCommand());
 		        Invoice invoice = model.getInvoiceAt(modelRowIndex);
@@ -108,6 +105,10 @@ public class ListPendingInvoices extends JPanel implements ActionListener, Mouse
 		{
 		    public void actionPerformed(ActionEvent e)
 		    {
+		    	if (JOptionPane.showConfirmDialog(ListPendingInvoices.this, "Are you sure?") != JOptionPane.YES_OPTION) {
+		        	return;
+		        }
+		    	
 		        JTable table = (JTable)e.getSource();
 		        int modelRowIndex = Integer.valueOf(e.getActionCommand());
 		        Invoice invoice = model.getInvoiceAt(modelRowIndex);
@@ -128,9 +129,9 @@ public class ListPendingInvoices extends JPanel implements ActionListener, Mouse
 		    }
 		};
 		
-		ButtonColumn btnColumn = new ButtonColumn(table, confirm, model.getColumnCount()-1);
+		ButtonColumn btnColumn = new ButtonColumn(table, confirm, model.getColumnCount()-2);
 		btnColumn.setMnemonic(KeyEvent.VK_ACCEPT);
-		btnColumn = new ButtonColumn(table, cancel, model.getColumnCount()-2);
+		btnColumn = new ButtonColumn(table, cancel, model.getColumnCount()-1);
 		btnColumn.setMnemonic(KeyEvent.VK_CANCEL);
 		
 		confirmInvoice.addPerformListener(this);

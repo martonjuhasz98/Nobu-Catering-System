@@ -131,6 +131,8 @@ public class DBSupplier implements IFDBSupplier {
 			System.out.println("Supplier was not inserted!");
 			System.out.println(e.getMessage());
 			System.out.println(query);
+			
+			return null;
 		}
 		
 		return cvr;

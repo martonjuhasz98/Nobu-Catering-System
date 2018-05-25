@@ -91,6 +91,8 @@ public class DBItemCategory implements IFDBItemCategory {
 			System.out.println("ItemCategory was not inserted!");
 			System.out.println(e.getMessage());
 			System.out.println(query);
+			
+			return -1;
 		}
 		
 		return id;

@@ -51,6 +51,10 @@ public class Supplier {
 	}
 	
 	@Override
+	public String toString() {
+		return String.format("%s - %s", cvr, name);
+	}
+	@Override
 	public boolean equals(Object o) {
 	    if (o == this) {
 	      return true;
