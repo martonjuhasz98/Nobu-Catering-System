@@ -1,24 +1,16 @@
 package guilayer.stocktaking;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.function.Consumer;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableCellEditor;
-import javax.swing.table.TableColumnModel;
 
 import ctrllayer.ItemController;
 import guilayer.ManagerWindow;
-import guilayer.interfaces.ButtonColumn;
-import guilayer.inventory.ListInventory;
+import guilayer.interfaces.ItemTableModel;
 import modlayer.Employee;
 import modlayer.Item;
-import modlayer.ItemCategory;
-import modlayer.Unit;
 
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
@@ -29,21 +21,8 @@ import javax.swing.JButton;
 import javax.swing.JOptionPane;
 
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.text.DecimalFormat;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextField;
-import javax.swing.JComboBox;
-import javax.swing.JFormattedTextField;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JRadioButton;
-import javax.swing.JList;
-import javax.swing.AbstractAction;
-import javax.swing.AbstractListModel;
-import javax.swing.Action;
-import javax.swing.DefaultCellEditor;
 import javax.swing.event.CaretListener;
 import javax.swing.event.CaretEvent;
 
@@ -69,7 +48,7 @@ public class CheckInventory extends JPanel implements ActionListener, CaretListe
 	private void initialize() {
 		
 		setLayout(null);
-		setBounds(0, 0, 801, 500);
+		setBounds(0, 0, ManagerWindow.contentWidth, ManagerWindow.totalHeight);
 		
 		mdl_inventory = new InventoryTableModel();
 		mdl_stocktaking = new StocktakingTableModel();
@@ -126,9 +105,9 @@ public class CheckInventory extends JPanel implements ActionListener, CaretListe
 		btn_remove.addActionListener(this);
 		mdl_stocktaking.addTableModelListener(this);
 		
-		resetForm();
+		reset();
 	}
-	private void resetForm() {
+	private void reset() {
 		mdl_inventory.setItems(itemCtrl.getItems());
 		mdl_stocktaking.setItems(new ArrayList<Item>());
 		
@@ -136,31 +115,25 @@ public class CheckInventory extends JPanel implements ActionListener, CaretListe
 		btn_remove.setEnabled(false);
 		btn_confirm.setEnabled(false);
 	}
-	private void searchInventory() {
+	private void search() {
 		String keyword = txt_search.getText().trim();
 		mdl_inventory.setItems(itemCtrl.searchItems(keyword));
 	}
 	private void addToStocktaking() {
 		int[] selection = tbl_inventory.getSelectedRows();
-		ArrayList<Item> items = new ArrayList<Item>(selection.length);
 		
 		for (int i = 0; i < selection.length; i++) {
 			selection[i] = tbl_inventory.convertRowIndexToModel(selection[i]);
-			items.add(mdl_inventory.getItemAt(selection[i]));
+			mdl_stocktaking.addItem(mdl_inventory.getItem(selection[i]));
 		}
-		
-		mdl_stocktaking.addItems(items);
 	}
 	private void removeFromStocktaking() {
 		int[] selection = tbl_stocktaking.getSelectedRows();
-		ArrayList<Item> items = new ArrayList<Item>(selection.length);
 		
 		for (int i = 0; i < selection.length; i++) {
 			selection[i] = tbl_stocktaking.convertRowIndexToModel(selection[i]);
-			items.add(mdl_stocktaking.getItemAt(selection[i]));
+			mdl_stocktaking.addItem(mdl_stocktaking.getItem(selection[i]));
 		}
-		
-		mdl_stocktaking.removeItems(items);
 	}
 	private void createStocktaking() {
 		Employee employee = new Employee();
@@ -178,13 +151,13 @@ public class CheckInventory extends JPanel implements ActionListener, CaretListe
 				"The Stock-taking was successfully created!",
 			    "Success!",
 			    JOptionPane.INFORMATION_MESSAGE);
-		resetForm();
+		reset();
 	}
 	
 	@Override
 	public void caretUpdate(CaretEvent e) {
 		if (e.getSource() == txt_search) {
-			searchInventory();
+			search();
 		}
 	}
 	@Override
@@ -208,7 +181,7 @@ public class CheckInventory extends JPanel implements ActionListener, CaretListe
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == btn_search) {
-			searchInventory();
+			search();
 		} else if (e.getSource() == btn_add) {
 			addToStocktaking();
 		} else if (e.getSource() == btn_remove) {
@@ -219,30 +192,16 @@ public class CheckInventory extends JPanel implements ActionListener, CaretListe
 	}
 	
 	
-	private class InventoryTableModel extends AbstractTableModel {
-		
-		private String[] columns = new String[] { "Name", "Quantity", "Unit", "Category" };
-		protected ArrayList<Item> items;
+	private class InventoryTableModel extends ItemTableModel<Item> {
 		
 		public InventoryTableModel() {
-			this(new ArrayList<Item>());
+			super();
+			
+			columns = new String[] { "Name", "Quantity", "Unit", "Category" };
 		}
-		public InventoryTableModel(ArrayList<Item> items) {
-			this.items = items;
-			update();
-		}
-
-		@Override
-		public int getRowCount() {
-			return items.size();
-		}
-		@Override
-		public int getColumnCount() {
-			return columns.length;
-		}
+		
 		@Override
 		public Object getValueAt(int rowIndex, int columnIndex) {
-			
 			Item item = items.get(rowIndex);
 			
 			switch(columnIndex) {
@@ -258,60 +217,11 @@ public class CheckInventory extends JPanel implements ActionListener, CaretListe
 			
 			return null;
 		}
-		@Override
-		public String getColumnName(int columnIndex) {
-			return columns[columnIndex];
-		}
-		@Override
-		public Class getColumnClass(int columnIndex) {
-			switch(columnIndex) {
-				case 0:
-					return String.class;
-				case 1:
-					return Double.class;
-				case 2:
-					return Unit.class;
-				case 3:
-					return ItemCategory.class;
-		}
-		
-		return null;
-		}
-		@Override
-		public boolean isCellEditable(int rowIndex, int columnIndex) {
-			return false;
-		}
-		public void update() {
-			fireTableDataChanged();
-		}
-		public Item getItemAt(int rowIndex) {
-			return items.get(rowIndex);
-		}
-		public void setItems(ArrayList<Item> items) {
-			this.items = items;
-			update();
-		}
-		public void addItems(ArrayList<Item> items) {
-			for (Item item : items) {
-				if (this.items.indexOf(item) < 0)
-					this.items.add(item);
-			}
-			update();
-		}
-		public void removeItems(ArrayList<Item> items) {
-			for (Item item : items) {
-				this.items.remove(item);
-			}
-			update();
-		}
 	}
 	private class StocktakingTableModel extends InventoryTableModel {
 		
 		public StocktakingTableModel() {
 			super();
-		}
-		public StocktakingTableModel(ArrayList<Item> items) {
-			super(items);
 		}
 		
 		@Override
@@ -324,9 +234,6 @@ public class CheckInventory extends JPanel implements ActionListener, CaretListe
 				double quantity = (double)value;
 				super.items.get(rowIndex).setQuantity(quantity);
 			} catch(Exception e) {}
-		}
-		public ArrayList<Item> getItems() {
-			return super.items;
 		}
 	}
 }

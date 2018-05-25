@@ -5,25 +5,20 @@ import javax.swing.JPanel;
 import ctrllayer.InvoiceController;
 import guilayer.ManagerWindow;
 import guilayer.interfaces.ButtonColumn;
+import guilayer.interfaces.ItemTableModel;
 import guilayer.interfaces.PerformListener;
-import guilayer.inventory.ListInventory;
 import modlayer.Invoice;
-import modlayer.Item;
-import modlayer.Unit;
 
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
-import javax.swing.table.AbstractTableModel;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.sql.Date;
-import java.util.ArrayList;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -85,7 +80,6 @@ public class ListPendingInvoices extends JPanel implements ActionListener, Mouse
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		table.getTableHeader().setReorderingAllowed(false);
 		table.setAutoCreateRowSorter(true);
-		model.setInvoices(invoiceCtrl.getPendingInvoices());
 		table.setModel(model);
 		scrollPane.setViewportView(table);
 		
@@ -93,9 +87,8 @@ public class ListPendingInvoices extends JPanel implements ActionListener, Mouse
 		{
 		    public void actionPerformed(ActionEvent e)
 		    {
-		        JTable table = (JTable)e.getSource();
 		        int modelRowIndex = Integer.valueOf(e.getActionCommand());
-		        Invoice invoice = model.getInvoiceAt(modelRowIndex);
+		        Invoice invoice = model.getItem(modelRowIndex);
 
 				setVisible(false);
 				confirmInvoice.confirm(invoice);
@@ -109,9 +102,8 @@ public class ListPendingInvoices extends JPanel implements ActionListener, Mouse
 		        	return;
 		        }
 		    	
-		        JTable table = (JTable)e.getSource();
 		        int modelRowIndex = Integer.valueOf(e.getActionCommand());
-		        Invoice invoice = model.getInvoiceAt(modelRowIndex);
+		        Invoice invoice = model.getItem(modelRowIndex);
 		        
 				if (!invoiceCtrl.cancelInvoice(invoice)) {
 					JOptionPane.showMessageDialog(ListPendingInvoices.this,
@@ -125,7 +117,7 @@ public class ListPendingInvoices extends JPanel implements ActionListener, Mouse
 					"The Invoice was successfully canceled!",
 				    "Success!",
 				    JOptionPane.INFORMATION_MESSAGE);
-				model.setInvoices(invoiceCtrl.getPendingInvoices());
+				reset();
 		    }
 		};
 		
@@ -139,13 +131,19 @@ public class ListPendingInvoices extends JPanel implements ActionListener, Mouse
 		btn_search.addActionListener(this);
 		btn_create.addActionListener(this);
 		table.addMouseListener(this);
+		
+		reset();
 	}
-	private void searchInventory() {
+	private void reset() {
+		model.setItems(invoiceCtrl.getPendingInvoices());
+		txt_search.setText("");
+	}
+	private void search() {
 		if (searching) return;
 		searching = true;
 
 		String keyword = txt_search.getText().trim();
-		model.setInvoices(invoiceCtrl.searchPendingInvoices(keyword));
+		model.setItems(invoiceCtrl.searchPendingInvoices(keyword));
 		
 		searching = false;
 	}
@@ -153,16 +151,16 @@ public class ListPendingInvoices extends JPanel implements ActionListener, Mouse
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == btn_search) {
-			searchInventory();
+			search();
 		} if (e.getSource() == btn_create) {
-			setVisible(false);
 			createInvoice.create();
+			setVisible(false);
 		}
 	}
 	@Override
 	public void caretUpdate(CaretEvent e) {
 		if (e.getSource() == txt_search) {
-			searchInventory();
+			search();
 		}
 	}
 	@Override
@@ -170,15 +168,15 @@ public class ListPendingInvoices extends JPanel implements ActionListener, Mouse
 		if (e.getClickCount() == 2 && e.getSource() == table) {
 			int viewRowIndex = table.getSelectedRow();
 			int modelRowIndex = table.convertRowIndexToModel(viewRowIndex);
-			Invoice invoice = model.getInvoiceAt(modelRowIndex);
+			Invoice invoice = model.getItem(modelRowIndex);
 			
+			showInvoice.show(invoice);
 			setVisible(false);
-			showInvoice.details(invoice);
 		}
 	}
 	@Override
 	public void performed() {
-		model.setInvoices(invoiceCtrl.getPendingInvoices());
+		model.setItems(invoiceCtrl.getPendingInvoices());
 		setVisible(true);
 	}
 	@Override
@@ -194,30 +192,16 @@ public class ListPendingInvoices extends JPanel implements ActionListener, Mouse
 	@Override
 	public void mouseExited(MouseEvent e) {}
 	
-	private class InvoiceTableModel extends AbstractTableModel {
-		
-		private String[] columns = new String[] { "Supplier", "Ordered", "Placed by", "", "" };
-		private ArrayList<Invoice> invoices;
+	private class InvoiceTableModel extends ItemTableModel<Invoice> {
 		
 		public InvoiceTableModel() {
-			this(new ArrayList<Invoice>());
-		}
-		public InvoiceTableModel(ArrayList<Invoice> invoices) {
-			this.invoices = invoices;
-			update();
-		}
-
-		@Override
-		public int getRowCount() {
-			return invoices.size();
-		}
-		@Override
-		public int getColumnCount() {
-			return columns.length;
+			super();
+			
+			columns = new String[] { "Supplier", "Ordered", "Placed by", "", "" };
 		}
 		@Override
 		public Object getValueAt(int rowIndex, int columnIndex) {
-			Invoice invoice = invoices.get(rowIndex);
+			Invoice invoice = items.get(rowIndex);
 			
 			switch(columnIndex) {
 				case 0:
@@ -235,39 +219,8 @@ public class ListPendingInvoices extends JPanel implements ActionListener, Mouse
 			return null;
 		}
 		@Override
-		public String getColumnName(int columnIndex) {
-			return columns[columnIndex];
-		}
-		@Override
-		public Class getColumnClass(int columnIndex) {
-			switch(columnIndex) {
-				case 0:
-					return String.class;
-				case 1:
-					return Date.class;
-				case 2:
-					return String.class;
-				case 3:
-					return JButton.class;
-				case 4:
-					return JButton.class;
-		}
-		
-		return null;
-		}
-		@Override
 		public boolean isCellEditable(int rowIndex, int columnIndex) {
 			return columnIndex >= getColumnCount() - 2;
-		}
-		public void update() {
-			fireTableDataChanged();
-		}
-		public Invoice getInvoiceAt(int rowIndex) {
-			return invoices.get(rowIndex);
-		}
-		public void setInvoices(ArrayList<Invoice> invoices) {
-			this.invoices = invoices;
-			update();
 		}
 	}
 }

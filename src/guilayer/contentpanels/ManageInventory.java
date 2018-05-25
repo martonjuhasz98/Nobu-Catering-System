@@ -1,8 +1,5 @@
 package guilayer.contentpanels;
 
-import java.awt.CardLayout;
-import java.util.function.Consumer;
-
 import javax.swing.JPanel;
 
 import guilayer.inventory.*;

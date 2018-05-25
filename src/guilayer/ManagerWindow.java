@@ -77,7 +77,7 @@ public class ManagerWindow extends JFrame {
 		content.setFont(contentFont);
 		contentPane.add(content);
 		
-		content.add(new AnalyticsTabbedPane(), "0");
+		content.add(new Analytics(), "0");
 		content.add(new ManageInventory(), "1");
 		content.add(new Stocktaking(), "2");
 		content.add(new ManageInvoices(), "3");

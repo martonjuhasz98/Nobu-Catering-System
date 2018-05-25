@@ -1,19 +1,12 @@
 package guilayer.menu;
 
 import java.awt.Color;
-import java.awt.Component;
-import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.ArrayList;
-import java.util.List;
 
-import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.SwingConstants;
-import javax.swing.border.EmptyBorder;
 
 public class Menu extends JPanel {
 	

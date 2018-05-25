@@ -9,11 +9,10 @@ public abstract class ItemTableModel<T> extends AbstractTableModel {
 	protected ArrayList<T> items;
 	
 	public ItemTableModel() {
-		this(new ArrayList<T>());
-	}
-	public ItemTableModel(ArrayList<T> items) {
-		this.items = items;
-		update();
+		super();
+		
+		columns = new String[0];
+		items = new ArrayList<T>();
 	}
 
 	@Override
@@ -46,8 +45,17 @@ public abstract class ItemTableModel<T> extends AbstractTableModel {
 	public void update() {
 		fireTableDataChanged();
 	}
-	public T getItemAt(int rowIndex) {
-		return items.get(rowIndex);
+	public T getItem(int index) {
+		return items.get(index);
+	}
+	public boolean addItem(T item) {
+		return items.add(item);
+	}
+	public T removeItem(int index) {
+		return items.remove(index);
+	}
+	public boolean removeItem(T item) {
+		return items.remove(item);
 	}
 	public ArrayList<T> getItems() {
 		return items;

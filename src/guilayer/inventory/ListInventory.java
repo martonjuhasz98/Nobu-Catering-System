@@ -1,25 +1,20 @@
 package guilayer.inventory;
 
 import java.util.ArrayList;
-import java.util.function.Consumer;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.table.AbstractTableModel;
 
 import ctrllayer.ItemController;
 import guilayer.ManagerWindow;
 import guilayer.interfaces.ButtonColumn;
+import guilayer.interfaces.ItemTableModel;
 import guilayer.interfaces.PerformListener;
 import guilayer.inventory.ListInventory;
 import modlayer.Item;
-import modlayer.ItemCategory;
-import modlayer.Unit;
 
 import javax.swing.ListSelectionModel;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 
@@ -29,13 +24,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextField;
-import javax.swing.JComboBox;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JRadioButton;
-import javax.swing.JList;
 import javax.swing.AbstractAction;
-import javax.swing.AbstractListModel;
-import javax.swing.Action;
 import javax.swing.event.CaretListener;
 import javax.swing.event.CaretEvent;
 
@@ -44,7 +33,7 @@ public class ListInventory extends JPanel implements ActionListener, MouseListen
 	private EditItem itemEditor;
 	private ItemController itemCtrl;
 	private JTable table;
-	private ItemTableModel model;
+	private InventoryTableModel<Item> model;
 	private JButton btn_search;
 	private JButton btn_create;
 	private JTextField txt_search;
@@ -65,7 +54,7 @@ public class ListInventory extends JPanel implements ActionListener, MouseListen
 		setLayout(null);
 		setBounds(0, 0, ManagerWindow.contentWidth, ManagerWindow.totalHeight);
 		
-		model = new ItemTableModel();
+		model = new InventoryTableModel<Item>();
 		
 		txt_search = new JTextField();
 		txt_search.setBounds(10, 4, 179, 20);
@@ -100,9 +89,8 @@ public class ListInventory extends JPanel implements ActionListener, MouseListen
 		        	return;
 		        }
 		    	
-		        JTable table = (JTable)e.getSource();
 		        int modelRowIndex = Integer.valueOf(e.getActionCommand());
-		        Item item = model.getItemAt(modelRowIndex);
+		        Item item = (Item)model.getItem(modelRowIndex);
 		        
 				if (!itemCtrl.deleteItem(item)) {
 					JOptionPane.showMessageDialog(ListInventory.this,
@@ -150,7 +138,7 @@ public class ListInventory extends JPanel implements ActionListener, MouseListen
 			searchInventory();
 		} if (e.getSource() == btn_create) {
 			setVisible(false);
-			itemEditor.createItem();
+			itemEditor.create();
 		}
 	}
 	@Override
@@ -158,10 +146,10 @@ public class ListInventory extends JPanel implements ActionListener, MouseListen
 		if (e.getClickCount() == 2 && e.getSource() == table) {
 			int viewRowIndex = table.getSelectedRow();
 			int modelRowIndex = table.convertRowIndexToModel(viewRowIndex);
-			Item item = model.getItemAt(modelRowIndex);
+			Item item = (Item)model.getItem(modelRowIndex);
 			
 			setVisible(false);
-			itemEditor.updateItem(item);
+			itemEditor.update(item);
 		}
 	}
 	@Override
@@ -182,28 +170,14 @@ public class ListInventory extends JPanel implements ActionListener, MouseListen
 	@Override
 	public void mouseExited(MouseEvent e) {}
 	
-	
-	private class ItemTableModel extends AbstractTableModel {
+	private class InventoryTableModel<T extends Item> extends ItemTableModel<T> {
 		
-		private String[] columns = new String[] { "Name", "Quantity", "Unit", "Category", "" };
-		private ArrayList<Item> items;
+		public InventoryTableModel() {
+			super();
+			
+			columns = new String[] { "Name", "Quantity", "Unit", "Category", "" };
+		}
 		
-		public ItemTableModel() {
-			this(new ArrayList<Item>());
-		}
-		public ItemTableModel(ArrayList<Item> items) {
-			this.items = items;
-			update();
-		}
-
-		@Override
-		public int getRowCount() {
-			return items.size();
-		}
-		@Override
-		public int getColumnCount() {
-			return columns.length;
-		}
 		@Override
 		public Object getValueAt(int rowIndex, int columnIndex) {
 			
@@ -225,39 +199,8 @@ public class ListInventory extends JPanel implements ActionListener, MouseListen
 			return null;
 		}
 		@Override
-		public String getColumnName(int columnIndex) {
-			return columns[columnIndex];
-		}
-		@Override
-		public Class getColumnClass(int columnIndex) {
-			switch(columnIndex) {
-				case 0:
-					return String.class;
-				case 1:
-					return double.class;
-				case 2:
-					return Unit.class;
-				case 3:
-					return ItemCategory.class;
-				case 4:
-					return JButton.class;
-		}
-		
-		return null;
-		}
-		@Override
 		public boolean isCellEditable(int rowIndex, int columnIndex) {
 			return columnIndex == getColumnCount() - 1;
-		}
-		public void update() {
-			fireTableDataChanged();
-		}
-		public Item getItemAt(int rowIndex) {
-			return items.get(rowIndex);
-		}
-		public void setItems(ArrayList<Item> items) {
-			this.items = items;
-			update();
 		}
 	}
 }

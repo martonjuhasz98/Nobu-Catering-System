@@ -1,19 +1,12 @@
 package guilayer.contentpanels;
 
-import java.awt.CardLayout;
-import java.util.function.Consumer;
-
 import javax.swing.JPanel;
 
-import guilayer.inventory.*;
-import guilayer.employees.EditEmployee;
-import guilayer.employees.ListEmployees;
+import guilayer.employees.*;
 
 public class ManageEmployees extends JPanel {
 	
 	public ManageEmployees() {
-
-		
 		initalize();
 	}
 

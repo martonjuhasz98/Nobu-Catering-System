@@ -7,7 +7,6 @@ import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
@@ -19,18 +18,12 @@ import modlayer.ItemCategory;
 import modlayer.Unit;
 
 import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.util.function.Consumer;
 import java.awt.event.ActionEvent;
-import javax.swing.JFormattedTextField;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.SwingConstants;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 
@@ -182,24 +175,6 @@ public class EditItem extends PerformPanel implements ActionListener, CaretListe
 		btn_submit.setText("Create");
 		btn_submit.setEnabled(false);
 	}
-	public void createItem() {
-		open();
-	}
-	public void updateItem(Item item) {
-		open();
-		fill(item);
-	}
-	private void open() {
-		cmb_unit.setModel(new DefaultComboBoxModel(itemCtrl.getUnits().toArray()));
-		cmb_unit.setSelectedIndex(-1);
-		cmb_category.setModel(new DefaultComboBoxModel(itemCtrl.getCategories().toArray()));
-		cmb_category.setSelectedIndex(-1);
-		setVisible(true);
-	}
-	private void close() {
-		setVisible(false);
-		reset();
-	}
 	private boolean isFilled() {
 		if (txt_barcode.getText().trim().isEmpty())
 			return false;
@@ -219,62 +194,87 @@ public class EditItem extends PerformPanel implements ActionListener, CaretListe
 		return true;
 	}
 	
+	public void create() {
+		open();
+	}
+	public void update(Item item) {
+		open();
+		fill(item);
+	}
+	private void open() {
+		cmb_unit.setModel(new DefaultComboBoxModel(itemCtrl.getUnits().toArray()));
+		cmb_unit.setSelectedIndex(-1);
+		cmb_category.setModel(new DefaultComboBoxModel(itemCtrl.getCategories().toArray()));
+		cmb_category.setSelectedIndex(-1);
+		setVisible(true);
+	}
+	private void close() {
+		setVisible(false);
+		reset();
+	}
+	private void submit() {
+		String barcode = txt_barcode.getText().trim();
+		String name = txt_name.getText().trim();
+		double quantity = (Double)sprm_quantity.getValue();
+		Unit unit = (Unit)cmb_unit.getSelectedItem();
+		ItemCategory category;
+		if (!creatingCategory) {
+			category = (ItemCategory)cmb_category.getSelectedItem();
+		} else {
+			category = new ItemCategory();
+			category.setName(txt_category.getText().trim());
+		}
+		
+		if (creatingItem) {
+			if (!itemCtrl.createItem(barcode, name, quantity, unit, category)) {
+				JOptionPane.showMessageDialog(this,
+					    "An error occured while creating the Item!",
+					    "Error!",
+					    JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			
+			JOptionPane.showMessageDialog(this,
+				    "The Item was successfully created!",
+				    "Success!",
+				    JOptionPane.INFORMATION_MESSAGE);
+			
+			triggerPerformListeners();
+		} else {
+			item.setBarcode(txt_barcode.getText().trim());
+			item.setName(txt_name.getText().trim());
+			item.setQuantity((Double)sprm_quantity.getValue());
+			item.setUnit((Unit)cmb_unit.getSelectedItem());
+			item.setCategory(category);
+			
+			if (!itemCtrl.updateItem(item)) {
+				JOptionPane.showMessageDialog(this,
+					    "An error occured while creating the Item!",
+					    "Error!",
+					    JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			
+			JOptionPane.showMessageDialog(this,
+				    "The Item was successfully edited!",
+				    "Success!",
+				    JOptionPane.INFORMATION_MESSAGE);
+			
+			triggerPerformListeners();
+		}
+		close();
+	}
+	private void cancel() {
+		triggerCancelListeners();
+		close();
+	}
+	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == btn_submit) {
-			String barcode = txt_barcode.getText().trim();
-			String name = txt_name.getText().trim();
-			double quantity = (Double)sprm_quantity.getValue();
-			Unit unit = (Unit)cmb_unit.getSelectedItem();
-			ItemCategory category;
-			if (!creatingCategory) {
-				category = (ItemCategory)cmb_category.getSelectedItem();
-			} else {
-				category = new ItemCategory();
-				category.setName(txt_category.getText().trim());
-			}
-			
-			if (creatingItem) {
-				if (!itemCtrl.createItem(barcode, name, quantity, unit, category)) {
-					JOptionPane.showMessageDialog(this,
-						    "An error occured while creating the Item!",
-						    "Error!",
-						    JOptionPane.ERROR_MESSAGE);
-					return;
-				}
-				
-				JOptionPane.showMessageDialog(this,
-					    "The Item was successfully created!",
-					    "Success!",
-					    JOptionPane.INFORMATION_MESSAGE);
-				
-				triggerPerformListeners();
-			} else {
-				item.setBarcode(txt_barcode.getText().trim());
-				item.setName(txt_name.getText().trim());
-				item.setQuantity((Double)sprm_quantity.getValue());
-				item.setUnit((Unit)cmb_unit.getSelectedItem());
-				item.setCategory(category);
-				
-				if (!itemCtrl.updateItem(item)) {
-					JOptionPane.showMessageDialog(this,
-						    "An error occured while creating the Item!",
-						    "Error!",
-						    JOptionPane.ERROR_MESSAGE);
-					return;
-				}
-				
-				JOptionPane.showMessageDialog(this,
-					    "The Item was successfully edited!",
-					    "Success!",
-					    JOptionPane.INFORMATION_MESSAGE);
-				
-				triggerPerformListeners();
-			}
-			close();
+			submit();
 		} else if (e.getSource() == btn_cancel) {
-			triggerCancelListeners();
-			close();
+			cancel();
 		}
 	}
 	@Override

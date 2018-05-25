@@ -13,7 +13,6 @@ import java.awt.event.ActionEvent;
 import javax.swing.JTextField;
 import javax.swing.JPasswordField;
 import javax.swing.JLabel;
-import java.awt.Component;
 import javax.swing.SwingConstants;
 
 import ctrllayer.SessionSingleton;

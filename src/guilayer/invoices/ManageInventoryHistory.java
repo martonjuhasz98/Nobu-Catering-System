@@ -5,8 +5,6 @@ import javax.swing.JPanel;
 public class ManageInventoryHistory extends JPanel {
 	
 	public ManageInventoryHistory() {
-
-		
 		initalize();
 	}
 
@@ -14,10 +12,12 @@ public class ManageInventoryHistory extends JPanel {
 		
 		setLayout(null);
 		
-		ShowInvoice showInvoice = new ShowInvoice();
-		add(showInvoice);
+		CreateInvoice createInvoice = new CreateInvoice();
+		add(createInvoice);	
 		
-		ListInvoiceHistory listInvoiceHistory = new ListInvoiceHistory(showInvoice);
+		ShowInvoice showInvoice = new ShowInvoice();
+		
+		ListInvoiceHistory listInvoiceHistory = new ListInvoiceHistory(createInvoice, showInvoice);
 		add(listInvoiceHistory);
 	}
 }

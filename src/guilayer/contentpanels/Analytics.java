@@ -2,14 +2,11 @@ package guilayer.contentpanels;
 
 import javax.swing.JTabbedPane;
 
-import guilayer.analytics.SalesGraph;
-import guilayer.analytics.SalesBreakdownTab;
-import guilayer.analytics.WasteTab;
-import guilayer.analytics.WeeklyUsageTab;
+import guilayer.analytics.*;
 
-public class AnalyticsTabbedPane extends JTabbedPane {
+public class Analytics extends JTabbedPane {
 
-	public AnalyticsTabbedPane() {
+	public Analytics() {
 		add(new WasteTab(),"Waste breakdown");
 		add(new SalesGraph(), "Sales graph");
 		add(new SalesBreakdownTab(),"Sales Item Breakdown");

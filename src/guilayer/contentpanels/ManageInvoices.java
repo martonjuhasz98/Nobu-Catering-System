@@ -1,9 +1,5 @@
 package guilayer.contentpanels;
 
-import java.awt.CardLayout;
-import java.util.function.Consumer;
-
-import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
 import guilayer.invoices.*;
@@ -11,7 +7,6 @@ import guilayer.invoices.*;
 public class ManageInvoices extends JTabbedPane {
 	
 	public ManageInvoices() {
-		
 		initalize();
 	}
 

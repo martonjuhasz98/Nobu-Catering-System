@@ -2,10 +2,8 @@ package guilayer.invoices;
 
 import java.util.ArrayList;
 
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.table.AbstractTableModel;
 
 import ctrllayer.InvoiceController;
 import guilayer.interfaces.ItemTableModel;
@@ -17,8 +15,6 @@ import modlayer.Item;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 
@@ -152,25 +148,19 @@ public class ConfirmInvoice extends PerformPanel implements ActionListener, Care
 	}
 	private void addToDelivered() {
 		int[] selection = tbl_ordered.getSelectedRows();
-		ArrayList<InvoiceItem> items = new ArrayList<InvoiceItem>(selection.length);
 		
 		for (int i = 0; i < selection.length; i++) {
 			selection[i] = tbl_ordered.convertRowIndexToModel(selection[i]);
-			items.add((InvoiceItem)mdl_ordered.getItemAt(selection[i]));
+			mdl_delivered.addItem(mdl_ordered.getItem(selection[i]));
 		}
-		
-		mdl_delivered.addItems(items);
 	}
 	private void removeFromDelivered() {
 		int[] selection = tbl_delivered.getSelectedRows();
-		ArrayList<InvoiceItem> items = new ArrayList<InvoiceItem>(selection.length);
 		
 		for (int i = 0; i < selection.length; i++) {
 			selection[i] = tbl_delivered.convertRowIndexToModel(selection[i]);
-			items.add((InvoiceItem)mdl_delivered.getItemAt(selection[i]));
+			mdl_delivered.removeItem(mdl_ordered.getItem(selection[i]));
 		}
-		
-		mdl_delivered.removeItems(items);
 	}
 	private void confirmInvoice() {
 		if (JOptionPane.showConfirmDialog(this, "Are you sure?") != JOptionPane.YES_OPTION) {
@@ -232,16 +222,12 @@ public class ConfirmInvoice extends PerformPanel implements ActionListener, Care
 		}
 	}
 	
-	
-	private class OrderedTableModel<T extends InvoiceItem> extends ItemTableModel<T> {
+	private class OrderedTableModel extends ItemTableModel<InvoiceItem> {
 
 		public OrderedTableModel() {
-			this(new ArrayList<T>());
-		}
-		public OrderedTableModel(ArrayList<T> items) {
-			super((ArrayList<T>)items);
+			super();
 			
-			this.columns = new String[] { "Barcode", "Name", "Quantity", "Unit", "Unit price", "Category" };
+			columns = new String[] { "Barcode", "Name", "Quantity", "Unit", "Unit price", "Category" };
 		}
 		
 		@Override
@@ -272,38 +258,22 @@ public class ConfirmInvoice extends PerformPanel implements ActionListener, Care
 				case 1:
 					double quantity = (double)value;
 					if (quantity > 0) {
-						getItemAt(rowIndex).setQuantity(quantity);
+						getItem(rowIndex).setQuantity(quantity);
 					}
 					break;
 				case 3:
 					double price = (double)value;
 					if (price > 0) {
-						getItemAt(rowIndex).setUnitPrice(price);
+						getItem(rowIndex).setUnitPrice(price);
 					}
 					break;
 			}
 		}
-		public void addItems(ArrayList<InvoiceItem> items) {
-			for (InvoiceItem item : items) {
-				if (this.items.indexOf((T)item) < 0)
-					this.items.add((T)item);
-			}
-			update();
-		}
-		public void removeItems(ArrayList<InvoiceItem> items) {
-			for (InvoiceItem item : items) {
-				this.items.remove((T)item);
-			}
-			update();
-		}
 	}
-	private class DeliveredTableModel<T extends InvoiceItem> extends OrderedTableModel<T> {
+	private class DeliveredTableModel extends OrderedTableModel {
 		
 		public DeliveredTableModel() {
-			this(new ArrayList<T>());
-		}
-		public DeliveredTableModel(ArrayList<T> items) {
-			super((ArrayList<T>)items);
+			super();
 		}
 		
 		@Override
@@ -318,9 +288,6 @@ public class ConfirmInvoice extends PerformPanel implements ActionListener, Care
 					super.items.get(rowIndex).setQuantity(quantity);
 				}
 			} catch(Exception e) {}
-		}
-		public ArrayList<T> getItems() {
-			return super.items;
 		}
 	}
 }

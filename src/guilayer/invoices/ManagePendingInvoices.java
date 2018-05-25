@@ -5,8 +5,6 @@ import javax.swing.JPanel;
 public class ManagePendingInvoices extends JPanel {
 	
 	public ManagePendingInvoices() {
-
-		
 		initalize();
 	}
 
