@@ -6,6 +6,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
 import ctrllayer.InvoiceController;
+import guilayer.ManagerWindow;
 import guilayer.interfaces.ItemTableModel;
 import guilayer.interfaces.PerformPanel;
 import modlayer.Invoice;
@@ -49,7 +50,7 @@ public class ConfirmInvoice extends PerformPanel implements ActionListener, Care
 		
 		setLayout(null);
 		setVisible(false);
-		setBounds(0, 0, 801, 500);
+		setBounds(0, 0, ManagerWindow.contentWidth, ManagerWindow.totalHeight - 30);
 		
 		mdl_ordered = new OrderedTableModel();
 		mdl_delivered = new DeliveredTableModel();
@@ -64,7 +65,7 @@ public class ConfirmInvoice extends PerformPanel implements ActionListener, Care
 		add(btn_search);
 		
 		JScrollPane scrlPane_ordered = new JScrollPane();
-		scrlPane_ordered.setBounds(10, 28, 300, 461);
+		scrlPane_ordered.setBounds(10, 28, 300, 431);
 		add(scrlPane_ordered);
 		
 		tbl_ordered = new JTable();
@@ -83,7 +84,7 @@ public class ConfirmInvoice extends PerformPanel implements ActionListener, Care
 		add(btn_remove);
 		
 		JScrollPane scrlPane_delivered = new JScrollPane();
-		scrlPane_delivered.setBounds(400, 28, 391, 461);
+		scrlPane_delivered.setBounds(400, 28, 391, 431);
 		add(scrlPane_delivered);
 		
 		tbl_delivered = new JTable();

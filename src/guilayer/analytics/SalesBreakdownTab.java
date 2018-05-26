@@ -5,9 +5,7 @@ import javax.swing.JPanel;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Locale;
-import java.awt.GridLayout;
 import java.awt.Rectangle;
 import javax.swing.JScrollPane;
 import javax.swing.JLabel;
@@ -15,18 +13,14 @@ import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
 import org.jdatepicker.JDatePicker;
-import org.jdatepicker.UtilDateModel;
 
 import ctrllayer.AnalyticsController;
 import ctrllayer.ItemController;
-import modlayer.Item;
 
-import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JComboBox;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 
 public class SalesBreakdownTab extends JPanel {

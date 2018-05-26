@@ -36,6 +36,7 @@ public class ListInvoiceHistory extends JPanel implements ActionListener, MouseL
 		this.showInvoice = showInvoice;
 		invoiceCtrl = new InvoiceController();
 		
+		createInvoice.addPerformListener(this);
 		showInvoice.addPerformListener(this);
 		
 		initialize();
@@ -44,7 +45,7 @@ public class ListInvoiceHistory extends JPanel implements ActionListener, MouseL
 	private void initialize() {
 		
 		setLayout(null);
-		setBounds(0, 0, ManagerWindow.contentWidth, ManagerWindow.totalHeight);
+		setBounds(0, 0, ManagerWindow.contentWidth, ManagerWindow.totalHeight - 30);
 		
 		model = new HistoryTableModel();
 		
@@ -62,12 +63,11 @@ public class ListInvoiceHistory extends JPanel implements ActionListener, MouseL
 		add(btn_create);
 		
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(10, 41, 780, 448);
+		scrollPane.setBounds(10, 41, 780, 418);
 		add(scrollPane);
 		
 		table = new JTable(model);
 		table.setAutoCreateRowSorter(true);
-		model.setItems(invoiceCtrl.getInvoiceHistory());
 		scrollPane.setViewportView(table);
 		
 		txt_search.addCaretListener(this);
@@ -78,7 +78,7 @@ public class ListInvoiceHistory extends JPanel implements ActionListener, MouseL
 		reset();
 	}
 	private void reset() {
-		model.setItems(invoiceCtrl.getPendingInvoices());
+		model.setItems(invoiceCtrl.getInvoiceHistory());
 		txt_search.setText("");
 	}
 	private void search() {

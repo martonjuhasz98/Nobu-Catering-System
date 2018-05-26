@@ -55,7 +55,7 @@ public class ListPendingInvoices extends JPanel implements ActionListener, Mouse
 	
 	private void initialize() {
 		setLayout(null);
-		setBounds(0, 0, ManagerWindow.contentWidth, ManagerWindow.totalHeight);
+		setBounds(0, 0, ManagerWindow.contentWidth, ManagerWindow.totalHeight - 30);
 		
 		model = new InvoiceTableModel();
 		
@@ -73,7 +73,7 @@ public class ListPendingInvoices extends JPanel implements ActionListener, Mouse
 		add(btn_create);
 		
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(10, 42, 780, 447);
+		scrollPane.setBounds(10, 42, 780, 417);
 		add(scrollPane);
 		
 		table = new JTable();

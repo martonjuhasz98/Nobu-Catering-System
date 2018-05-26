@@ -68,7 +68,7 @@ public class CreateInvoice extends PerformPanel implements ActionListener, Caret
 		
 		setLayout(null);
 		setVisible(false);
-		setBounds(0, 0, ManagerWindow.contentWidth, ManagerWindow.totalHeight);
+		setBounds(0, 0, ManagerWindow.contentWidth, ManagerWindow.totalHeight - 30);
 		
 		mdl_inventory = new InventoryTableModel();
 		mdl_invoice = new InvoiceTableModel();
@@ -98,7 +98,7 @@ public class CreateInvoice extends PerformPanel implements ActionListener, Caret
 		add(btn_search);
 		
 		JScrollPane scrlPane_inventory = new JScrollPane();
-		scrlPane_inventory.setBounds(10, 123, 316, 366);
+		scrlPane_inventory.setBounds(10, 123, 316, 336);
 		add(scrlPane_inventory);
 		
 		tbl_inventory = new JTable();
@@ -118,7 +118,7 @@ public class CreateInvoice extends PerformPanel implements ActionListener, Caret
 		add(btn_remove);
 		
 		JScrollPane scrlPane_invoiceItem = new JScrollPane();
-		scrlPane_invoiceItem.setBounds(419, 123, 371, 366);
+		scrlPane_invoiceItem.setBounds(419, 123, 371, 336);
 		add(scrlPane_invoiceItem);
 		
 		tbl_invoiceItem = new JTable();
@@ -230,7 +230,7 @@ public class CreateInvoice extends PerformPanel implements ActionListener, Caret
 			invoiceItem.setItem((Item)mdl_inventory.getItem(selection[i]));
 			invoiceItem.setQuantity(1.0);
 			invoiceItem.setUnitPrice(1.0);
-			mdl_invoice.removeItem(invoiceItem);
+			mdl_invoice.addItem(invoiceItem);
 		}
 	}
 	private void removeFromInvoice() {

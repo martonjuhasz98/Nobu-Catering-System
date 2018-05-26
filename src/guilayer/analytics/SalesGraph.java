@@ -4,19 +4,15 @@ import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Locale;
 
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.table.AbstractTableModel;
 
 import org.jdatepicker.JDatePicker;
 import org.knowm.xchart.CategoryChart;
@@ -83,21 +79,21 @@ public class SalesGraph extends JPanel {
 							new java.sql.Date(format.parse(fromDatePicker.getFormattedTextField().getText()).getTime()),
 							new java.sql.Date(format.parse(toDatePicker.getFormattedTextField().getText()).getTime()));
 					
-					ArrayList<java.util.Date> xData = new ArrayList();
+					ArrayList<Date> xData = new ArrayList<Date>();
 					for (String s : data[0])
 						xData.add(format.parse(s));
 					
-					ArrayList<Double> revenue = new ArrayList();
+					ArrayList<Double> revenue = new ArrayList<Double>();
 					for (String s : data[1])
 						revenue.add(Double.valueOf((s.equals("NULL"))?"0":s));
 					chart.addSeries("Revenue", xData,revenue );
 					
-					ArrayList<Double> costs = new ArrayList();
+					ArrayList<Double> costs = new ArrayList<Double>();
 					for (String s : data[1])
 						costs.add(Double.valueOf((s.equals("NULL"))?"0":s));
 					chart.addSeries("Costs", xData,costs );
 					
-					ArrayList<Double> profit = new ArrayList();
+					ArrayList<Double> profit = new ArrayList<Double>();
 					for (String s : data[1])
 						profit.add(Double.valueOf((s.equals("NULL"))?"0":s));
 					chart.addSeries("Profit", xData,profit );

@@ -45,17 +45,26 @@ public abstract class ItemTableModel<T> extends AbstractTableModel {
 	public void update() {
 		fireTableDataChanged();
 	}
-	public T getItem(int index) {
+	public T getItem(int index) {		
 		return items.get(index);
 	}
 	public boolean addItem(T item) {
-		return items.add(item);
+		boolean result = items.add(item);
+		update();
+		
+		return result;
 	}
 	public T removeItem(int index) {
-		return items.remove(index);
+		T result = items.remove(index);
+		update();
+		
+		return result;
 	}
 	public boolean removeItem(T item) {
-		return items.remove(item);
+		boolean result = items.remove(item);
+		update();
+		
+		return result;
 	}
 	public ArrayList<T> getItems() {
 		return items;

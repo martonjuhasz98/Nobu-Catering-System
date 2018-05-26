@@ -301,7 +301,7 @@ public class DBInvoice implements IFDBInvoice {
 			ps.close();
 		}
 		catch (SQLException e) {
-			System.out.println("Item was not deleted!");
+			System.out.println("Invoice was not deleted!");
 			System.out.println(e.getMessage());
 			System.out.println(query);
 		}

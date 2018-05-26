@@ -16,6 +16,7 @@ public class ManageInventoryHistory extends JPanel {
 		add(createInvoice);	
 		
 		ShowInvoice showInvoice = new ShowInvoice();
+		add(showInvoice);
 		
 		ListInvoiceHistory listInvoiceHistory = new ListInvoiceHistory(createInvoice, showInvoice);
 		add(listInvoiceHistory);

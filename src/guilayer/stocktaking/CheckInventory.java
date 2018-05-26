@@ -13,6 +13,7 @@ import modlayer.Employee;
 import modlayer.Item;
 
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
@@ -136,8 +137,7 @@ public class CheckInventory extends JPanel implements ActionListener, CaretListe
 		}
 	}
 	private void createStocktaking() {
-		Employee employee = new Employee();
-		employee.setCpr("100298-0612");
+		Employee employee = ((ManagerWindow)SwingUtilities.getWindowAncestor(this)).getUser();
 		
 		if (!itemCtrl.createStocktaking(employee, mdl_stocktaking.getItems())) {
 			JOptionPane.showMessageDialog(this,
