@@ -36,12 +36,15 @@ public class EditEmployee extends PerformPanel implements ActionListener, CaretL
 	private JTextField txtZipCode;
 	private JTextField txtPhone;
 	private JTextField txtEmail;
-	private JLabel lblCity;
+	private JTextField txtCity;
 	private JTextField txtName;
 	private JPasswordField passwordField;
 	private JPasswordField passwordRepeatField;
 	private JLabel lblUpdateTooltip;
 	private JSpinner spinnerAccLvl;
+	private Label lbl_username;
+	private Label lbl_password;
+	private Label lbl_confirmPassword;
 
 	public EditEmployee() {
 		employeeCtrl = new EmployeeController();
@@ -56,57 +59,129 @@ public class EditEmployee extends PerformPanel implements ActionListener, CaretL
 		setVisible(false);
 		setBounds(0, 0, ManagerWindow.contentWidth, ManagerWindow.totalHeight);
 
-		Label lbl_barcode = new Label("Barcode *");
-		lbl_barcode.setFont(new Font("Dialog", Font.PLAIN, 15));
-		lbl_barcode.setBounds(16, 1, 129, 22);
-		add(lbl_barcode);
+		Label lbl_Cpr = new Label("CPR *");
+		lbl_Cpr.setFont(new Font("Dialog", Font.PLAIN, 15));
+		lbl_Cpr.setBounds(16, 10, 181, 22);
+		add(lbl_Cpr);
 
 		txtCpr = new JTextField();
 		txtCpr.setColumns(10);
-		txtCpr.setBounds(16, 45, 150, 26);
+		txtCpr.setBounds(16, 38, 181, 26);
 		add(txtCpr);
+		
+				Label lbl_name = new Label("Name *");
+				lbl_name.setForeground(Color.BLACK);
+				lbl_name.setFont(new Font("Dialog", Font.PLAIN, 15));
+				lbl_name.setBounds(215, 10, 564, 22);
+				add(lbl_name);
 
 		txtName = new JTextField();
-		txtName.setBounds(200, 45, 259, 26);
-		add(txtName);
+		txtName.setBounds(215, 38, 399, 26);
 		txtName.setColumns(10);
-
-		Label lbl_name = new Label("Name *");
-		lbl_name.setForeground(Color.BLACK);
-		lbl_name.setFont(new Font("Dialog", Font.PLAIN, 15));
-		lbl_name.setBounds(16, 75, 129, 22);
-		add(lbl_name);
-
-		txtUsername = new JTextField();
-		txtUsername.setText("");
-		txtUsername.setColumns(10);
-		txtUsername.setBounds(16, 105, 200, 26);
-		add(txtUsername);
-
-		txtAddress = new JTextField();
-		txtAddress.setColumns(10);
-		txtAddress.setBounds(16, 225, 400, 26);
-		add(txtAddress);
+		add(txtName);
+		
+		Label lbl_zipCode = new Label("Zipcode *");
+		lbl_zipCode.setForeground(Color.BLACK);
+		lbl_zipCode.setFont(new Font("Dialog", Font.PLAIN, 15));
+		lbl_zipCode.setBounds(16, 75, 129, 22);
+		add(lbl_zipCode);
 
 		txtZipCode = new JTextField();
-		txtZipCode.setBounds(16, 285, 90, 26);
+		txtZipCode.setBounds(16, 103, 48, 26);
+		txtZipCode.setColumns(4);
 		add(txtZipCode);
-		txtZipCode.setColumns(10);
 
-		lblCity = new JLabel("City");
-		lblCity.setForeground(Color.DARK_GRAY);
-		lblCity.setBounds(113, 285, 279, 26);
-		add(lblCity);
+		txtCity = new JTextField();
+		txtCity.setEditable(false);
+		txtCity.setBounds(66, 103, 131, 26);
+		txtCity.setColumns(10);
+		add(txtCity);
+		
+		Label lbl_address = new Label("Address *");
+		lbl_address.setForeground(Color.BLACK);
+		lbl_address.setFont(new Font("Dialog", Font.PLAIN, 15));
+		lbl_address.setBounds(215, 75, 129, 22);
+		add(lbl_address);
+		
+				txtAddress = new JTextField();
+				txtAddress.setColumns(10);
+				txtAddress.setBounds(215, 103, 399, 26);
+				add(txtAddress);
+				txtAddress.addCaretListener(this);
+		
+		Label lbl_phone = new Label("Phone *");
+		lbl_phone.setForeground(Color.BLACK);
+		lbl_phone.setFont(new Font("Dialog", Font.PLAIN, 15));
+		lbl_phone.setBounds(16, 140, 129, 22);
+		add(lbl_phone);
 
 		txtPhone = new JTextField();
-		txtPhone.setBounds(16, 345, 204, 26);
+		txtPhone.setBounds(16, 168, 181, 26);
 		add(txtPhone);
-		txtPhone.setColumns(10);
+		txtPhone.setColumns(15);
+		
+		Label lbl_email = new Label("Email");
+		lbl_email.setForeground(Color.BLACK);
+		lbl_email.setFont(new Font("Dialog", Font.PLAIN, 15));
+		lbl_email.setBounds(215, 140, 129, 22);
+		add(lbl_email);
 
 		txtEmail = new JTextField();
-		txtEmail.setBounds(246, 345, 376, 26);
+		txtEmail.setBounds(215, 168, 399, 26);
 		add(txtEmail);
 		txtEmail.setColumns(10);
+		
+		lbl_username = new Label("Username *");
+		lbl_username.setForeground(Color.BLACK);
+		lbl_username.setFont(new Font("Dialog", Font.PLAIN, 15));
+		lbl_username.setBounds(16, 238, 129, 22);
+		add(lbl_username);
+		
+				txtUsername = new JTextField();
+				txtUsername.setText("");
+				txtUsername.setColumns(10);
+				txtUsername.setBounds(16, 265, 150, 26);
+				add(txtUsername);
+				txtUsername.addCaretListener(this);
+				txtUsername.addCaretListener(this);
+		
+		lbl_password = new Label("Password *");
+		lbl_password.setForeground(Color.BLACK);
+		lbl_password.setFont(new Font("Dialog", Font.PLAIN, 15));
+		lbl_password.setBounds(16, 297, 129, 22);
+		add(lbl_password);
+		
+				passwordField = new JPasswordField();
+				passwordField.setBounds(16, 320, 181, 26);
+				add(passwordField);
+				passwordField.addCaretListener(this);
+		
+		lbl_confirmPassword = new Label("Confirm password*");
+		lbl_confirmPassword.setForeground(Color.BLACK);
+		lbl_confirmPassword.setFont(new Font("Dialog", Font.PLAIN, 15));
+		lbl_confirmPassword.setBounds(216, 293, 129, 22);
+		add(lbl_confirmPassword);
+		
+				passwordRepeatField = new JPasswordField();
+				passwordRepeatField.setBounds(216, 321, 209, 26);
+				add(passwordRepeatField);
+				passwordRepeatField.addCaretListener(this);
+		
+				lblUpdateTooltip = new JLabel("*Leave empty for no changes");
+				lblUpdateTooltip.setForeground(Color.GRAY);
+				lblUpdateTooltip.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
+				lblUpdateTooltip.setBounds(16, 348, 200, 16);
+				add(lblUpdateTooltip);
+		
+		SpinnerNumberModel spinnerModel = new SpinnerNumberModel(3, 0, 3, 1);
+		Label lbl_accessLevel = new Label("Access level *");
+		lbl_accessLevel.setForeground(Color.BLACK);
+		lbl_accessLevel.setFont(new Font("Dialog", Font.PLAIN, 15));
+		lbl_accessLevel.setBounds(17, 375, 129, 22);
+		add(lbl_accessLevel);
+		spinnerAccLvl = new JSpinner(spinnerModel);
+		spinnerAccLvl.setBounds(16, 403, 33, 26);
+		add(spinnerAccLvl);
 
 		btn_submit = new JButton("Create");
 		btn_submit.setBounds(536, 457, 122, 32);
@@ -117,33 +192,9 @@ public class EditEmployee extends PerformPanel implements ActionListener, CaretL
 		btn_cancel.setBounds(668, 457, 122, 32);
 		add(btn_cancel);
 		btn_cancel.addActionListener(this);
-
-		passwordField = new JPasswordField();
-		passwordField.setBounds(16, 165, 200, 26);
-		add(passwordField);
-
-		passwordRepeatField = new JPasswordField();
-		passwordRepeatField.setBounds(246, 165, 204, 26);
-		add(passwordRepeatField);
-
-		lblUpdateTooltip = new JLabel("*Leave empty for no changes");
-		lblUpdateTooltip.setForeground(Color.GRAY);
-		lblUpdateTooltip.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
-		lblUpdateTooltip.setBounds(16, 186, 218, 16);
-		add(lblUpdateTooltip);
-
-		SpinnerNumberModel spinnerModel = new SpinnerNumberModel(3, 0, 3, 1);
-		spinnerAccLvl = new JSpinner(spinnerModel);
-		spinnerAccLvl.setBounds(16, 405, 33, 26);
-		add(spinnerAccLvl);
 		
 		txtCpr.addCaretListener(this);
 		txtName.addCaretListener(this);
-		txtUsername.addCaretListener(this);
-		passwordField.addCaretListener(this);
-		passwordRepeatField.addCaretListener(this);
-		txtAddress.addCaretListener(this);
-		txtUsername.addCaretListener(this);
 		txtZipCode.addCaretListener(this);
 		txtPhone.addCaretListener(this);
 		txtEmail.addCaretListener(this);
@@ -159,7 +210,7 @@ public class EditEmployee extends PerformPanel implements ActionListener, CaretL
 		txtName.setText(employee.getName().trim());
 		txtAddress.setText(employee.getAddress().trim());
 		txtZipCode.setText(employee.getCity().getZipCode().trim());
-		lblCity.setText("City: " + employee.getCity().getName().trim());
+		txtCity.setText(employee.getCity().getName().trim());
 		txtPhone.setText(employee.getPhone().trim());
 		txtEmail.setText(employee.getEmail().trim());
 		spinnerAccLvl.setValue(employee.getAccessLevel());
@@ -181,7 +232,7 @@ public class EditEmployee extends PerformPanel implements ActionListener, CaretL
 		txtUsername.setText("");
 		txtAddress.setText("");
 		txtZipCode.setText("");
-		lblCity.setText("City: ");
+		txtCity.setText("");
 		txtPhone.setText("");
 		txtEmail.setText("");
 		spinnerAccLvl.setValue(0);
@@ -220,7 +271,7 @@ public class EditEmployee extends PerformPanel implements ActionListener, CaretL
 			return false;
 		if (txtAddress.getText().trim().isEmpty())
 			return false;
-		if (lblCity.getText().trim().equals("City:"))
+		if (txtCity.getText().trim().isEmpty())
 			return false;
 		if (!txtPhone.getText().trim().matches("^\\+?[0-9]{1,15}$"))  
 			return false;
@@ -286,7 +337,7 @@ public class EditEmployee extends PerformPanel implements ActionListener, CaretL
 	public void caretUpdate(CaretEvent e) {
 		if (e.getSource() == txtZipCode) {
 			City c = employeeCtrl.getCity(txtZipCode.getText().trim());
-			lblCity.setText((c == null) ? "City: " : "City: " + c.getName());
+			txtCity.setText((c == null) ? "" : c.getName());
 		} else if (e.getSource() == txtCpr || e.getSource() == txtName || e.getSource() == txtUsername
 				|| e.getSource() == passwordField || e.getSource() == passwordRepeatField || e.getSource() == txtAddress
 				|| e.getSource() == txtZipCode || e.getSource() == txtPhone || e.getSource() == txtEmail) {
