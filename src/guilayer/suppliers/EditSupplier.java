@@ -161,21 +161,21 @@ public class EditSupplier extends PerformPanel implements ActionListener, CaretL
 	}
 
 	private boolean isFilled() {
-		if (txt_Cvr.getText().trim().length() != 8 || !txt_Cvr.getText().trim().matches("[0-9]+"))
+		if (!txtCvr.getText().trim().matches("[0-9]{8}"))
 			return false;
-		if (txt_Name.getText().trim().isEmpty())
+		if (txtName.getText().trim().isEmpty())
 			return false;
-		if (txt_Address.getText().trim().isEmpty())
+		if (txtAddress.getText().trim().isEmpty())
 			return false;
-		if (!txt_ZipCode.getText().trim().matches("[0-9]+"))
+		if (!txtZipCode.getText().trim().matches("[0-9]+"))
 			return false;
-		if (txt_Address.getText().trim().isEmpty())
+		if (txtAddress.getText().trim().isEmpty())
 			return false;
-		if (lbl_City.getText().trim().equals("City:"))
+		if (lblCity.getText().trim().equals("City:"))
 			return false;
-		if (txt_Phone.getText().trim().isEmpty() || !txt_Phone.getText().trim().matches("[0-9]+"))
+		if (!txtPhone.getText().trim().matches("^\\+?[0-9]{1,15}$"))  
 			return false;
-		if (txt_Email.getText().trim().isEmpty() || !txt_Email.getText().trim().contains("@"))
+		if (!txtEmail.getText().trim().matches(".+@.+\\..+"))
 			return false;
 		return true;
 	}
@@ -202,11 +202,11 @@ public class EditSupplier extends PerformPanel implements ActionListener, CaretL
 
 				triggerPerformListeners();
 			} else {
-				supplier.setName(txt_Name.getText().trim());
-				supplier.setAddress(txt_Address.getText().trim());
-				supplier.setCity(new City(txt_ZipCode.getText().trim()));
-				supplier.setPhone(txt_Phone.getText().trim());
-				supplier.setEmail(txt_Email.getText().trim());
+				supplier.setName(name);
+				supplier.setAddress(address);
+				supplier.setCity(new City(zipCode));
+				supplier.setPhone(phone);
+				supplier.setEmail(email);
 				if (!supplierCtrl.updateSupplier(supplier)) {
 					JOptionPane.showMessageDialog(this, "An error occured while creating the Supplier!", "Error!",
 							JOptionPane.ERROR_MESSAGE);
