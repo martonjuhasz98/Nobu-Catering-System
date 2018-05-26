@@ -205,45 +205,34 @@ public class EditEmployee extends PerformPanel implements ActionListener, CaretL
 		reset();
 	}
 	private boolean isFilled() {
-		System.out.println("start");
-		if (txtCpr.getText().trim().length() != 10 || !txtCpr.getText().trim().matches("[0-9]+"))
+		if (!txtCpr.getText().trim().matches("^[0-9]{6}\\-?[0-9]{4}$"))
 			return false;
-		System.out.println("a1");
 		if (txtUsername.getText().trim().isEmpty())
 			return false;
-		System.out.println("a1");
 		if (txtName.getText().trim().isEmpty())
 			return false;
-		System.out.println("a1");
-		if (passwordField.getPassword().length==0||!new String(passwordField.getPassword()).equals(new String(passwordRepeatField.getPassword())))
+		if (creatingEmployee && passwordField.getPassword().length == 0
+				|| !new String(passwordField.getPassword()).equals(new String(passwordRepeatField.getPassword())))
 			return false;
-		System.out.println("a1");
 		if (txtAddress.getText().trim().isEmpty())
 			return false;
-		System.out.println("a1");
-		if (!txtZipCode.getText().trim().matches("[0-9]+"))
+		if (!txtZipCode.getText().trim().matches("^[0-9]{1,4}$"))  
 			return false;
-		System.out.println("a1");
 		if (txtAddress.getText().trim().isEmpty())
 			return false;
-		System.out.println("a1");
 		if (lblCity.getText().trim().equals("City:"))
 			return false;
-		System.out.println("a1");
-		if (txtPhone.getText().trim().isEmpty() || !txtPhone.getText().trim().matches("[0-9]+"))
+		if (!txtPhone.getText().trim().matches("^\\+?[0-9]{1,15}$"))  
 			return false;
-		System.out.println("a1");
-		if (txtEmail.getText().trim().isEmpty() || !txtEmail.getText().trim().contains("@"))
+		if (!txtEmail.getText().trim().matches(".+@.+\\..+"))
 			return false;
-		System.out.println("a1");
-		System.out.println("end");
 		return true;
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == btn_submit) {
-			String cpr = txtCpr.getText().trim();
+			String cpr = txtCpr.getText().trim().replace("-", "");
 			String name = txtName.getText().trim();
 			String username = txtUsername.getText().trim();
 			String password = new String(passwordField.getPassword());
