@@ -23,8 +23,8 @@ public class MenuItemController {
 	public ArrayList<MenuItem> searchMenuItems(String keyword) {
 		return dbMenuItem.searchMenuItems(keyword);
 	}
-	public MenuItem getMenuItem(String barcode) {
-		return dbMenuItem.selectMenuItem(barcode);
+	public MenuItem getMenuItem(int id) {
+		return dbMenuItem.selectMenuItem(id);
 	}
 	public boolean createMenuItem(String name, double price, MenuItemCategory category) {
 		MenuItem item = new MenuItem();

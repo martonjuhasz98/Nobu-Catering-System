@@ -95,7 +95,7 @@ public class DBMenuItem implements IFDBMenuItem {
 	}
 
 	@Override
-	public MenuItem selectMenuItem(String id) {
+	public MenuItem selectMenuItem(int id) {
 		MenuItem menuItem = null;
 		
 		String query = "SELECT "
@@ -112,7 +112,7 @@ public class DBMenuItem implements IFDBMenuItem {
 			
 			PreparedStatement ps = con.prepareStatement(query);
 			ps.setQueryTimeout(5);
-			ps.setString(1, id);
+			ps.setInt(1, id);
 			
 			ResultSet results = ps.executeQuery();
 			if (results.next()) {
