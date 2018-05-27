@@ -118,7 +118,9 @@ public class DBOrder implements IFDBOrder {
 		try {
 			DBConnection.startTransaction();
 			
-			query = "INSERT INTO [Order] (table_no, employee_cpr) VALUES (?, ?)";
+			query = "INSERT INTO [Order] "
+					+ "(table_no, employee_cpr) "
+					+ "VALUES (?, ?)";
 			PreparedStatement ps = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 			ps.setQueryTimeout(5);
 			ps.setInt(1, order.getTableNo());
@@ -134,51 +136,11 @@ public class DBOrder implements IFDBOrder {
 			ps.close();
 			
 			//OrderMenuItems
-			double totalPrice = 0;
-			String itemBarcode;
-			double unitPrice;
-			double quantity;
-			
+			DBOrderMenuItem dbOrderMenuItem = new DBOrderMenuItem();
 			for (OrderMenuItem item : order.getItems()) {
-				itemBarcode = item.getItem().getBarcode();
-				unitPrice = item.getUnitPrice();
-				quantity = item.getQuantity();
-				totalPrice += quantity * unitPrice;
-				
-				query =   "INSERT INTO [Order_Item] "
-						+ "(item_barcode, order_id, quantity, unit_price) "
-						+ "VALUES (?, ?, ?, ?)";
-				try {
-					ps = con.prepareStatement(query);
-					ps.setQueryTimeout(5);
-					ps.setString(1, itemBarcode);
-					ps.setInt(2, id);
-					ps.setDouble(3, quantity);
-					ps.setDouble(4, unitPrice);
-					
-					boolean success = ps.executeUpdate() > 0;
-					ps.close();
-					if (!success) {
-						throw new SQLException();
-					}
-				}
-				catch (SQLException e) {
-					System.out.println("OrderMenuItem was not inserted!");
-					
-					throw e;
-				}
+				item.setOrder(order);
+				dbOrderMenuItem.insertOrderMenuItem(item);
 			}
-			
-			//Transaction
-			Transaction transaction = new Transaction();
-			transaction.setId(id);
-			transaction.setAmount(totalPrice);
-			transaction.setType(TransactionType.ACCOUNT);
-			DBTransaction dbTransaction = new DBTransaction();
-			if (dbTransaction.insertTransaction(transaction) < 0) {
-				throw new SQLException("Transaction was not inserted!");
-			}
-			ps.close();
 			
 			DBConnection.commitTransaction();
 		}
@@ -197,12 +159,8 @@ public class DBOrder implements IFDBOrder {
 	@Override
 	public boolean payOrder(Order order) {
 		boolean success = false;
+		String query = "";
 		
-		String query =
-				"UPDATE [Order] "
-			  + "SET is_payed = ?,"
-			  + "date_payed = GETDATE() "
-			  + "WHERE id = ?";
 		try {
 			DBConnection.startTransaction();
 			
@@ -213,36 +171,6 @@ public class DBOrder implements IFDBOrder {
 			
 			success = ps.executeUpdate() > 0;
 			ps.close();
-			
-			//Update Item quantity
-			String itemBarcode;
-			double quantity;
-			
-			for (OrderMenuItem item : order.getItems()) {
-				itemBarcode = item.getItem().getBarcode();
-				quantity = item.getQuantity();
-				if (quantity == 0) continue;
-				
-				query =   "UPDATE [Item] "
-						+ "SET quantity = quantity + ? "
-						+ "WHERE barcode = ?";
-				try {
-					ps = con.prepareStatement(query);
-					ps.setQueryTimeout(5);
-					ps.setDouble(1, quantity);
-					ps.setString(2, itemBarcode);
-					
-					if (ps.executeUpdate() < 1) {
-						throw new SQLException();
-					}
-					ps.close();
-				}
-				catch (SQLException e) {
-					System.out.println("OrderMenuItem was not inserted!");
-					
-					throw e;
-				}
-			}
 		
 			DBConnection.commitTransaction();
 		}
@@ -331,58 +259,23 @@ public class DBOrder implements IFDBOrder {
 			employee.setPhone(results.getString("employeePhone"));
 			employee.setEmail(results.getString("employeeEmail"));
 			employee.setAccessLevel(results.getInt("employeeAccessLevel"));
-			
-			//City
-			city = new City();
-			city.setZipCode(results.getString("supplierCityZipCode"));
-			city.setName(results.getString("supplierCityName"));
-
-			//Supplier
-			Supplier supplier = new Supplier();
-			supplier.setCvr(results.getString("supplierCvr"));
-			supplier.setName(results.getString("supplierName"));
-			supplier.setAddress(results.getString("supplierAddress"));
-			supplier.setCity(city);
-			supplier.setPhone(results.getString("supplierPhone"));
-			supplier.setEmail(results.getString("supplierEmail"));
 				
 			//Transaction
 			Transaction transaction = new Transaction();
-			transaction.setId(results.getInt("orderId"));
+			transaction.setId(results.getInt("transactionId"));
 			transaction.setAmount(results.getDouble("transactionAmount"));
-			transaction.setType(TransactionType.getType(results.getInt("transactionTransactionType")));
+			transaction.setType(TransactionType.getType(results.getInt("transactionTypeId")));
 			transaction.setTimestamp(results.getDate("transactionTimestamp"));
+			
+			//OrderMenuItems
+			DBOrderMenuItem dbOrderMenuItem = new DBOrderMenuItem();
+			ArrayList<OrderMenuItem> items = dbOrderMenuItem.getOrderMenuItems(order.getId());
 			
 			//Order
 			order.setId(results.getInt("orderId"));
-			order.setDelivered(results.getBoolean("orderIsDelivered"));
-			order.setTimestamp(results.getDate("orderTimestamp"));
-			order.setDateDelivered(results.getDate("orderDateDelivered"));
-			order.setPlacedBy(employee);
-			order.setSupplier(supplier);
+			order.setTableNo(results.getInt("orderTableNo"));
+			order.setEmployee(employee);
 			order.setTransaction(transaction);
-			
-			//OrderMenuItem
-			ArrayList<OrderMenuItem> items = new ArrayList<OrderMenuItem>();
-			query =   "SELECT item_barcode, quantity, unit_price "
-					+ "FROM [Order_item] "
-					+ "WHERE order_id = ?";
-			PreparedStatement ps = con.prepareStatement(query);
-			ps.setQueryTimeout(5);
-			ps.setInt(1, order.getId());
-			
-			DBItem dbItem = new DBItem();
-			OrderMenuItem item;
-			results = ps.executeQuery();
-			while (results.next()) {
-				item = new OrderMenuItem();
-				item.setOrder(order);
-				item.setItem(dbItem.selectItem(results.getString("item_barcode")));
-				item.setQuantity(results.getInt("quantity"));
-				item.setUnitPrice(results.getDouble("unit_price"));
-				items.add(item);
-			}
-			ps.close();
 			order.setItems(items);
 		}
 		catch (SQLException e) {

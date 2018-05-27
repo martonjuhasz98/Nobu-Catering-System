@@ -135,7 +135,7 @@ public class DBMenuItem implements IFDBMenuItem {
 		int id = -1;
 		
 		String query =
-				  "INSERT INTO [MenuItem] "
+				  "INSERT INTO [Menu_Item] "
 				+ "(id, name, price, category_id) "
 				+ "VALUES (?, ?, ?, ?)";
 		try {
@@ -296,6 +296,33 @@ public class DBMenuItem implements IFDBMenuItem {
 			
 		return success;
 	}
+	
+	@Override
+	public boolean canCreateMenuItem(MenuItem menuItem) {
+		boolean canCreate = false;
+		
+		String query = "SELECT (it.quantity - ing.quantity >= 0) FROM [Ingredient] AS ing"
+					+ "INNER JOIN [Item] AS it"
+					+ "ON ing.item_barcode = it.barcode"
+					+ "WHERE ing.menu_item_id = ?";
+		try {
+			
+			PreparedStatement ps = con.prepareStatement(query);
+			ps.setQueryTimeout(5);
+			ps.setInt(1, menuItem.getId());
+			
+			canCreate = ps.executeUpdate() > 0;
+			ps.close();
+		}
+		catch (SQLException e) {
+			System.out.println("MenuItem was not deleted!");
+			System.out.println(e.getMessage());
+			System.out.println(query);
+		}
+			
+		return canCreate;
+	}
+	
 	private boolean insertIngredientsToMenuItem(ArrayList<Ingredient> ingredients, MenuItem menuItem) throws SQLException{
 		String query;
 		PreparedStatement ps;

@@ -4,15 +4,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 
 import dblayer.interfaces.IFDBOrderMenuItem;
-import modlayer.Supplier;
-import modlayer.Transaction;
-import modlayer.TransactionType;
-import modlayer.City;
-import modlayer.Employee;
+import modlayer.MenuItem;
+import modlayer.Order;
 import modlayer.OrderMenuItem;
 
 public class DBOrderMenuItem implements IFDBOrderMenuItem {
@@ -169,77 +165,20 @@ public class DBOrderMenuItem implements IFDBOrderMenuItem {
 		
 		String query = "";
 		try {
-			orderMenuItem = new OrderMenuItem();
+			//Order
+			Order order = new Order();
+			order.setId(results.getInt("order_id"));
 			
-			//City
-			City city = new City();
-			city.setZipCode(results.getString("employeeCityZipCode"));
-			city.setName(results.getString("employeeCityName"));
-			
-			//Employee
-			Employee employee = new Employee();
-			employee.setCpr(results.getString("employeeCpr"));
-			employee.setName(results.getString("employeeName"));
-			employee.setUsername(results.getString("employeeUsername"));
-			employee.setPassword(results.getString("employeePassword"));
-			employee.setAddress(results.getString("employeeAddress"));
-			employee.setCity(city);
-			employee.setPhone(results.getString("employeePhone"));
-			employee.setEmail(results.getString("employeeEmail"));
-			employee.setAccessLevel(results.getInt("employeeAccessLevel"));
-			
-			//City
-			city = new City();
-			city.setZipCode(results.getString("supplierCityZipCode"));
-			city.setName(results.getString("supplierCityName"));
-
-			//Supplier
-			Supplier supplier = new Supplier();
-			supplier.setCvr(results.getString("supplierCvr"));
-			supplier.setName(results.getString("supplierName"));
-			supplier.setAddress(results.getString("supplierAddress"));
-			supplier.setCity(city);
-			supplier.setPhone(results.getString("supplierPhone"));
-			supplier.setEmail(results.getString("supplierEmail"));
-				
-			//Transaction
-			Transaction transaction = new Transaction();
-			transaction.setId(results.getInt("orderId"));
-			transaction.setAmount(results.getDouble("transactionAmount"));
-			transaction.setType(TransactionType.getType(results.getInt("transactionTransactionType")));
-			transaction.setTimestamp(results.getDate("transactionTimestamp"));
+			//MenuItem
+			DBMenuItem dbMenuItem = new DBMenuItem();
+			MenuItem menuItem = dbMenuItem.selectMenuItem(results.getInt("menu_item_id"));
 			
 			//OrderMenuItem
-			orderMenuItem.setId(results.getInt("orderId"));
-			orderMenuItem.setDelivered(results.getBoolean("orderMenuItemIsDelivered"));
-			orderMenuItem.setTimestamp(results.getDate("orderMenuItemTimestamp"));
-			orderMenuItem.setDateDelivered(results.getDate("orderMenuItemDateDelivered"));
-			orderMenuItem.setPlacedBy(employee);
-			orderMenuItem.setSupplier(supplier);
-			orderMenuItem.setTransaction(transaction);
-			
-			//OrderMenuItemMenuItem
-			ArrayList<OrderMenuItemMenuItem> items = new ArrayList<OrderMenuItemMenuItem>();
-			query =   "SELECT item_barcode, quantity, unit_price "
-					+ "FROM [OrderMenuItem_item] "
-					+ "WHERE orderMenuItem_id = ?";
-			PreparedStatement ps = con.prepareStatement(query);
-			ps.setQueryTimeout(5);
-			ps.setInt(1, orderMenuItem.getId());
-			
-			DBItem dbItem = new DBItem();
-			OrderMenuItem item;
-			results = ps.executeQuery();
-			while (results.next()) {
-				item = new OrderMenuItem();
-				item.setOrderMenuItem(orderMenuItem);
-				item.setItem(dbItem.selectItem(results.getString("item_barcode")));
-				item.setQuantity(results.getInt("quantity"));
-				item.setUnitPrice(results.getDouble("unit_price"));
-				items.add(item);
-			}
-			ps.close();
-			orderMenuItem.setItems(items);
+			orderMenuItem = new OrderMenuItem();
+			orderMenuItem.setOrder(order);
+			orderMenuItem.setMenuItem(menuItem);
+			orderMenuItem.setQuantity(results.getInt("quantity"));
+			orderMenuItem.setFinished(results.getBoolean("is_finished"));
 		}
 		catch (SQLException e) {
 			System.out.println("OrderMenuItem was not built!");
