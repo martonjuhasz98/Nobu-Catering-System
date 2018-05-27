@@ -12,6 +12,7 @@ import javax.swing.JTextField;
 
 import ctrllayer.ItemController;
 import guilayer.ManagerWindow;
+import guilayer.employees.ListEmployees;
 import guilayer.interfaces.PerformPanel;
 import modlayer.Item;
 import modlayer.ItemCategory;
@@ -176,7 +177,7 @@ public class EditItem extends PerformPanel implements ActionListener, CaretListe
 		btn_submit.setEnabled(false);
 	}
 	private boolean isFilled() {
-		if (txt_barcode.getText().trim().isEmpty())
+		if (!txt_barcode.getText().matches("[0-9]+"))
 			return false;
 		if (txt_name.getText().trim().isEmpty())
 			return false;
@@ -213,6 +214,11 @@ public class EditItem extends PerformPanel implements ActionListener, CaretListe
 		reset();
 	}
 	private void submit() {
+		if (JOptionPane.showConfirmDialog(this, "Are you sure?", (creatingItem ?  "Creating" : "Updating") + " item", JOptionPane.YES_NO_OPTION)
+				!= JOptionPane.YES_OPTION) {
+			return;
+		}
+		
 		String barcode = txt_barcode.getText().trim();
 		String name = txt_name.getText().trim();
 		double quantity = (Double)sprm_quantity.getValue();

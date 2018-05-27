@@ -98,9 +98,10 @@ public class ListPendingInvoices extends JPanel implements ActionListener, Mouse
 		{
 		    public void actionPerformed(ActionEvent e)
 		    {
-		    	if (JOptionPane.showConfirmDialog(ListPendingInvoices.this, "Are you sure?") != JOptionPane.YES_OPTION) {
-		        	return;
-		        }
+		    	if (JOptionPane.showConfirmDialog(ListPendingInvoices.this, "Are you sure?", "Canceling invoice", JOptionPane.YES_NO_OPTION)
+						!= JOptionPane.YES_OPTION) {
+					return;
+				}
 		    	
 		        int modelRowIndex = Integer.valueOf(e.getActionCommand());
 		        Invoice invoice = model.getItem(modelRowIndex);

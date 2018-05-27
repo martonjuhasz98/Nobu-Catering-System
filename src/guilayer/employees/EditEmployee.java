@@ -283,6 +283,11 @@ public class EditEmployee extends PerformPanel implements ActionListener, CaretL
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == btn_submit) {
+			if (JOptionPane.showConfirmDialog(this, "Are you sure?", creatingEmployee ? "Creating employee" : "Updating employee", JOptionPane.YES_NO_OPTION)
+					!= JOptionPane.YES_OPTION) {
+				return;
+			}
+			
 			String cpr = txtCpr.getText().trim().replace("-", "");
 			String name = txtName.getText().trim();
 			String username = txtUsername.getText().trim();

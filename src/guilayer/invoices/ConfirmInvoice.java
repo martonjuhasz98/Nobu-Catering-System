@@ -24,6 +24,9 @@ import java.awt.event.ActionEvent;
 import javax.swing.JTextField;
 import javax.swing.event.CaretListener;
 import javax.swing.event.CaretEvent;
+import javax.swing.JLabel;
+import java.awt.Font;
+import java.awt.Label;
 
 public class ConfirmInvoice extends PerformPanel implements ActionListener, CaretListener, ListSelectionListener {
 
@@ -39,6 +42,7 @@ public class ConfirmInvoice extends PerformPanel implements ActionListener, Care
 	private DeliveredTableModel mdl_delivered;
 	private JButton btn_confirm;
 	private JButton btn_cancel;
+	private JTextField txt_supplier;
 	
 	public ConfirmInvoice() {
 		invoiceCtrl = new InvoiceController();
@@ -55,17 +59,33 @@ public class ConfirmInvoice extends PerformPanel implements ActionListener, Care
 		mdl_ordered = new OrderedTableModel();
 		mdl_delivered = new DeliveredTableModel();
 		
+		Label lbl_supplier = new Label("Supplier");
+		lbl_supplier.setFont(new Font("Dialog", Font.PLAIN, 15));
+		lbl_supplier.setBounds(10, 11, 129, 22);
+		add(lbl_supplier);
+		
+		txt_supplier = new JTextField();
+		txt_supplier.setEditable(false);
+		txt_supplier.setColumns(10);
+		txt_supplier.setBounds(10, 39, 341, 20);
+		add(txt_supplier);
+		
+		Label lbl_items = new Label("Items");
+		lbl_items.setFont(new Font("Dialog", Font.PLAIN, 15));
+		lbl_items.setBounds(10, 80, 129, 22);
+		add(lbl_items);
+		
 		txt_search = new JTextField();
-		txt_search.setBounds(10, 4, 179, 20);
+		txt_search.setBounds(10, 110, 217, 20);
 		txt_search.setColumns(10);
 		add(txt_search);
 		
 		btn_search = new JButton("Search");
-		btn_search.setBounds(199, 4, 73, 20);
+		btn_search.setBounds(237, 110, 73, 20);
 		add(btn_search);
 		
 		JScrollPane scrlPane_ordered = new JScrollPane();
-		scrlPane_ordered.setBounds(10, 28, 300, 431);
+		scrlPane_ordered.setBounds(10, 141, 300, 310);
 		add(scrlPane_ordered);
 		
 		tbl_ordered = new JTable();
@@ -76,15 +96,15 @@ public class ConfirmInvoice extends PerformPanel implements ActionListener, Care
 		scrlPane_ordered.setViewportView(tbl_ordered);
 		
 		btn_add = new JButton("Add");
-		btn_add.setBounds(320, 236, 73, 23);
+		btn_add.setBounds(316, 272, 73, 23);
 		add(btn_add);
 		
 		btn_remove = new JButton("Remove");
-		btn_remove.setBounds(320, 270, 73, 23);
+		btn_remove.setBounds(316, 306, 73, 23);
 		add(btn_remove);
 		
 		JScrollPane scrlPane_delivered = new JScrollPane();
-		scrlPane_delivered.setBounds(400, 28, 391, 431);
+		scrlPane_delivered.setBounds(399, 141, 391, 310);
 		add(scrlPane_delivered);
 		
 		tbl_delivered = new JTable();
@@ -95,14 +115,13 @@ public class ConfirmInvoice extends PerformPanel implements ActionListener, Care
 		scrlPane_delivered.setViewportView(tbl_delivered);
 		
 		btn_confirm = new JButton("Confirm");
-		btn_confirm.setBounds(636, 3, 73, 23);
+		btn_confirm.setBounds(635, 11, 73, 23);
 		btn_confirm.setEnabled(true);
 		add(btn_confirm);
-		btn_confirm.addActionListener(this);
 		
 		btn_cancel = new JButton("Cancel");
 		btn_cancel.setEnabled(true);
-		btn_cancel.setBounds(718, 3, 73, 23);
+		btn_cancel.setBounds(717, 11, 73, 23);
 		add(btn_cancel);
 		
 		txt_search.addCaretListener(this);
@@ -117,6 +136,8 @@ public class ConfirmInvoice extends PerformPanel implements ActionListener, Care
 		resetForm();
 	}
 	private void resetForm() {
+		txt_supplier.setText("");
+		txt_search.setText("");
 		mdl_ordered.setItems(new ArrayList<InvoiceItem>());
 		mdl_delivered.setItems(new ArrayList<InvoiceItem>());
 		
@@ -127,6 +148,7 @@ public class ConfirmInvoice extends PerformPanel implements ActionListener, Care
 		resetForm();
 		
 		this.invoice = invoice;
+		txt_supplier.setText(invoice.getSupplier().toString());
 		mdl_ordered.setItems(invoice.getItems());
 		
 		setVisible(true);
@@ -164,9 +186,10 @@ public class ConfirmInvoice extends PerformPanel implements ActionListener, Care
 		}
 	}
 	private void confirmInvoice() {
-		if (JOptionPane.showConfirmDialog(this, "Are you sure?") != JOptionPane.YES_OPTION) {
-        	return;
-        }
+		if (JOptionPane.showConfirmDialog(this, "Are you sure?", "Confirming invoice", JOptionPane.YES_NO_OPTION)
+				!= JOptionPane.YES_OPTION) {
+			return;
+		}
 		
 		invoice.setItems(mdl_delivered.getItems());
 		

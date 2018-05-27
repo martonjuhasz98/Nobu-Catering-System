@@ -85,9 +85,10 @@ public class ListInventory extends JPanel implements ActionListener, MouseListen
 		{
 		    public void actionPerformed(ActionEvent e)
 		    {
-		        if (JOptionPane.showConfirmDialog(ListInventory.this, "Are you sure?") != JOptionPane.YES_OPTION) {
-		        	return;
-		        }
+		    	if (JOptionPane.showConfirmDialog(ListInventory.this, "Are you sure?", "Deleting item", JOptionPane.YES_NO_OPTION)
+						!= JOptionPane.YES_OPTION) {
+					return;
+				}
 		    	
 		        int modelRowIndex = Integer.valueOf(e.getActionCommand());
 		        Item item = (Item)model.getItem(modelRowIndex);

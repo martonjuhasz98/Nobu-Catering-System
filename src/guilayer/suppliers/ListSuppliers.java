@@ -77,9 +77,10 @@ public class ListSuppliers extends JPanel implements ActionListener, MouseListen
 
 		AbstractAction delete = new AbstractAction() {
 			public void actionPerformed(ActionEvent e) {
-				if (JOptionPane.showConfirmDialog(ListSuppliers.this, "Are you sure?") != JOptionPane.YES_OPTION) {
-		        	return;
-		        }
+				if (JOptionPane.showConfirmDialog(ListSuppliers.this, "Are you sure?", "Deleting supplier", JOptionPane.YES_NO_OPTION)
+						!= JOptionPane.YES_OPTION) {
+					return;
+				}
 				
 				int modelRowIndex = Integer.valueOf(e.getActionCommand());
 				Supplier supplier = model.getItem(modelRowIndex);

@@ -78,9 +78,10 @@ public class ListEmployees extends JPanel implements ActionListener, MouseListen
 
 		AbstractAction delete = new AbstractAction() {
 			public void actionPerformed(ActionEvent e) {
-				if (JOptionPane.showConfirmDialog(ListEmployees.this, "Are you sure?") != JOptionPane.YES_OPTION) {
-		        	return;
-		        }
+				if (JOptionPane.showConfirmDialog(ListEmployees.this, "Are you sure?", "Deleting employee", JOptionPane.YES_NO_OPTION)
+						!= JOptionPane.YES_OPTION) {
+					return;
+				}
 				
 				int modelRowIndex = Integer.valueOf(e.getActionCommand());
 				Employee employee = model.getItem(modelRowIndex);

@@ -4,7 +4,6 @@ import java.awt.Font;
 import java.awt.Label;
 
 import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
@@ -26,14 +25,14 @@ public class EditSupplier extends PerformPanel implements ActionListener, CaretL
 	private Supplier supplier;
 	private boolean creatingSupplier = false;
 	private JTextField txtCvr;
-	private JTextField txtAddress;
-	private JButton btn_submit;
-	private JButton btn_cancel;
 	private JTextField txtName;
 	private JTextField txtZipCode;
+	private JTextField txtCity;
+	private JTextField txtAddress;
 	private JTextField txtPhone;
 	private JTextField txtEmail;
-	private JLabel lblCity;
+	private JButton btn_submit;
+	private JButton btn_cancel;
 
 	public EditSupplier() {
 		supplierCtrl = new SupplierController();
@@ -46,71 +45,102 @@ public class EditSupplier extends PerformPanel implements ActionListener, CaretL
 		setLayout(null);
 		setVisible(false);
 		setBounds(0, 0, ManagerWindow.contentWidth, ManagerWindow.totalHeight);
-
-		Label lblbarcode = new Label("Barcode *");
-		lblbarcode.setFont(new Font("Dialog", Font.PLAIN, 15));
-		lblbarcode.setBounds(16, 1, 129, 22);
-		add(lblbarcode);
-
+		
+		Label lbl_cvr = new Label("CVR *");
+		lbl_cvr.setFont(new Font("Dialog", Font.PLAIN, 15));
+		lbl_cvr.setBounds(10, 10, 181, 22);
+		add(lbl_cvr);
+		
 		txtCvr = new JTextField();
+		txtCvr.setText("");
+		txtCvr.setEnabled(true);
 		txtCvr.setColumns(10);
-		txtCvr.setBounds(16, 45, 376, 20);
+		txtCvr.setBounds(10, 38, 181, 26);
 		add(txtCvr);
-
-		Label lblname = new Label("Name *");
-		lblname.setForeground(Color.BLACK);
-		lblname.setFont(new Font("Dialog", Font.PLAIN, 15));
-		lblname.setBounds(16, 75, 129, 22);
-		add(lblname);
-
+		
+		Label lbl_name = new Label("Name *");
+		lbl_name.setForeground(Color.BLACK);
+		lbl_name.setFont(new Font("Dialog", Font.PLAIN, 15));
+		lbl_name.setBounds(10, 75, 564, 22);
+		add(lbl_name);
+		
 		txtName = new JTextField();
 		txtName.setText("");
 		txtName.setColumns(10);
-		txtName.setBounds(16, 105, 376, 20);
+		txtName.setBounds(10, 103, 399, 26);
 		add(txtName);
-
-		txtAddress = new JTextField();
-		txtAddress.setColumns(10);
-		txtAddress.setBounds(16, 165, 376, 20);
-		add(txtAddress);
-
+		
+		Label lbl_zipCode = new Label("Zipcode *");
+		lbl_zipCode.setForeground(Color.BLACK);
+		lbl_zipCode.setFont(new Font("Dialog", Font.PLAIN, 15));
+		lbl_zipCode.setBounds(10, 140, 129, 22);
+		add(lbl_zipCode);
+		
 		txtZipCode = new JTextField();
-		txtZipCode.setBounds(16, 225, 90, 26);
+		txtZipCode.setText("");
+		txtZipCode.setColumns(4);
+		txtZipCode.setBounds(10, 168, 48, 26);
 		add(txtZipCode);
-		txtZipCode.setColumns(10);
-
-		lblCity = new JLabel("City");
-		lblCity.setForeground(Color.DARK_GRAY);
-		lblCity.setBounds(113, 230, 279, 16);
-		add(lblCity);
-
+		
+		txtCity = new JTextField();
+		txtCity.setText("");
+		txtCity.setEditable(false);
+		txtCity.setColumns(10);
+		txtCity.setBounds(60, 168, 131, 26);
+		add(txtCity);
+		
+		Label lbl_address = new Label("Address *");
+		lbl_address.setForeground(Color.BLACK);
+		lbl_address.setFont(new Font("Dialog", Font.PLAIN, 15));
+		lbl_address.setBounds(10, 200, 129, 22);
+		add(lbl_address);
+		
+		txtAddress = new JTextField();
+		txtAddress.setText("");
+		txtAddress.setColumns(10);
+		txtAddress.setBounds(10, 228, 399, 26);
+		add(txtAddress);
+		
+		Label lbl_phone = new Label("Phone *");
+		lbl_phone.setForeground(Color.BLACK);
+		lbl_phone.setFont(new Font("Dialog", Font.PLAIN, 15));
+		lbl_phone.setBounds(10, 260, 129, 22);
+		add(lbl_phone);
+		
 		txtPhone = new JTextField();
-		txtPhone.setBounds(16, 285, 204, 26);
+		txtPhone.setText("");
+		txtPhone.setColumns(15);
+		txtPhone.setBounds(10, 288, 181, 26);
 		add(txtPhone);
-		txtPhone.setColumns(10);
-
+		
+		Label lbl_email = new Label("Email");
+		lbl_email.setForeground(Color.BLACK);
+		lbl_email.setFont(new Font("Dialog", Font.PLAIN, 15));
+		lbl_email.setBounds(10, 318, 129, 22);
+		add(lbl_email);
+		
 		txtEmail = new JTextField();
-		txtEmail.setBounds(16, 345, 376, 26);
-		add(txtEmail);
+		txtEmail.setText("");
 		txtEmail.setColumns(10);
+		txtEmail.setBounds(10, 346, 399, 26);
+		add(txtEmail);
 
 		btn_submit = new JButton("Create");
 		btn_submit.setBounds(536, 457, 122, 32);
 		add(btn_submit);
-		btn_submit.addActionListener(this);
 
 		btn_cancel = new JButton("Cancel");
 		btn_cancel.setBounds(668, 457, 122, 32);
 		add(btn_cancel);
-		
-		btn_cancel.addActionListener(this);
+
 		txtCvr.addCaretListener(this);
 		txtName.addCaretListener(this);
-		txtAddress.addCaretListener(this);
-		txtName.addCaretListener(this);
 		txtZipCode.addCaretListener(this);
+		txtAddress.addCaretListener(this);
 		txtPhone.addCaretListener(this);
 		txtEmail.addCaretListener(this);
+		btn_submit.addActionListener(this);
+		btn_cancel.addActionListener(this);
 		reset();
 	}
 	private void fill(Supplier supplier) {
@@ -121,7 +151,7 @@ public class EditSupplier extends PerformPanel implements ActionListener, CaretL
 		txtName.setText(supplier.getName().trim());
 		txtAddress.setText(supplier.getAddress().trim());
 		txtZipCode.setText(supplier.getCity().getZipCode().trim());
-		lblCity.setText("City: " + supplier.getCity().getName().trim());
+		txtCity.setText(supplier.getCity().getName().trim());
 		txtPhone.setText(supplier.getPhone().trim());
 		txtEmail.setText(supplier.getEmail().trim());
 
@@ -138,7 +168,7 @@ public class EditSupplier extends PerformPanel implements ActionListener, CaretL
 		txtName.setText("");
 		txtAddress.setText("");
 		txtZipCode.setText("");
-		lblCity.setText("City: ");
+		txtCity.setText("");
 		txtPhone.setText("");
 		txtEmail.setText("");
 
@@ -171,7 +201,7 @@ public class EditSupplier extends PerformPanel implements ActionListener, CaretL
 			return false;
 		if (txtAddress.getText().trim().isEmpty())
 			return false;
-		if (lblCity.getText().trim().equals("City:"))
+		if (txtCity.getText().trim().isEmpty())
 			return false;
 		if (!txtPhone.getText().trim().matches("^\\+?[0-9]{1,15}$"))  
 			return false;
@@ -183,6 +213,11 @@ public class EditSupplier extends PerformPanel implements ActionListener, CaretL
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == btn_submit) {
+			if (JOptionPane.showConfirmDialog(this, "Are you sure?", (creatingSupplier ?  "Creating" : "Updating") + " supplier", JOptionPane.YES_NO_OPTION)
+					!= JOptionPane.YES_OPTION) {
+				return;
+			}
+			
 			String cvr = txtCvr.getText().trim();
 			String name = txtName.getText().trim();
 			String address = txtAddress.getText().trim();
@@ -228,7 +263,7 @@ public class EditSupplier extends PerformPanel implements ActionListener, CaretL
 	public void caretUpdate(CaretEvent e) {
 		if (e.getSource() == txtZipCode) {
 			City c = supplierCtrl.getCity(txtZipCode.getText().trim());
-			lblCity.setText((c == null) ? "City: " : "City: " + c.getName());
+			txtCity.setText((c == null) ? "" : c.getName());
 		} else if (e.getSource() == txtCvr || e.getSource() == txtName || e.getSource() == txtAddress
 				|| e.getSource() == txtZipCode || e.getSource() == txtPhone || e.getSource() == txtEmail) {
 			btn_submit.setEnabled(isFilled());

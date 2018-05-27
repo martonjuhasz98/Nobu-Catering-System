@@ -137,6 +137,11 @@ public class CheckInventory extends JPanel implements ActionListener, CaretListe
 		}
 	}
 	private void createStocktaking() {
+		if (JOptionPane.showConfirmDialog(this, "Are you sure?", "Finalize stock-taking", JOptionPane.YES_NO_OPTION)
+				!= JOptionPane.YES_OPTION) {
+			return;
+		}
+		
 		Employee employee = ((ManagerWindow)SwingUtilities.getWindowAncestor(this)).getUser();
 		
 		if (!itemCtrl.createStocktaking(employee, mdl_stocktaking.getItems())) {

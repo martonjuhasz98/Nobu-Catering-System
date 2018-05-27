@@ -169,9 +169,10 @@ public class CreateInvoice extends PerformPanel implements ActionListener, Caret
 		reset();
 	}
 	private void createInvoice() {
-		if (JOptionPane.showConfirmDialog(this, "Are you sure?") != JOptionPane.YES_OPTION) {
-        	return;
-        }
+		if (JOptionPane.showConfirmDialog(this, "Are you sure?", "Creating invoice", JOptionPane.YES_NO_OPTION)
+				!= JOptionPane.YES_OPTION) {
+			return;
+		}
 		
 		//Supplier
 		Supplier supplier = (Supplier)cmb_supplier.getSelectedItem();
