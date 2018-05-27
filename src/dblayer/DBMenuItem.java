@@ -153,7 +153,7 @@ public class DBMenuItem implements IFDBMenuItem {
 			}
 			
 			//MenuItem
-			PreparedStatement ps = con.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
+			PreparedStatement ps = con.prepareStatement(query);
 			ps.setQueryTimeout(5);
 			ps.setInt(1, menuItem.getId());
 			ps.setString(2, menuItem.getName());
@@ -161,11 +161,8 @@ public class DBMenuItem implements IFDBMenuItem {
 			ps.setInt(4, menuItem.getCategory().getId());
 			
 			if (ps.executeUpdate() > 0) {
-				ResultSet generatedKeys = ps.getGeneratedKeys();
-	            if (generatedKeys.next()) {
-	            	id = generatedKeys.getInt(1);
-		            menuItem.setId(id);
-	            }
+            	id = menuItem.getId();
+		            
 			}
 			ps.close();
 			
