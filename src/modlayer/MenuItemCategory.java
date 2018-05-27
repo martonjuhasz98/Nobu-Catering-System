@@ -37,4 +37,9 @@ public class MenuItemCategory {
 	public int hashCode() {
 	    return 0;
 	}
+	
+	@Override
+	public String toString() {
+		return name;
+	}
 }

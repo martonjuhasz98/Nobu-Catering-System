@@ -43,7 +43,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
-import modlayer.ItemCategory;
 
 public class EditMenuItem extends PerformPanel
 		implements ActionListener, CaretListener, ItemListener, ListSelectionListener, TableModelListener {
@@ -70,7 +69,7 @@ public class EditMenuItem extends PerformPanel
 	private JTextField txt_category;
 	private JTextField txtPrice;
 	private ButtonGroup rdbtn_group;
-	private JComboBox<ItemCategory> cmb_category;
+	private JComboBox<MenuItemCategory> cmb_category;
 	private JScrollPane scrlPane_menuItemItem;
 	private JRadioButton rdbtn_createCategory;
 	private JRadioButton rdbtn_selectCategory;
@@ -131,7 +130,6 @@ public class EditMenuItem extends PerformPanel
 		txt_search.setBounds(16, 224, 179, 20);
 		add(txt_search);
 		txt_search.setColumns(10);
-		txt_search.addCaretListener(this);
 
 		btn_search = new JButton("Search");
 		btn_search.setBounds(195, 224, 73, 20);
@@ -177,15 +175,7 @@ public class EditMenuItem extends PerformPanel
 		btn_cancel.setBounds(668, 432, 122, 32);
 		add(btn_cancel);
 
-		reset();
-		btn_search.addActionListener(this);
-		btn_add.addActionListener(this);
-		btn_remove.addActionListener(this);
-		btn_submit.addActionListener(this);
-		btn_cancel.addActionListener(this);
-		tbl_inventory.getSelectionModel().addListSelectionListener(this);
-		tbl_menuItemItem.getSelectionModel().addListSelectionListener(this);
-		mdl_menuItem.addTableModelListener(this);
+
 
 		rdbtn_selectCategory = new JRadioButton("Select from existing");
 		rdbtn_selectCategory.setSelected(true);
@@ -193,7 +183,7 @@ public class EditMenuItem extends PerformPanel
 		rdbtn_group.add(rdbtn_selectCategory);
 		add(rdbtn_selectCategory);
 
-		cmb_category = new JComboBox<ItemCategory>();
+		cmb_category = new JComboBox<MenuItemCategory>();
 		cmb_category.setSelectedIndex(-1);
 		cmb_category.setBounds(419, 110, 376, 20);
 		add(cmb_category);
@@ -210,33 +200,76 @@ public class EditMenuItem extends PerformPanel
 		txt_category.setColumns(10);
 		txt_category.setBounds(419, 164, 376, 20);
 		add(txt_category);
+		
+		btn_search.addActionListener(this);
+		btn_add.addActionListener(this);
+		btn_remove.addActionListener(this);
+		btn_submit.addActionListener(this);
+		btn_cancel.addActionListener(this);
+		tbl_inventory.getSelectionModel().addListSelectionListener(this);
+		tbl_menuItemItem.getSelectionModel().addListSelectionListener(this);
+		mdl_menuItem.addTableModelListener(this);
+		txt_search.addCaretListener(this);
+		txtName.addCaretListener(this);
+		txtId.addCaretListener(this);
+		txtPrice.addCaretListener(this);
+		txt_category.addCaretListener(this);
+		cmb_category.addItemListener(this);
+		rdbtn_selectCategory.addItemListener(this);
+		rdbtn_createCategory.addItemListener(this);
+
+		reset();
 	}
 
 	private void reset() {
-		// cmb_supplier.setModel(new
-		// DefaultComboBoxModel(supplierCtrl.getSuppliers().toArray()));
-		// cmb_supplier.setSelectedIndex(-1);
-		// inventoryModel.setItems(itemCtrl.getItems());
-		// mdl_menuItem.setItems(new ArrayList<MenuItem>());
-		//
-		// txt_search.setText("");
-		// btn_add.setEnabled(false);
-		// btn_remove.setEnabled(false);
-		// btn_create.setEnabled(false);
+		txtId.setText("");
+		txtName.setText("");
+		txtPrice.setText("");
+		inventoryModel.setItems(itemCtrl.getItems());
+		mdl_menuItem.setItems(new ArrayList<Ingredient>());
+		menuItem = null;
+		creatingCategory = false;
+		isCreatingMenuItem = true;
+
+		rdbtn_selectCategory.setSelected(true);
+		cmb_category.setSelectedIndex(-1);
+		txt_category.setText("");
+
+		txt_search.setText("");
+		btn_add.setEnabled(false);
+		btn_remove.setEnabled(false);
+		btn_submit.setEnabled(false);
 	}
 
 	public void create() {
+		cmb_category.setModel(new DefaultComboBoxModel(menuItemCtrl.getCategories().toArray()));
+		cmb_category.setSelectedIndex(-1);
 		open();
 	}
 
 	public void update(MenuItem menuItem) {
-		// fill(menuItem);
+		cmb_category.setModel(new DefaultComboBoxModel(menuItemCtrl.getCategories().toArray()));
+		cmb_category.setSelectedIndex(-1);
+		fill(menuItem);
 		open();
 	}
 
+	public void fill(MenuItem menuItem) {
+		this.menuItem = menuItem;
+		isCreatingMenuItem = false;
+
+		txtId.setText(String.valueOf(menuItem.getId()));
+		txtName.setText(menuItem.getName());
+		txtPrice.setText(String.valueOf(menuItem.getPrice()));
+		cmb_category.setSelectedItem(menuItem.getCategory());
+		for (Ingredient i : menuItem.getIngredients())
+			mdl_menuItem.addItem(i);
+		btn_submit.setText("Update");
+		btn_submit.setEnabled(true);
+	}
+
 	private void open() {
-		cmb_category.setModel(new DefaultComboBoxModel(itemCtrl.getCategories().toArray()));
-		cmb_category.setSelectedIndex(-1);
+
 		setVisible(true);
 	}
 
@@ -245,51 +278,52 @@ public class EditMenuItem extends PerformPanel
 		reset();
 	}
 
-	private void createMenuItem() {
-		// if (JOptionPane.showConfirmDialog(this, "Are you sure?", "Creating menuItem",
-		// JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
-		// return;
-		// }
-		// int id;
-		// String name;
-		// Double price;
-		// MenuItemCategory menuItemCategory;
-		// ArrayList<Ingredient> ingredients = mdl_menuItem.getItems();
-		//
-		// if (isCreatingMenuItem) {
-		// if (!menuItemCtrl.createMenuItem(id, name, price, menuItemCategory,
-		// ingredients)) {
-		// JOptionPane.showMessageDialog(this, "An error occured while creating the
-		// Item!", "Error!",
-		// JOptionPane.ERROR_MESSAGE);
-		// return;
-		// }
-		//
-		// JOptionPane.showMessageDialog(this, "The Item was successfully created!",
-		// "Success!",
-		// JOptionPane.INFORMATION_MESSAGE);
-		//
-		// triggerPerformListeners();
-		// } else {
-		// menuItem.setId(id);
-		// menuItem.setName(name);
-		// menuItem.setPrice(price);
-		// menuItem.setCategory(menuItemCategory);
-		// menuItem.setIngredients(ingredients);
-		//
-		// if (!menuItemCtrl.updateMenuItem(menuItem)) {
-		// JOptionPane.showMessageDialog(this, "An error occured while creating the
-		// Item!", "Error!",
-		// JOptionPane.ERROR_MESSAGE);
-		// return;
-		// }
-		//
-		// JOptionPane.showMessageDialog(this, "The Item was successfully edited!",
-		// "Success!",
-		// JOptionPane.INFORMATION_MESSAGE);
-		//
-		// triggerPerformListeners();
-		// }
+	private void submit() {
+		if (JOptionPane.showConfirmDialog(this, "Are you sure?", "Creating menuItem",
+				JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
+			return;
+		}
+		int id = Integer.valueOf(txtId.getText());
+		String name = txtName.getText();
+		Double price = Double.valueOf(txtPrice.getText());
+		MenuItemCategory menuItemCategory;
+		if (!creatingCategory) {
+			menuItemCategory = (MenuItemCategory) cmb_category.getSelectedItem();
+		} else {
+			menuItemCategory = new MenuItemCategory();
+			menuItemCategory.setName(txt_category.getText().trim());
+		}
+		ArrayList<Ingredient> ingredients = mdl_menuItem.getItems();
+
+		if (isCreatingMenuItem) {
+			if (!menuItemCtrl.createMenuItem(id, name, price, menuItemCategory, ingredients)) {
+				JOptionPane.showMessageDialog(this, "An error occured while creating the Item!", "Error!",
+						JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+
+			JOptionPane.showMessageDialog(this, "The Item was successfully created!", "Success!",
+					JOptionPane.INFORMATION_MESSAGE);
+
+			triggerPerformListeners();
+		} else {
+			menuItem.setId(id);
+			menuItem.setName(name);
+			menuItem.setPrice(price);
+			menuItem.setCategory(menuItemCategory);
+			menuItem.setIngredients(ingredients);
+
+			if (!menuItemCtrl.updateMenuItem(menuItem)) {
+				JOptionPane.showMessageDialog(this, "An error occured while creating the Item!", "Error!",
+						JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+
+			JOptionPane.showMessageDialog(this, "The Item was successfully edited!", "Success!",
+					JOptionPane.INFORMATION_MESSAGE);
+
+			triggerPerformListeners();
+		}
 		close();
 	}
 
@@ -302,7 +336,19 @@ public class EditMenuItem extends PerformPanel
 		// Double.valueOf()
 		if (mdl_menuItem.getItems().isEmpty())
 			return false;
-
+		if (!txtId.getText().trim().matches("[0-9]+"))
+			return false;
+		if (txtName.getText().trim().isEmpty())
+			return false;
+		if (!txtPrice.getText().trim().matches("[0-9]+\\.[0-9]{2}"))
+			return false;
+		if (!creatingCategory) {
+			if (cmb_category.getSelectedIndex() < 0)
+				return false;
+		} else {
+			if (txt_category.getText().trim().isEmpty())
+				return false;
+		}
 		return true;
 	}
 
@@ -365,7 +411,7 @@ public class EditMenuItem extends PerformPanel
 		} else if (e.getSource() == btn_remove) {
 			removeFromMenuItem();
 		} else if (e.getSource() == btn_submit) {
-			createMenuItem();
+			submit();
 		} else if (e.getSource() == btn_cancel) {
 			cancel();
 		}
@@ -376,7 +422,7 @@ public class EditMenuItem extends PerformPanel
 		if (e.getSource() == txt_search) {
 			search();
 		}
-		if (e.getSource() == txtId||e.getSource() == txtName||e.getSource() == txtPrice) {
+		if (e.getSource() == txtId || e.getSource() == txtName || e.getSource() == txtPrice || e.getSource() == txt_category ) {
 			btn_submit.setEnabled(isFilled());
 		}
 	}
@@ -392,7 +438,6 @@ public class EditMenuItem extends PerformPanel
 			btn_remove.setEnabled(!empty);
 		}
 	}
-
 
 	@Override
 	public void tableChanged(TableModelEvent e) {

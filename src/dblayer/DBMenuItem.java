@@ -36,7 +36,7 @@ public class DBMenuItem implements IFDBMenuItem {
 					+ "c.name AS categoryName "
 					+ "FROM [Menu_Item] AS i "
 					+ "INNER JOIN [Menu_Item_Category] AS c "
-					+ "ON i.category_id = c.id";
+					+ "ON i.category_id = c.id ";
 		try {
 			
 			Statement st = con.createStatement();
@@ -70,9 +70,9 @@ public class DBMenuItem implements IFDBMenuItem {
 					+ "c.name AS categoryName "
 					+ "FROM [Menu_Item] AS i "
 					+ "INNER JOIN [Menu_Item_Category] AS c "
-					+ "ON i.category_id = c.id"
-					+ "WHERE itemId LIKE ? "
-					+ "OR itemName LIKE ?";
+					+ "ON i.category_id = c.id "
+					+ "WHERE i.id LIKE ? "
+					+ "OR i.name LIKE ?";
 		
 		try {
 			PreparedStatement ps = con.prepareStatement(query);
@@ -298,9 +298,9 @@ public class DBMenuItem implements IFDBMenuItem {
 	public boolean canCreateMenuItem(MenuItem menuItem) {
 		boolean canCreate = false;
 		
-		String query = "SELECT (it.quantity - ing.quantity >= 0) FROM [Ingredient] AS ing"
-					+ "INNER JOIN [Item] AS it"
-					+ "ON ing.item_barcode = it.barcode"
+		String query = "SELECT (it.quantity - ing.quantity >= 0) FROM [Ingredient] AS ing "
+					+ "INNER JOIN [Item] AS it "
+					+ "ON ing.item_barcode = it.barcode "
 					+ "WHERE ing.menu_item_id = ?";
 		try {
 			
