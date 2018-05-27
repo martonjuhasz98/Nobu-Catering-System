@@ -7,92 +7,90 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
-import dblayer.interfaces.IFDBInvoice;
+import dblayer.interfaces.IFDBOrder;
 import modlayer.Supplier;
 import modlayer.Transaction;
 import modlayer.TransactionType;
 import modlayer.City;
 import modlayer.Employee;
-import modlayer.Invoice;
-import modlayer.InvoiceItem;
+import modlayer.Order;
+import modlayer.OrderMenuItem;
 
-public class DBInvoice implements IFDBInvoice {
+public class DBOrder implements IFDBOrder {
 	
 	private Connection con;
 	
-	public DBInvoice() {
+	public DBOrder() {
 		con = DBConnection.getConnection();
 	}
 	
 	@Override
-	public ArrayList<Invoice> getInvoices(boolean delivered) {
-		ArrayList<Invoice> invoices = new ArrayList<>();
+	public ArrayList<Order> getOrders(boolean payed) {
+		ArrayList<Order> orders = new ArrayList<>();
 		
-		String query = "SELECT * FROM [Invoice_View] "
-					+ "WHERE invoiceIsDelivered = ?";
+		String query = "SELECT * FROM [Order_View] "
+					+ "WHERE transactionId IS " + (payed ? "NOT" : "") + " NULL";
 		try {
 			
-			PreparedStatement ps = con.prepareStatement(query);
-			ps.setQueryTimeout(5);
-			ps.setBoolean(1, delivered);
+			Statement st = con.createStatement();
+			st.setQueryTimeout(5);
 			
-			Invoice invoice;
-			ResultSet results = ps.executeQuery();
+			Order order;
+			ResultSet results = st.executeQuery(query);
 			while (results.next()) {
-				invoice = buildInvoice(results);
-				invoices.add(invoice);
+				order = buildOrder(results);
+				orders.add(order);
 			}
-			ps.close();
+			st.close();
 		} catch (SQLException e) {
-			System.out.println("Invoices were not found!");
+			System.out.println("Orders were not found!");
 			System.out.println(e.getMessage());
 			System.out.println(query);
 		}
 		
-		return invoices;
+		return orders;
 	}
 	
 	@Override
-	public ArrayList<Invoice> searchInvoices(String keyword, boolean delivered) {
-		ArrayList<Invoice> invoices = new ArrayList<Invoice>();
+	public ArrayList<Order> searchOrders(String keyword, boolean payed) {
+		ArrayList<Order> orders = new ArrayList<Order>();
 
-		String query = "SELECT * FROM [Invoice_View] "
-						+ "WHERE invoiceIsDelivered = ? "
-						+ "AND (invoiceId LIKE ? "
+		String query = "SELECT * FROM [Order_View] "
+						+ "WHERE transactionId IS " + (payed ? "NOT" : "") + " NULL"
+						+ "AND (orderId LIKE ? "
 						+ "OR employeeName LIKE ? "
 						+ "OR supplierName LIKE ?)";
 		
 		try {
 			PreparedStatement ps = con.prepareStatement(query);
 			ps.setQueryTimeout(5);
-			ps.setBoolean(1, delivered);
+			ps.setString(1, "%" + keyword + "%");
 			ps.setString(2, "%" + keyword + "%");
 			ps.setString(3, "%" + keyword + "%");
-			ps.setString(4, "%" + keyword + "%");
 			
-			Invoice invoice;
+			Order order;
 			ResultSet results = ps.executeQuery();
 			while (results.next()) {
-				invoice = buildInvoice(results);
-				invoices.add(invoice);
+				order = buildOrder(results);
+				orders.add(order);
 			}
 			ps.close();
 		}
 		catch (SQLException e) {
-			System.out.println("Invoices were not found!");
+			System.out.println("Orders were not found!");
 			System.out.println(e.getMessage());
 			System.out.println(query);
 		}
 		
-		return invoices;
+		return orders;
 	}
 	
 	@Override
-	public Invoice selectInvoice(int id) {
-		Invoice invoice = null;
+	public Order selectOrder(int id) {
+		Order order = null;
 		
-		String query = "SELECT * FROM [Invoice_View] "
-						+ "WHERE invoiceId = ?";
+		String query = "SELECT * FROM [Order_View] "
+						+ "WHERE orderId = ?";
 		try {
 			
 			PreparedStatement ps = con.prepareStatement(query);
@@ -101,54 +99,54 @@ public class DBInvoice implements IFDBInvoice {
 			
 			ResultSet results = ps.executeQuery();
 			if (results.next()) {
-				invoice = buildInvoice(results);
+				order = buildOrder(results);
 			}
 		} catch (SQLException e) {
-			System.out.println("Invoice was not found!");
+			System.out.println("Order was not found!");
 			System.out.println(e.getMessage());
 			System.out.println(query);
 		}
 		
-		return invoice;
+		return order;
 	}
 	
 	@Override
-	public int insertInvoice(Invoice invoice) {
+	public int insertOrder(Order order) {
 		int id = -1;
 		String query = "";
 		
 		try {
 			DBConnection.startTransaction();
 			
-			query = "INSERT INTO [Invoice] (employee_cpr, supplier_cvr) VALUES (?, ?)";
+			query = "INSERT INTO [Order] (table_no, employee_cpr) VALUES (?, ?)";
 			PreparedStatement ps = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 			ps.setQueryTimeout(5);
-			ps.setString(1, invoice.getPlacedBy().getCpr());
-			ps.setString(2, invoice.getSupplier().getCvr());
+			ps.setInt(1, order.getTableNo());
+			ps.setString(2, order.getEmployee().getCpr());
 			
 			if (ps.executeUpdate() > 0) {
 				ResultSet generatedKeys = ps.getGeneratedKeys();
 	            if (generatedKeys.next()) {
 	            	id = generatedKeys.getInt(1);
-		            invoice.setId(id);
+		            order.setId(id);
 	            }
 			}
 			ps.close();
 			
-			//InvoiceItems
+			//OrderMenuItems
 			double totalPrice = 0;
 			String itemBarcode;
 			double unitPrice;
 			double quantity;
 			
-			for (InvoiceItem item : invoice.getItems()) {
+			for (OrderMenuItem item : order.getItems()) {
 				itemBarcode = item.getItem().getBarcode();
 				unitPrice = item.getUnitPrice();
 				quantity = item.getQuantity();
 				totalPrice += quantity * unitPrice;
 				
-				query =   "INSERT INTO [Invoice_Item] "
-						+ "(item_barcode, invoice_id, quantity, unit_price) "
+				query =   "INSERT INTO [Order_Item] "
+						+ "(item_barcode, order_id, quantity, unit_price) "
 						+ "VALUES (?, ?, ?, ?)";
 				try {
 					ps = con.prepareStatement(query);
@@ -165,7 +163,7 @@ public class DBInvoice implements IFDBInvoice {
 					}
 				}
 				catch (SQLException e) {
-					System.out.println("InvoiceItem was not inserted!");
+					System.out.println("OrderMenuItem was not inserted!");
 					
 					throw e;
 				}
@@ -185,7 +183,7 @@ public class DBInvoice implements IFDBInvoice {
 			DBConnection.commitTransaction();
 		}
 		catch (SQLException e) {
-			System.out.println("Invoice was not inserted!");
+			System.out.println("Order was not inserted!");
 			System.out.println(e.getMessage());
 			System.out.println(query);
 			
@@ -197,13 +195,13 @@ public class DBInvoice implements IFDBInvoice {
 	}
 	
 	@Override
-	public boolean confirmInvoice(Invoice invoice) {
+	public boolean payOrder(Order order) {
 		boolean success = false;
 		
 		String query =
-				"UPDATE [Invoice] "
-			  + "SET is_delivered = ?,"
-			  + "date_delivered = GETDATE() "
+				"UPDATE [Order] "
+			  + "SET is_payed = ?,"
+			  + "date_payed = GETDATE() "
 			  + "WHERE id = ?";
 		try {
 			DBConnection.startTransaction();
@@ -211,7 +209,7 @@ public class DBInvoice implements IFDBInvoice {
 			PreparedStatement ps = con.prepareStatement(query);
 			ps.setQueryTimeout(5);
 			ps.setBoolean(1, true);
-			ps.setInt(2, invoice.getId());
+			ps.setInt(2, order.getId());
 			
 			success = ps.executeUpdate() > 0;
 			ps.close();
@@ -220,7 +218,7 @@ public class DBInvoice implements IFDBInvoice {
 			String itemBarcode;
 			double quantity;
 			
-			for (InvoiceItem item : invoice.getItems()) {
+			for (OrderMenuItem item : order.getItems()) {
 				itemBarcode = item.getItem().getBarcode();
 				quantity = item.getQuantity();
 				if (quantity == 0) continue;
@@ -240,7 +238,7 @@ public class DBInvoice implements IFDBInvoice {
 					ps.close();
 				}
 				catch (SQLException e) {
-					System.out.println("InvoiceItem was not inserted!");
+					System.out.println("OrderMenuItem was not inserted!");
 					
 					throw e;
 				}
@@ -260,30 +258,30 @@ public class DBInvoice implements IFDBInvoice {
 	}
 	
 	@Override
-	public boolean cancelInvoice(Invoice invoice) {
+	public boolean cancelOrder(Order order) {
 		boolean success = false;
 		String query = "";
 		
 		try {
 			PreparedStatement ps;
 			
-			//InvoiceItems
-			query = "DELETE FROM [Invoice_Item] WHERE invoice_id = ?";
+			//OrderMenuItems
+			query = "DELETE FROM [Order_Item] WHERE order_id = ?";
 			ps = con.prepareStatement(query);
 			ps.setQueryTimeout(5);
-			ps.setInt(1, invoice.getId());
+			ps.setInt(1, order.getId());
 			
 			success = ps.executeUpdate() > 0;
 			ps.close();
 			if (!success) {
-				throw new SQLException("InvoiceItems were not deleted!");
+				throw new SQLException("OrderMenuItems were not deleted!");
 			}
 			
 			//Transaction
 			query = "DELETE FROM [Transaction] WHERE id = ?";
 			ps = con.prepareStatement(query);
 			ps.setQueryTimeout(5);
-			ps.setInt(1, invoice.getId());
+			ps.setInt(1, order.getId());
 			
 			success = ps.executeUpdate() > 0;
 			ps.close();
@@ -291,30 +289,31 @@ public class DBInvoice implements IFDBInvoice {
 				throw new SQLException("Transaction was not deleted!");
 			}
 			
-			//Invoice
-			query = "DELETE FROM [Invoice] WHERE id = ?";
+			//Order
+			query = "DELETE FROM [Order] WHERE id = ?";
 			ps = con.prepareStatement(query);
 			ps.setQueryTimeout(5);
-			ps.setInt(1, invoice.getId());
+			ps.setInt(1, order.getId());
 			
 			success = ps.executeUpdate() > 0;
 			ps.close();
 		}
 		catch (SQLException e) {
-			System.out.println("Invoice was not deleted!");
+			System.out.println("Order was not deleted!");
 			System.out.println(e.getMessage());
 			System.out.println(query);
 		}
 			
 		return success;
 	}
+
 	
-	private Invoice buildInvoice(ResultSet results) throws SQLException {
-		Invoice invoice = null;
+	private Order buildOrder(ResultSet results) throws SQLException {
+		Order order = null;
 		
 		String query = "";
 		try {
-			invoice = new Invoice();
+			order = new Order();
 			
 			//City
 			City city = new City();
@@ -349,49 +348,51 @@ public class DBInvoice implements IFDBInvoice {
 				
 			//Transaction
 			Transaction transaction = new Transaction();
-			transaction.setId(results.getInt("invoiceId"));
+			transaction.setId(results.getInt("orderId"));
 			transaction.setAmount(results.getDouble("transactionAmount"));
-			transaction.setType(TransactionType.getType(results.getInt("transactionTypeId")));
+			transaction.setType(TransactionType.getType(results.getInt("transactionTransactionType")));
 			transaction.setTimestamp(results.getDate("transactionTimestamp"));
 			
-			//Invoice
-			invoice.setId(results.getInt("invoiceId"));
-			invoice.setDelivered(results.getBoolean("invoiceIsDelivered"));
-			invoice.setTimestamp(results.getDate("invoiceTimestamp"));
-			invoice.setDateDelivered(results.getDate("invoiceDateDelivered"));
-			invoice.setPlacedBy(employee);
-			invoice.setSupplier(supplier);
-			invoice.setTransaction(transaction);
+			//Order
+			order.setId(results.getInt("orderId"));
+			order.setDelivered(results.getBoolean("orderIsDelivered"));
+			order.setTimestamp(results.getDate("orderTimestamp"));
+			order.setDateDelivered(results.getDate("orderDateDelivered"));
+			order.setPlacedBy(employee);
+			order.setSupplier(supplier);
+			order.setTransaction(transaction);
 			
-			//InvoiceItem
-			ArrayList<InvoiceItem> items = new ArrayList<InvoiceItem>();
+			//OrderMenuItem
+			ArrayList<OrderMenuItem> items = new ArrayList<OrderMenuItem>();
 			query =   "SELECT item_barcode, quantity, unit_price "
-					+ "FROM [Invoice_item] "
-					+ "WHERE invoice_id = ?";
+					+ "FROM [Order_item] "
+					+ "WHERE order_id = ?";
 			PreparedStatement ps = con.prepareStatement(query);
 			ps.setQueryTimeout(5);
-			ps.setInt(1, invoice.getId());
+			ps.setInt(1, order.getId());
 			
 			DBItem dbItem = new DBItem();
-			InvoiceItem item;
+			OrderMenuItem item;
 			results = ps.executeQuery();
 			while (results.next()) {
-				item = new InvoiceItem();
-				item.setInvoice(invoice);
+				item = new OrderMenuItem();
+				item.setOrder(order);
 				item.setItem(dbItem.selectItem(results.getString("item_barcode")));
 				item.setQuantity(results.getInt("quantity"));
 				item.setUnitPrice(results.getDouble("unit_price"));
 				items.add(item);
 			}
 			ps.close();
-			invoice.setItems(items);
+			order.setItems(items);
 		}
 		catch (SQLException e) {
-			System.out.println("Invoice was not built!");
+			System.out.println("Order was not built!");
 			System.out.println(e.getMessage());
 			System.out.println(query);
 		}
 		
-		return invoice;
+		return order;
 	}
+
+
 }

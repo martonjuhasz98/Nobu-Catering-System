@@ -1,11 +1,14 @@
 package modlayer;
 
+import java.util.ArrayList;
+
 public class Order {
 
 	private int id;
 	private int tableNo;
 	private Employee employee;
 	private Transaction transaction;
+	private ArrayList<OrderMenuItem> items;
 	
 	public Order() {
 		id = -1;
@@ -24,6 +27,9 @@ public class Order {
 	public Transaction getTransaction() {
 		return transaction;
 	}
+	public ArrayList<OrderMenuItem> getItems() {
+		return items;
+	}
 	public void setId(int id) {
 		this.id = id;
 	}
@@ -35,6 +41,9 @@ public class Order {
 	}
 	public void setTransaction(Transaction transaction) {
 		this.transaction = transaction;
+	}
+	public void setItems(ArrayList<OrderMenuItem> items) {
+		this.items = items;
 	}
 	
 	@Override
