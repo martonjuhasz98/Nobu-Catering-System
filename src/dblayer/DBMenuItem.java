@@ -131,7 +131,7 @@ public class DBMenuItem implements IFDBMenuItem {
 	}
 
 	@Override
-	public int insertMenuItem(MenuItem item) {
+	public int insertMenuItem(MenuItem menuItem) {
 		int id = -1;
 		
 		String query =
@@ -139,84 +139,136 @@ public class DBMenuItem implements IFDBMenuItem {
 				+ "(id, name, price, category_id) "
 				+ "VALUES (?, ?, ?, ?)";
 		try {
+			DBConnection.startTransaction();
+			
 			//Create new MenuItemCategory if needed
-			if (item.getCategory().getId() < 1) {
+			if (menuItem.getCategory().getId() < 1) {
 				DBMenuItemCategory dbCategory = new DBMenuItemCategory();
-				if ((id = dbCategory.insertCategory(item.getCategory())) < 0) {
+				if ((id = dbCategory.insertCategory(menuItem.getCategory())) < 0) {
 					throw new SQLException("MenuItemCategory was not inserted!");
 				}
 				
-				item.getCategory().setId(id);
+				menuItem.getCategory().setId(id);
 				id = -1;
 			}
 			
 			//MenuItem
 			PreparedStatement ps = con.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
 			ps.setQueryTimeout(5);
-			ps.setInt(1, item.getId());
-			ps.setString(2, item.getName());
-			ps.setDouble(3, item.getPrice());
-			ps.setInt(4, item.getCategory().getId());
+			ps.setInt(1, menuItem.getId());
+			ps.setString(2, menuItem.getName());
+			ps.setDouble(3, menuItem.getPrice());
+			ps.setInt(4, menuItem.getCategory().getId());
 			
 			if (ps.executeUpdate() > 0) {
 				ResultSet generatedKeys = ps.getGeneratedKeys();
 	            if (generatedKeys.next()) {
 	            	id = generatedKeys.getInt(1);
-		            item.setId(id);
+		            menuItem.setId(id);
 	            }
 			}
 			ps.close();
+			
+			//Ingredients
+			try	{
+				insertIngredientsToMenuItem(menuItem.getIngredients(), menuItem);
+			} catch(SQLException e) {
+				System.out.println("Ingredients were not inserted!");
+				
+				throw e;
+			}
+			
+			DBConnection.commitTransaction();
 		}
 		catch (SQLException e) {
 			System.out.println("MenuItem was not inserted!");
 			System.out.println(e.getMessage());
 			System.out.println(query);
 			
-			return -1;
+			id = -1;
+			DBConnection.rollbackTransaction();
 		}
 		
 		return id;
 	}
 
 	@Override
-	public boolean updateMenuItem(MenuItem item) {
+	public boolean updateMenuItem(MenuItem menuItem) {
 		boolean success = false;
+		String query = "";
 		
-		String query =
-				"UPDATE [Menu_Item] "
-			  + "SET id = ?, "
-			  + "name = ?, "
-			  + "price = ?, "
-			  + "category_id = ? "
-			  + "WHERE id = ?";
 		try {
+			DBConnection.startTransaction();
+			
 			//Create new ItemCategory if needed
-			if (item.getCategory().getId() < 1) {
+			if (menuItem.getCategory().getId() < 1) {
 				int id = -1;
 				
 				DBMenuItemCategory dbCategory = new DBMenuItemCategory();
-				if ((id = dbCategory.insertCategory(item.getCategory())) < 0) {
+				if ((id = dbCategory.insertCategory(menuItem.getCategory())) < 0) {
 					throw new SQLException("ItemCategory was not inserted!");
 				}
 				
-				item.getCategory().setId(id);
+				menuItem.getCategory().setId(id);
 			}
 			
+			//MenuItem
+			query =
+					"UPDATE [Menu_Item] "
+				  + "SET id = ?, "
+				  + "name = ?, "
+				  + "price = ?, "
+				  + "category_id = ? "
+				  + "WHERE id = ?";
 			PreparedStatement ps = con.prepareStatement(query);
 			ps.setQueryTimeout(5);
-			ps.setInt(1, item.getId());
-			ps.setString(2, item.getName());
-			ps.setDouble(3, item.getPrice());
-			ps.setInt(4, item.getCategory().getId());
-			ps.setInt(5, item.getId());
+			ps.setInt(1, menuItem.getId());
+			ps.setString(2, menuItem.getName());
+			ps.setDouble(3, menuItem.getPrice());
+			ps.setInt(4, menuItem.getCategory().getId());
+			ps.setInt(5, menuItem.getId());
 			
 			success = ps.executeUpdate() > 0;
 			ps.close();
+			
+			//Ingredients
+			//Delete old ones
+			query =   "DELETE FROM [Ingredient] "
+					+ "WHERE menu_item_id = ?";
+			try {
+				ps = con.prepareStatement(query);
+				ps.setQueryTimeout(5);
+				ps.setInt(1, menuItem.getId());
+				
+				success = ps.executeUpdate() > 0;
+				ps.close();
+				if (!success) {
+					throw new SQLException();
+				}
+			}
+			catch (SQLException e) {
+				System.out.println("Ingredients were not deleted!");
+				
+				throw e;
+			}
+			
+			//Insert new ones
+			try	{
+				insertIngredientsToMenuItem(menuItem.getIngredients(), menuItem);
+			} catch(SQLException e) {
+				System.out.println("Ingredients were not inserted!");
+				
+				throw e;
+			}
+			
+			DBConnection.commitTransaction();
 		}
 		catch (SQLException e) {
 			System.out.println("MenuItem was not updated!");
 			System.out.println(e.getMessage());
 			System.out.println(query);
+			
+			DBConnection.rollbackTransaction();
 		}
 		
 		return success;
@@ -244,7 +296,43 @@ public class DBMenuItem implements IFDBMenuItem {
 			
 		return success;
 	}
-	
+	private boolean insertIngredientsToMenuItem(ArrayList<Ingredient> ingredients, MenuItem menuItem) throws SQLException{
+		String query;
+		PreparedStatement ps;
+		String barcode;
+		double quantity;
+		double waste;
+		
+		for (Ingredient ingredient : menuItem.getIngredients()) {
+			barcode= ingredient.getItem().getBarcode();
+			quantity = ingredient.getQuantity();
+			waste = ingredient.getWaste();
+			
+			query =   "INSERT INTO [Ingredient] "
+					+ "(menu_item_id, item_barcode, quantity, waste) "
+					+ "VALUES (?, ?, ?, ?)";
+			try {
+				ps = con.prepareStatement(query);
+				ps.setQueryTimeout(5);
+				ps.setInt(1, menuItem.getId());
+				ps.setString(2, barcode);
+				ps.setDouble(3, quantity);
+				ps.setDouble(4, waste);
+				
+				boolean success = ps.executeUpdate() > 0;
+				ps.close();
+				if (!success) {
+					throw new SQLException();
+				}
+			}
+			catch (SQLException e) {
+				System.out.println("Ingredient was not inserted!");
+				
+				throw e;
+			}
+		}
+		return true;
+	}
 	private MenuItem buildMenuItem(ResultSet results) throws SQLException {
 		MenuItem menuItem = null;
 		
