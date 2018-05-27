@@ -26,12 +26,13 @@ public class MenuItemController {
 	public MenuItem getMenuItem(int id) {
 		return dbMenuItem.selectMenuItem(id);
 	}
-	public boolean createMenuItem(int id, String name, double price, MenuItemCategory category) {
+	public boolean createMenuItem(int id, String name, double price, MenuItemCategory category, ArrayList<Ingredient> ingredients) {
 		MenuItem item = new MenuItem();
 		item.setId(id);
 		item.setName(name);
 		item.setPrice(price);
 		item.setCategory(category);
+		item.setIngredients(ingredients);
 		
 		boolean success = dbMenuItem.insertMenuItem(item) > 0;
 		
