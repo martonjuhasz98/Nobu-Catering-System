@@ -136,8 +136,8 @@ public class DBMenuItem implements IFDBMenuItem {
 		
 		String query =
 				  "INSERT INTO [MenuItem] "
-				+ "(name, price, category_id) "
-				+ "VALUES (?, ?, ?)";
+				+ "(id, name, price, category_id) "
+				+ "VALUES (?, ?, ?, ?)";
 		try {
 			//Create new MenuItemCategory if needed
 			if (item.getCategory().getId() < 1) {
@@ -153,9 +153,10 @@ public class DBMenuItem implements IFDBMenuItem {
 			//MenuItem
 			PreparedStatement ps = con.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
 			ps.setQueryTimeout(5);
-			ps.setString(1, item.getName());
-			ps.setDouble(2, item.getPrice());
-			ps.setInt(3, item.getCategory().getId());
+			ps.setInt(1, item.getId());
+			ps.setString(2, item.getName());
+			ps.setDouble(3, item.getPrice());
+			ps.setInt(4, item.getCategory().getId());
 			
 			if (ps.executeUpdate() > 0) {
 				ResultSet generatedKeys = ps.getGeneratedKeys();
@@ -183,7 +184,8 @@ public class DBMenuItem implements IFDBMenuItem {
 		
 		String query =
 				"UPDATE [Menu_Item] "
-			  + "SET name = ?, "
+			  + "SET id = ?, "
+			  + "name = ?, "
 			  + "price = ?, "
 			  + "category_id = ? "
 			  + "WHERE id = ?";
@@ -202,10 +204,11 @@ public class DBMenuItem implements IFDBMenuItem {
 			
 			PreparedStatement ps = con.prepareStatement(query);
 			ps.setQueryTimeout(5);
-			ps.setString(1, item.getName());
-			ps.setDouble(2, item.getPrice());
-			ps.setInt(3, item.getCategory().getId());
-			ps.setInt(4, item.getId());
+			ps.setInt(1, item.getId());
+			ps.setString(2, item.getName());
+			ps.setDouble(3, item.getPrice());
+			ps.setInt(4, item.getCategory().getId());
+			ps.setInt(5, item.getId());
 			
 			success = ps.executeUpdate() > 0;
 			ps.close();
