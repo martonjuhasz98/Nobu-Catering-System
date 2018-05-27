@@ -9,6 +9,9 @@ import java.util.ArrayList;
 
 import dblayer.interfaces.IFDBMenuItem;
 import modlayer.City;
+import modlayer.Ingredient;
+import modlayer.InvoiceItem;
+import modlayer.Item;
 import modlayer.ItemCategory;
 import modlayer.MenuItem;
 import modlayer.MenuItemCategory;
@@ -240,22 +243,45 @@ public class DBMenuItem implements IFDBMenuItem {
 	}
 	
 	private MenuItem buildMenuItem(ResultSet results) throws SQLException {
-		MenuItem item = null;
+		MenuItem menuItem = null;
 		
 		String query = "";
 		try {
 			
-			//ItemCategory
+			//MenuItemCategory
 			MenuItemCategory category = new MenuItemCategory();
 			category.setId(results.getInt("categoryId"));
 			category.setName(results.getString("categoryName"));
 			
 			//MenuItem
-			item = new MenuItem();
-			item.setId(results.getInt("itemId"));
-			item.setName(results.getString("itemName"));
-			item.setPrice(results.getDouble("itemPrice"));
-			item.setCategory(category);
+			menuItem = new MenuItem();
+			menuItem.setId(results.getInt("itemId"));
+			menuItem.setName(results.getString("itemName"));
+			menuItem.setPrice(results.getDouble("itemPrice"));
+			menuItem.setCategory(category);
+			
+			//Ingredients
+			ArrayList<Ingredient> ingredients = new ArrayList<Ingredient>();
+			query =   "SELECT item_barcode, quantity, waste "
+					+ "FROM [Ingredient] "
+					+ "WHERE menu_item_id = ?";
+			PreparedStatement ps = con.prepareStatement(query);
+			ps.setQueryTimeout(5);
+			ps.setInt(1, menuItem.getId());
+			
+			DBItem dbItem = new DBItem();
+			Ingredient ingredient;
+			results = ps.executeQuery();
+			while (results.next()) {
+				ingredient = new Ingredient();
+				ingredient.setMenuItem(menuItem);
+				ingredient.setItem(dbItem.selectItem(results.getString("item_barcode")));
+				ingredient.setQuantity(results.getInt("quantity"));
+				ingredient.setWaste(results.getDouble("waste"));
+				ingredients.add(ingredient);
+			}
+			ps.close();
+			menuItem.setIngredients(ingredients);
 		}
 		catch (SQLException e) {
 			System.out.println("MenuItem was not built!");
@@ -263,6 +289,6 @@ public class DBMenuItem implements IFDBMenuItem {
 			System.out.println(query);
 		}
 		
-		return item;
+		return menuItem;
 	}
 }

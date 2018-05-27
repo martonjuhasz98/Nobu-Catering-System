@@ -5,9 +5,11 @@ public class Ingredient {
 	private Item item;
 	private MenuItem menuItem;
 	private double quantity;
+	private double waste;
 	
 	public Ingredient() {
 		quantity = 0.0;
+		waste = 0.0;
 	}
 
 	public Item getItem() {
@@ -19,6 +21,9 @@ public class Ingredient {
 	public double getQuantity() {
 		return quantity;
 	}
+	public double getWaste() {
+		return waste;
+	}
 	public void setItem(Item item) {
 		this.item = item;
 	}
@@ -27,6 +32,9 @@ public class Ingredient {
 	}
 	public void setQuantity(double quantity) {
 		this.quantity = quantity;
+	}
+	public void setWaste(double waste) {
+		this.waste = waste;
 	}
 	
 	@Override

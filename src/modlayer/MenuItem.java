@@ -1,11 +1,14 @@
 package modlayer;
 
+import java.util.ArrayList;
+
 public class MenuItem {
 	
 	private int id;
 	private String name;
 	private double price;
 	private MenuItemCategory category;
+	private ArrayList<Ingredient> ingredients;
 	
 	public MenuItem() {
 		id = -1;
@@ -23,6 +26,9 @@ public class MenuItem {
 	public MenuItemCategory getCategory() {
 		return category;
 	}
+	public ArrayList<Ingredient> getIngredients() {
+		return ingredients;
+	}
 	public void setId(int id) {
 		this.id = id;
 	}
@@ -34,6 +40,9 @@ public class MenuItem {
 	}
 	public void setCategory(MenuItemCategory category) {
 		this.category = category;
+	}
+	public void setIngredients(ArrayList<Ingredient> ingredients) {
+		this.ingredients = ingredients;
 	}
 	
 	@Override
