@@ -26,8 +26,9 @@ public class MenuItemController {
 	public MenuItem getMenuItem(int id) {
 		return dbMenuItem.selectMenuItem(id);
 	}
-	public boolean createMenuItem(String name, double price, MenuItemCategory category) {
+	public boolean createMenuItem(int id, String name, double price, MenuItemCategory category) {
 		MenuItem item = new MenuItem();
+		item.setId(id);
 		item.setName(name);
 		item.setPrice(price);
 		item.setCategory(category);
