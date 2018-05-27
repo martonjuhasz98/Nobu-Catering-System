@@ -9,9 +9,12 @@ import guilayer.ManagerWindow;
 import guilayer.interfaces.ButtonColumn;
 import guilayer.interfaces.ItemTableModel;
 import guilayer.interfaces.PerformListener;
+import guilayer.invoices.ListInvoiceHistory.SearchWorker;
 import modlayer.Employee;
+import modlayer.Invoice;
 
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingWorker;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 
@@ -19,6 +22,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextField;
 import javax.swing.AbstractAction;
@@ -34,10 +38,14 @@ public class ListEmployees extends JPanel implements ActionListener, MouseListen
 	private JButton btn_search;
 	private JButton btn_create;
 	private JTextField txt_search;
+	private boolean isSearching;
+	private String lastKeyword;
 
 	public ListEmployees(EditEmployee editEmployee) {
 		this.employeeEditor = editEmployee;
 		employeeCtrl = new EmployeeController();
+		lastKeyword = "";
+		isSearching = false;
 
 		editEmployee.addPerformListener(this);
 
@@ -78,11 +86,11 @@ public class ListEmployees extends JPanel implements ActionListener, MouseListen
 
 		AbstractAction delete = new AbstractAction() {
 			public void actionPerformed(ActionEvent e) {
-				if (JOptionPane.showConfirmDialog(ListEmployees.this, "Are you sure?", "Deleting employee", JOptionPane.YES_NO_OPTION)
-						!= JOptionPane.YES_OPTION) {
+				if (JOptionPane.showConfirmDialog(ListEmployees.this, "Are you sure?", "Deleting employee",
+						JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
 					return;
 				}
-				
+
 				int modelRowIndex = Integer.valueOf(e.getActionCommand());
 				Employee employee = model.getItem(modelRowIndex);
 
@@ -106,13 +114,24 @@ public class ListEmployees extends JPanel implements ActionListener, MouseListen
 		btn_create.addActionListener(this);
 		table.addMouseListener(this);
 	}
+
 	private void reset() {
 		model.setItems(employeeCtrl.getEmployees());
 		txt_search.setText("");
 	}
+
 	private void search() {
+		if (isSearching)
+			return;
+		isSearching = true;
 		String keyword = txt_search.getText().trim();
-		model.setItems(employeeCtrl.searchEmployees(keyword));
+		if (lastKeyword.equals(keyword)) {
+			isSearching = false;
+			return;
+		}
+		lastKeyword = keyword;
+		// model.setItems(invoiceCtrl.searchInvoiceHistory(keyword));
+		new SearchWorker(keyword).execute();
 	}
 
 	@Override
@@ -125,6 +144,7 @@ public class ListEmployees extends JPanel implements ActionListener, MouseListen
 			employeeEditor.create();
 		}
 	}
+
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		if (e.getClickCount() == 2 && e.getSource() == table) {
@@ -136,38 +156,50 @@ public class ListEmployees extends JPanel implements ActionListener, MouseListen
 			setVisible(false);
 		}
 	}
+
 	@Override
 	public void caretUpdate(CaretEvent e) {
 		if (e.getSource() == txt_search) {
 			search();
 		}
 	}
+
 	@Override
 	public void performed() {
 		model.setItems(employeeCtrl.getEmployees());
 		setVisible(true);
 	}
+
 	@Override
 	public void cancelled() {
 		setVisible(true);
 	}
+
 	@Override
-	public void mousePressed(MouseEvent e) {}
+	public void mousePressed(MouseEvent e) {
+	}
+
 	@Override
-	public void mouseReleased(MouseEvent e) {}
+	public void mouseReleased(MouseEvent e) {
+	}
+
 	@Override
-	public void mouseEntered(MouseEvent e) {}
+	public void mouseEntered(MouseEvent e) {
+	}
+
 	@Override
-	public void mouseExited(MouseEvent e) {}
+	public void mouseExited(MouseEvent e) {
+	}
 
 	private class EmployeeTableModel extends ItemTableModel<Employee> {
 
 		public EmployeeTableModel() {
 			super();
-			
-			columns = new String[] { "CPR", "Name", "Username", "Address", "Zip code", "City", "Phone", "Email", "Access", "" };
+
+			columns = new String[] { "CPR", "Name", "Username", "Address", "Zip code", "City", "Phone", "Email",
+					"Access", "" };
 		}
-		
+
 		@Override
 		public Object getValueAt(int rowIndex, int columnIndex) {
 			Employee employee = items.get(rowIndex);
@@ -197,9 +229,36 @@ public class ListEmployees extends JPanel implements ActionListener, MouseListen
 
 			return null;
 		}
+
 		@Override
 		public boolean isCellEditable(int rowIndex, int columnIndex) {
 			return columnIndex == getColumnCount() - 1;
+		}
+	}
+
+	public class SearchWorker extends SwingWorker<ArrayList<Employee>, Void> {
+		private String keyword;
+
+		public SearchWorker(String keyword) {
+			super();
+			this.keyword = keyword;
+		}
+
+		@Override
+		protected ArrayList<Employee> doInBackground() throws Exception {
+			// Start
+			return employeeCtrl.searchEmployees(keyword);
+		}
+
+		@Override
+		protected void done() {
+			try {
+				model.setItems(get());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			isSearching = false;
+			search();
 		}
 	}
 }

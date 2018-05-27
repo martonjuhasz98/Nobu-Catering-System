@@ -9,9 +9,12 @@ import guilayer.ManagerWindow;
 import guilayer.interfaces.ButtonColumn;
 import guilayer.interfaces.ItemTableModel;
 import guilayer.interfaces.PerformListener;
+import guilayer.invoices.ListInvoiceHistory.SearchWorker;
+import modlayer.Invoice;
 import modlayer.Supplier;
 
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingWorker;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 
@@ -19,6 +22,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextField;
 import javax.swing.AbstractAction;
@@ -34,10 +38,14 @@ public class ListSuppliers extends JPanel implements ActionListener, MouseListen
 	private JButton btn_search;
 	private JButton btn_create;
 	private JTextField txt_search;
+	private boolean isSearching;
+	private String lastKeyword;
 
 	public ListSuppliers(EditSupplier editSupplier) {
 		this.supplierEditor = editSupplier;
 		supplierCtrl = new SupplierController();
+		lastKeyword = "";
+		isSearching = false;
 
 		editSupplier.addPerformListener(this);
 
@@ -112,8 +120,17 @@ public class ListSuppliers extends JPanel implements ActionListener, MouseListen
 		txt_search.setText("");
 	}
 	private void search() {
+		if (isSearching)
+			return;
+		isSearching = true;
 		String keyword = txt_search.getText().trim();
-		model.setItems(supplierCtrl.searchSuppliers(keyword));
+		if (lastKeyword.equals(keyword)) {
+			isSearching = false;
+			return;
+		}
+		lastKeyword = keyword;
+		// model.setItems(invoiceCtrl.searchInvoiceHistory(keyword));
+		new SearchWorker(keyword).execute();
 	}
 	@Override
 	public void actionPerformed(ActionEvent e) {
@@ -196,6 +213,31 @@ public class ListSuppliers extends JPanel implements ActionListener, MouseListen
 		@Override
 		public boolean isCellEditable(int rowIndex, int columnIndex) {
 			return columnIndex == getColumnCount() - 1;
+		}
+	}
+	public class SearchWorker extends SwingWorker<ArrayList<Supplier>, Void> {
+		private String keyword;
+
+		public SearchWorker(String keyword) {
+			super();
+			this.keyword = keyword;
+		}
+
+		@Override
+		protected ArrayList<Supplier> doInBackground() throws Exception {
+			// Start
+			return supplierCtrl.searchSuppliers(keyword);
+		}
+
+		@Override
+		protected void done() {
+			try {
+				model.setItems(get());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			isSearching = false;
+			search();
 		}
 	}
 }

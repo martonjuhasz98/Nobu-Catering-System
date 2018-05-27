@@ -1,4 +1,4 @@
-package guilayer.invoices;
+package guilayer.menuitems;
 
 import javax.swing.JPanel;
 
@@ -29,11 +29,11 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
-public class ListPendingInvoices extends JPanel
+public class ListMenuItems extends JPanel
 		implements ActionListener, MouseListener, PerformListener, CaretListener {
 
 	private InvoiceController invoiceCtrl;
-	private CreateInvoice createInvoice;
+	private EditMenuItem createInvoice;
 	private ShowInvoice showInvoice;
 	private ConfirmInvoice confirmInvoice;
 	private JTextField txt_search;
@@ -44,7 +44,7 @@ public class ListPendingInvoices extends JPanel
 	private boolean isSearching;
 	private String lastKeyword;
 
-	public ListPendingInvoices(ConfirmInvoice confirmInvoice, CreateInvoice createInvoice, ShowInvoice showInvoice) {
+	public ListMenuItems(ConfirmInvoice confirmInvoice, EditMenuItem createInvoice, ShowInvoice showInvoice) {
 		this.confirmInvoice = confirmInvoice;
 		this.createInvoice = createInvoice;
 		this.showInvoice = showInvoice;
@@ -99,7 +99,7 @@ public class ListPendingInvoices extends JPanel
 		};
 		AbstractAction cancel = new AbstractAction() {
 			public void actionPerformed(ActionEvent e) {
-				if (JOptionPane.showConfirmDialog(ListPendingInvoices.this, "Are you sure?", "Canceling invoice",
+				if (JOptionPane.showConfirmDialog(ListMenuItems.this, "Are you sure?", "Canceling invoice",
 						JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
 					return;
 				}
@@ -108,12 +108,12 @@ public class ListPendingInvoices extends JPanel
 				Invoice invoice = model.getItem(modelRowIndex);
 
 				if (!invoiceCtrl.cancelInvoice(invoice)) {
-					JOptionPane.showMessageDialog(ListPendingInvoices.this,
+					JOptionPane.showMessageDialog(ListMenuItems.this,
 							"An error occured while canceled the Invoice!", "Error!", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
 
-				JOptionPane.showMessageDialog(ListPendingInvoices.this, "The Invoice was successfully canceled!",
+				JOptionPane.showMessageDialog(ListMenuItems.this, "The Invoice was successfully canceled!",
 						"Success!", JOptionPane.INFORMATION_MESSAGE);
 				reset();
 			}

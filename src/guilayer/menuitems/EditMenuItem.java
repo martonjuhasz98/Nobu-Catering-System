@@ -1,4 +1,4 @@
-package guilayer.invoices;
+package guilayer.menuitems;
 
 import java.awt.Font;
 import java.awt.Label;
@@ -39,7 +39,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 
-public class CreateInvoice extends PerformPanel implements ActionListener, CaretListener, ItemListener, ListSelectionListener, TableModelListener {
+public class EditMenuItem extends PerformPanel implements ActionListener, CaretListener, ItemListener, ListSelectionListener, TableModelListener {
 
 	private InvoiceController invoiceCtrl;
 	private SupplierController supplierCtrl;
@@ -58,7 +58,7 @@ public class CreateInvoice extends PerformPanel implements ActionListener, Caret
 	private boolean isSearching;
 	private String lastKeyword;
 	
-	public CreateInvoice() {
+	public EditMenuItem() {
 		invoiceCtrl = new InvoiceController();
 		supplierCtrl = new SupplierController();
 		itemCtrl = new ItemController();

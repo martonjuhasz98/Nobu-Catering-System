@@ -12,9 +12,12 @@ import guilayer.interfaces.ButtonColumn;
 import guilayer.interfaces.ItemTableModel;
 import guilayer.interfaces.PerformListener;
 import guilayer.inventory.ListInventory;
+import guilayer.invoices.ListInvoiceHistory.SearchWorker;
+import modlayer.Invoice;
 import modlayer.Item;
 
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingWorker;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 
@@ -37,12 +40,14 @@ public class ListInventory extends JPanel implements ActionListener, MouseListen
 	private JButton btn_search;
 	private JButton btn_create;
 	private JTextField txt_search;
-	private boolean searching;
+	private boolean isSearching;
+	private String lastKeyword;
 	
 	public ListInventory(EditItem editInv) {
 		this.itemEditor = editInv;
 		itemCtrl = new ItemController();
-		searching = false;
+		lastKeyword = "";
+		isSearching = false;
 		
 		editInv.addPerformListener(this);
 		
@@ -117,26 +122,30 @@ public class ListInventory extends JPanel implements ActionListener, MouseListen
 		btn_create.addActionListener(this);
 		table.addMouseListener(this);
 	}
-	private void searchInventory() {
-		if (searching) return;
-		searching = true;
-		
-		String keyword = txt_search.getText().trim();
-		model.setItems(itemCtrl.searchItems(keyword));
-		
-		searching = false;
+	private void search() {	
+		if (isSearching)
+		return;
+	isSearching = true;
+	String keyword = txt_search.getText().trim();
+	if (lastKeyword.equals(keyword)) {
+		isSearching = false;
+		return;
+	}
+	lastKeyword = keyword;
+	// model.setItems(invoiceCtrl.searchInvoiceHistory(keyword));
+	new SearchWorker(keyword).execute();
 	}
 	
 	@Override
 	public void caretUpdate(CaretEvent e) {
 		if (e.getSource() == txt_search) {
-			searchInventory();
+			search();
 		}
 	}
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == btn_search) {
-			searchInventory();
+			search();
 		} if (e.getSource() == btn_create) {
 			setVisible(false);
 			itemEditor.create();
@@ -202,6 +211,31 @@ public class ListInventory extends JPanel implements ActionListener, MouseListen
 		@Override
 		public boolean isCellEditable(int rowIndex, int columnIndex) {
 			return columnIndex == getColumnCount() - 1;
+		}
+	}
+	public class SearchWorker extends SwingWorker<ArrayList<Item>, Void> {
+		private String keyword;
+
+		public SearchWorker(String keyword) {
+			super();
+			this.keyword = keyword;
+		}
+
+		@Override
+		protected ArrayList<Item> doInBackground() throws Exception {
+			// Start
+			return itemCtrl.searchItems(keyword);
+		}
+
+		@Override
+		protected void done() {
+			try {
+				model.setItems(get());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			isSearching = false;
+			search();
 		}
 	}
 }
