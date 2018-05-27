@@ -2,13 +2,12 @@ package guilayer.menuitems;
 
 import javax.swing.JPanel;
 
-import ctrllayer.InvoiceController;
+import ctrllayer.MenuItemController;
 import guilayer.ManagerWindow;
 import guilayer.interfaces.ButtonColumn;
 import guilayer.interfaces.ItemTableModel;
 import guilayer.interfaces.PerformListener;
-import guilayer.invoices.ListInvoiceHistory.SearchWorker;
-import modlayer.Invoice;
+import modlayer.MenuItem;
 
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
@@ -29,32 +28,24 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
-public class ListMenuItems extends JPanel
-		implements ActionListener, MouseListener, PerformListener, CaretListener {
+public class ListMenuItems extends JPanel implements ActionListener, MouseListener, PerformListener, CaretListener {
 
-	private InvoiceController invoiceCtrl;
-	private EditMenuItem createInvoice;
-	private ShowInvoice showInvoice;
-	private ConfirmInvoice confirmInvoice;
+	private MenuItemController menuItemCtrl;
+	private EditMenuItem editMenuItem;
 	private JTextField txt_search;
 	private JButton btn_search;
 	private JButton btn_create;
 	private JTable table;
-	private InvoiceTableModel model;
+	private MenuItemTableModel model;
 	private boolean isSearching;
 	private String lastKeyword;
 
-	public ListMenuItems(ConfirmInvoice confirmInvoice, EditMenuItem createInvoice, ShowInvoice showInvoice) {
-		this.confirmInvoice = confirmInvoice;
-		this.createInvoice = createInvoice;
-		this.showInvoice = showInvoice;
-		invoiceCtrl = new InvoiceController();
+	public ListMenuItems(EditMenuItem editMenuItem) {
+		this.editMenuItem = editMenuItem;
+		menuItemCtrl = new MenuItemController();
 		lastKeyword = "";
 		isSearching = false;
-		showInvoice.addPerformListener(this);
-		createInvoice.addPerformListener(this);
-		confirmInvoice.addPerformListener(this);
-
+		editMenuItem.addPerformListener(this);
 		initialize();
 	}
 
@@ -62,7 +53,7 @@ public class ListMenuItems extends JPanel
 		setLayout(null);
 		setBounds(0, 0, ManagerWindow.contentWidth, ManagerWindow.totalHeight - 30);
 
-		model = new InvoiceTableModel();
+		model = new MenuItemTableModel();
 
 		txt_search = new JTextField();
 		txt_search.setBounds(10, 11, 142, 20);
@@ -88,43 +79,32 @@ public class ListMenuItems extends JPanel
 		table.setModel(model);
 		scrollPane.setViewportView(table);
 
-		AbstractAction confirm = new AbstractAction() {
+		AbstractAction delete = new AbstractAction() {
 			public void actionPerformed(ActionEvent e) {
-				int modelRowIndex = Integer.valueOf(e.getActionCommand());
-				Invoice invoice = model.getItem(modelRowIndex);
-
-				setVisible(false);
-				confirmInvoice.confirm(invoice);
-			}
-		};
-		AbstractAction cancel = new AbstractAction() {
-			public void actionPerformed(ActionEvent e) {
-				if (JOptionPane.showConfirmDialog(ListMenuItems.this, "Are you sure?", "Canceling invoice",
+				if (JOptionPane.showConfirmDialog(ListMenuItems.this, "Are you sure?", "Canceling menuItem",
 						JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
 					return;
 				}
 
 				int modelRowIndex = Integer.valueOf(e.getActionCommand());
-				Invoice invoice = model.getItem(modelRowIndex);
+				MenuItem menuItem = model.getItem(modelRowIndex);
 
-				if (!invoiceCtrl.cancelInvoice(invoice)) {
-					JOptionPane.showMessageDialog(ListMenuItems.this,
-							"An error occured while canceled the Invoice!", "Error!", JOptionPane.ERROR_MESSAGE);
+				if (!menuItemCtrl.deleteMenuItem(menuItem)) {
+					JOptionPane.showMessageDialog(ListMenuItems.this, "An error occured while canceled the MenuItem!",
+							"Error!", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
 
-				JOptionPane.showMessageDialog(ListMenuItems.this, "The Invoice was successfully canceled!",
-						"Success!", JOptionPane.INFORMATION_MESSAGE);
+				JOptionPane.showMessageDialog(ListMenuItems.this, "The MenuItem was successfully canceled!", "Success!",
+						JOptionPane.INFORMATION_MESSAGE);
 				reset();
 			}
 		};
 
-		ButtonColumn confirmColumn = new ButtonColumn(table, confirm, model.getColumnCount() - 2);
-		confirmColumn.setMnemonic(KeyEvent.VK_ACCEPT);
-		ButtonColumn cancelColumn = new ButtonColumn(table, cancel, model.getColumnCount() - 1);
-		cancelColumn.setMnemonic(KeyEvent.VK_CANCEL);
+		
+		ButtonColumn deleteColumn = new ButtonColumn(table, delete, model.getColumnCount() - 1);
+		deleteColumn.setMnemonic(KeyEvent.VK_DELETE);
 
-		confirmInvoice.addPerformListener(this);
 		txt_search.addCaretListener(this);
 		btn_search.addActionListener(this);
 		btn_create.addActionListener(this);
@@ -134,7 +114,7 @@ public class ListMenuItems extends JPanel
 	}
 
 	private void reset() {
-		model.setItems(invoiceCtrl.getPendingInvoices());
+		model.setItems(menuItemCtrl.getMenuItems());
 		txt_search.setText("");
 	}
 
@@ -148,7 +128,7 @@ public class ListMenuItems extends JPanel
 			return;
 		}
 		lastKeyword = keyword;
-		// model.setItems(invoiceCtrl.searchInvoiceHistory(keyword));
+		// model.setItems(menuItemCtrl.searchMenuItemHistory(keyword));
 		new SearchWorker(keyword).execute();
 	}
 
@@ -158,7 +138,7 @@ public class ListMenuItems extends JPanel
 			search();
 		}
 		if (e.getSource() == btn_create) {
-			createInvoice.create();
+			editMenuItem.create();
 			setVisible(false);
 		}
 	}
@@ -175,16 +155,16 @@ public class ListMenuItems extends JPanel
 		if (e.getClickCount() == 2 && e.getSource() == table) {
 			int viewRowIndex = table.getSelectedRow();
 			int modelRowIndex = table.convertRowIndexToModel(viewRowIndex);
-			Invoice invoice = model.getItem(modelRowIndex);
+			MenuItem menuItem = model.getItem(modelRowIndex);
 
-			showInvoice.show(invoice);
+			editMenuItem.update(menuItem);
 			setVisible(false);
 		}
 	}
 
 	@Override
 	public void performed() {
-		model.setItems(invoiceCtrl.getPendingInvoices());
+		model.setItems(menuItemCtrl.getMenuItems());
 		setVisible(true);
 	}
 
@@ -209,29 +189,29 @@ public class ListMenuItems extends JPanel
 	public void mouseExited(MouseEvent e) {
 	}
 
-	private class InvoiceTableModel extends ItemTableModel<Invoice> {
+	private class MenuItemTableModel extends ItemTableModel<MenuItem> {
 
-		public InvoiceTableModel() {
+		public MenuItemTableModel() {
 			super();
 
-			columns = new String[] { "Supplier", "Ordered", "Placed by", "", "" };
+			columns = new String[] { "ID", "Name", "Category", "Price", "" };
 		}
 
 		@Override
 		public Object getValueAt(int rowIndex, int columnIndex) {
-			Invoice invoice = items.get(rowIndex);
+			MenuItem menuItem = items.get(rowIndex);
 
 			switch (columnIndex) {
 			case 0:
-				return invoice.getSupplier().getName();
+				return menuItem.getId();
 			case 1:
-				return invoice.getTimestamp();
+				return menuItem.getName();
 			case 2:
-				return invoice.getPlacedBy().getName();
+				return menuItem.getCategory().getName();
 			case 3:
-				return "Confirm";
+				return menuItem.getPrice();
 			case 4:
-				return "Cancel";
+				return "Delete";
 			}
 
 			return null;
@@ -239,11 +219,11 @@ public class ListMenuItems extends JPanel
 
 		@Override
 		public boolean isCellEditable(int rowIndex, int columnIndex) {
-			return columnIndex >= getColumnCount() - 2;
+			return columnIndex == getColumnCount() - 1;
 		}
 	}
 
-	public class SearchWorker extends SwingWorker<ArrayList<Invoice>, Void> {
+	public class SearchWorker extends SwingWorker<ArrayList<MenuItem>, Void> {
 		private String keyword;
 
 		public SearchWorker(String keyword) {
@@ -252,9 +232,9 @@ public class ListMenuItems extends JPanel
 		}
 
 		@Override
-		protected ArrayList<Invoice> doInBackground() throws Exception {
+		protected ArrayList<MenuItem> doInBackground() throws Exception {
 			// Start
-			return invoiceCtrl.searchInvoiceHistory(keyword);
+			return menuItemCtrl.searchMenuItems(keyword);
 		}
 
 		@Override

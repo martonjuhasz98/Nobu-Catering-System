@@ -49,6 +49,9 @@ public abstract class ItemTableModel<T> extends AbstractTableModel {
 		return items.get(index);
 	}
 	public boolean addItem(T item) {
+		for(T i:items)
+			if(i.equals(item))
+				return false;
 		boolean result = items.add(item);
 		update();
 		
