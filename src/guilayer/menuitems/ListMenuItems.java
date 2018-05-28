@@ -82,7 +82,7 @@ public class ListMenuItems extends JPanel implements ActionListener, MouseListen
 
 		AbstractAction delete = new AbstractAction() {
 			public void actionPerformed(ActionEvent e) {
-				if (JOptionPane.showConfirmDialog(ListMenuItems.this, "Are you sure?", "Canceling menuItem",
+				if (JOptionPane.showConfirmDialog(ListMenuItems.this, "Are you sure?", "Deliting Menu Item",
 						JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
 					return;
 				}
@@ -91,12 +91,12 @@ public class ListMenuItems extends JPanel implements ActionListener, MouseListen
 				MenuItem menuItem = model.getItem(modelRowIndex);
 
 				if (!menuItemCtrl.deleteMenuItem(menuItem)) {
-					JOptionPane.showMessageDialog(ListMenuItems.this, "An error occured while canceled the MenuItem!",
+					JOptionPane.showMessageDialog(ListMenuItems.this, "An error occured while deleting the Menu Item!",
 							"Error!", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
 
-				JOptionPane.showMessageDialog(ListMenuItems.this, "The MenuItem was successfully canceled!", "Success!",
+				JOptionPane.showMessageDialog(ListMenuItems.this, "The MenuItem was successfully deleted!", "Success!",
 						JOptionPane.INFORMATION_MESSAGE);
 				reset();
 			}
@@ -129,7 +129,7 @@ public class ListMenuItems extends JPanel implements ActionListener, MouseListen
 			return;
 		}
 		lastKeyword = keyword;
-		// model.setItems(menuItemCtrl.searchMenuItemHistory(keyword));
+		
 		new SearchWorker(keyword).execute();
 	}
 

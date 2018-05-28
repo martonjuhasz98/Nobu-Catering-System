@@ -264,7 +264,8 @@ public class EditSupplier extends PerformPanel implements ActionListener, CaretL
 		if (e.getSource() == txtZipCode) {
 			City c = supplierCtrl.getCity(txtZipCode.getText().trim());
 			txtCity.setText((c == null) ? "" : c.getName());
-		} else if (e.getSource() == txtCvr || e.getSource() == txtName || e.getSource() == txtAddress
+		}
+		if (e.getSource() == txtCvr || e.getSource() == txtName || e.getSource() == txtAddress
 				|| e.getSource() == txtZipCode || e.getSource() == txtPhone || e.getSource() == txtEmail) {
 			btn_submit.setEnabled(isFilled());
 		}
