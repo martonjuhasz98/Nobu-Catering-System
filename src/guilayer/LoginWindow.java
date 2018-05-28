@@ -78,7 +78,7 @@ public class LoginWindow extends JFrame {
 
 		JPanel panel_1 = new JPanel();
 		panel_1.setBounds(350, 125, 300, 250);
-		// panel_1.setBackground(contentBackgroundColour);
+		panel_1.setBackground(contentBackgroundColour);
 		panel.add(panel_1);
 		panel_1.setLayout(null);
 

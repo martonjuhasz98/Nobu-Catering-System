@@ -49,14 +49,13 @@ public class DBTransaction implements IFDBTransaction {
 		
 		String query =
 				  "INSERT INTO [Transaction] "
-				+ "(id, amount, transaction_type) "
-				+ "VALUES (?, ?, ?)";
+				+ "(amount, transaction_type) "
+				+ "VALUES (?, ?)";
 		try {
 			PreparedStatement ps = con.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
 			ps.setQueryTimeout(5);
-			ps.setInt(1, transaction.getId());
-			ps.setDouble(2, transaction.getAmount());
-			ps.setInt(3, transaction.getType().getId());
+			ps.setDouble(1, transaction.getAmount());
+			ps.setInt(2, transaction.getType().getId());
 			
 			if (ps.executeUpdate() > 0) {
 				ResultSet generatedKeys = ps.getGeneratedKeys();

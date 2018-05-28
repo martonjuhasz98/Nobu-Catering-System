@@ -117,13 +117,24 @@ public class DBInvoice implements IFDBInvoice {
 		
 		try {
 			DBConnection.startTransaction();
+			PreparedStatement ps;
 			
-			query = "INSERT INTO [Invoice] (employee_cpr, supplier_cvr) VALUES (?, ?)";
-			PreparedStatement ps = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+			//Transaction
+			DBTransaction dbTransaction = new DBTransaction();
+			int transactionId = dbTransaction.insertTransaction(invoice.getTransaction());
+			if (transactionId < 0) {
+				throw new SQLException("Transaction was not inserted!");
+			}
+			
+			//Invoice
+			query = "INSERT INTO [Invoice] "
+					+ "(employee_cpr, supplier_cvr, transaction_id) "
+					+ "VALUES (?, ?, ?)";
+			ps = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 			ps.setQueryTimeout(5);
 			ps.setString(1, invoice.getPlacedBy().getCpr());
 			ps.setString(2, invoice.getSupplier().getCvr());
-			
+			ps.setInt(3, transactionId);
 			if (ps.executeUpdate() > 0) {
 				ResultSet generatedKeys = ps.getGeneratedKeys();
 	            if (generatedKeys.next()) {
@@ -134,7 +145,6 @@ public class DBInvoice implements IFDBInvoice {
 			ps.close();
 			
 			//InvoiceItems
-			double totalPrice = 0;
 			String itemBarcode;
 			double unitPrice;
 			double quantity;
@@ -143,7 +153,7 @@ public class DBInvoice implements IFDBInvoice {
 				itemBarcode = item.getItem().getBarcode();
 				unitPrice = item.getUnitPrice();
 				quantity = item.getQuantity();
-				totalPrice += quantity * unitPrice;
+				
 				
 				query =   "INSERT INTO [Invoice_Item] "
 						+ "(item_barcode, invoice_id, quantity, unit_price) "
@@ -168,16 +178,6 @@ public class DBInvoice implements IFDBInvoice {
 					throw e;
 				}
 			}
-			
-			//Transaction
-			Transaction transaction = new Transaction();
-			transaction.setAmount(totalPrice);
-			transaction.setType(TransactionType.ACCOUNT);
-			DBTransaction dbTransaction = new DBTransaction();
-			if (dbTransaction.insertTransaction(transaction) < 0) {
-				throw new SQLException("Transaction was not inserted!");
-			}
-			ps.close();
 			
 			DBConnection.commitTransaction();
 		}
@@ -260,6 +260,7 @@ public class DBInvoice implements IFDBInvoice {
 		String query = "";
 		
 		try {
+			DBConnection.startTransaction();
 			PreparedStatement ps;
 			
 			//Invoice
@@ -270,6 +271,9 @@ public class DBInvoice implements IFDBInvoice {
 			
 			success = ps.executeUpdate() > 0;
 			ps.close();
+			if (!success) {
+				throw new SQLException("Invoice was not deleted!");
+			}
 			
 			//Transaction
 			query = "DELETE FROM [Transaction] WHERE id = ?";
@@ -280,13 +284,19 @@ public class DBInvoice implements IFDBInvoice {
 			success = ps.executeUpdate() > 0;
 			ps.close();
 			if (!success) {
+				System.out.println(invoice.getTransaction().getId());
 				throw new SQLException("Transaction was not deleted!");
 			}
+			
+			DBConnection.commitTransaction();
 		}
 		catch (SQLException e) {
 			System.out.println("Invoice was not deleted!");
 			System.out.println(e.getMessage());
 			System.out.println(query);
+			
+			success = false;
+			DBConnection.rollbackTransaction();
 		}
 			
 		return success;
@@ -332,7 +342,7 @@ public class DBInvoice implements IFDBInvoice {
 				
 			//Transaction
 			Transaction transaction = new Transaction();
-			transaction.setId(results.getInt("invoiceId"));
+			transaction.setId(results.getInt("transactionId"));
 			transaction.setAmount(results.getDouble("transactionAmount"));
 			transaction.setType(TransactionType.getType(results.getInt("transactionTypeId")));
 			transaction.setTimestamp(results.getDate("transactionTimestamp"));

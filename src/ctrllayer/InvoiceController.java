@@ -30,10 +30,20 @@ public class InvoiceController {
 		return dbInvoice.selectInvoice(id);
 	}
 	public boolean createInvoice(Supplier supplier, Employee employee, ArrayList<InvoiceItem> items) {
+		double totalPrice = 0;
+		for (InvoiceItem item : items) {
+			totalPrice += item.getQuantity() * item.getQuantity();
+		}
+		
+		Transaction transaction = new Transaction();
+		transaction.setAmount(totalPrice);
+		transaction.setType(TransactionType.ACCOUNT);
+		
 		Invoice invoice = new Invoice();
 		invoice.setSupplier(supplier);
 		invoice.setPlacedBy(employee);
 		invoice.setItems(items);
+		invoice.setTransaction(transaction);
 		
 		boolean success = dbInvoice.insertInvoice(invoice) > 0;
 		

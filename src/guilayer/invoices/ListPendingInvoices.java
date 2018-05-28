@@ -148,7 +148,6 @@ public class ListPendingInvoices extends JPanel
 			return;
 		}
 		lastKeyword = keyword;
-		// model.setItems(invoiceCtrl.searchInvoiceHistory(keyword));
 		new SearchWorker(keyword).execute();
 	}
 
@@ -254,7 +253,7 @@ public class ListPendingInvoices extends JPanel
 		@Override
 		protected ArrayList<Invoice> doInBackground() throws Exception {
 			// Start
-			return invoiceCtrl.searchInvoiceHistory(keyword);
+			return invoiceCtrl.searchPendingInvoices(keyword);
 		}
 
 		@Override
