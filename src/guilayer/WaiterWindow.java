@@ -90,8 +90,4 @@ public class WaiterWindow extends JFrame {
 		
 		setVisible(true);
 	}
-	
-	public Employee getUser() {
-		return user;
-	}
 }

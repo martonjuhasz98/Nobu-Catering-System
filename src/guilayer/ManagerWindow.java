@@ -115,8 +115,4 @@ public class ManagerWindow extends JFrame {
 		});
 		
 	}
-	
-//	public Employee getUser() {
-//		return user;
-//	}
 }

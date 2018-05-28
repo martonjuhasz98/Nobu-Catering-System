@@ -162,17 +162,12 @@ public class DBMenuItem implements IFDBMenuItem {
 			
 			if (ps.executeUpdate() > 0) {
             	id = menuItem.getId();
-		            
 			}
 			ps.close();
 			
 			//Ingredients
-			try	{
-				insertIngredientsToMenuItem(menuItem.getIngredients(), menuItem);
-			} catch(SQLException e) {
-				System.out.println("Ingredients were not inserted!");
-				
-				throw e;
+			if (!insertIngredientsToMenuItem(menuItem)) {
+				throw new SQLException("Ingredients were not inserted!");
 			}
 			
 			DBConnection.commitTransaction();
@@ -250,12 +245,8 @@ public class DBMenuItem implements IFDBMenuItem {
 			}
 			
 			//Insert new ones
-			try	{
-				insertIngredientsToMenuItem(menuItem.getIngredients(), menuItem);
-			} catch(SQLException e) {
-				System.out.println("Ingredients were not inserted!");
-				
-				throw e;
+			if (!insertIngredientsToMenuItem(menuItem)) {
+				throw new SQLException("Ingredients were not inserted!");
 			}
 			
 			DBConnection.commitTransaction();
@@ -265,6 +256,7 @@ public class DBMenuItem implements IFDBMenuItem {
 			System.out.println(e.getMessage());
 			System.out.println(query);
 			
+			success = false;
 			DBConnection.rollbackTransaction();
 		}
 		
@@ -274,10 +266,11 @@ public class DBMenuItem implements IFDBMenuItem {
 	@Override
 	public boolean deleteMenuItem(MenuItem menuItem) {
 		boolean success = false;
+		String query = "";
 		
-		String query = "DELETE FROM [Menu_Item] WHERE id = ?";
 		try {
 			
+			query = "DELETE FROM [Menu_Item] WHERE id = ?";
 			PreparedStatement ps = con.prepareStatement(query);
 			ps.setQueryTimeout(5);
 			ps.setInt(1, menuItem.getId());
@@ -325,22 +318,26 @@ public class DBMenuItem implements IFDBMenuItem {
 		return canCreate;
 	}
 	
-	private boolean insertIngredientsToMenuItem(ArrayList<Ingredient> ingredients, MenuItem menuItem) throws SQLException{
-		String query;
-		PreparedStatement ps;
-		String barcode;
-		double quantity;
-		double waste;
+	private boolean insertIngredientsToMenuItem(MenuItem menuItem) {
+		boolean success = true;
+		String query = "";
 		
-		for (Ingredient ingredient : menuItem.getIngredients()) {
-			barcode= ingredient.getItem().getBarcode();
-			quantity = ingredient.getQuantity();
-			waste = ingredient.getWaste();
+		try {
+			DBConnection.startTransaction();
 			
-			query =   "INSERT INTO [Ingredient] "
-					+ "(menu_item_id, item_barcode, quantity, waste) "
-					+ "VALUES (?, ?, ?, ?)";
-			try {
+			PreparedStatement ps;
+			String barcode;
+			double quantity;
+			double waste;
+			
+			for (Ingredient ingredient : menuItem.getIngredients()) {
+				barcode= ingredient.getItem().getBarcode();
+				quantity = ingredient.getQuantity();
+				waste = ingredient.getWaste();
+				
+				query =   "INSERT INTO [Ingredient] "
+						+ "(menu_item_id, item_barcode, quantity, waste) "
+						+ "VALUES (?, ?, ?, ?)";
 				ps = con.prepareStatement(query);
 				ps.setQueryTimeout(5);
 				ps.setInt(1, menuItem.getId());
@@ -348,19 +345,23 @@ public class DBMenuItem implements IFDBMenuItem {
 				ps.setDouble(3, quantity);
 				ps.setDouble(4, waste);
 				
-				boolean success = ps.executeUpdate() > 0;
-				ps.close();
-				if (!success) {
-					throw new SQLException();
+				if (ps.executeUpdate() < 1) {
+					throw new SQLException("Ingredient was not inserted!");
 				}
+				ps.close();
 			}
-			catch (SQLException e) {
-				System.out.println("Ingredient was not inserted!");
-				
-				throw e;
-			}
+			
+			DBConnection.commitTransaction();
+		} catch (SQLException e) {
+			System.out.println("Ingredients were not inserted!");
+			System.out.println(e.getMessage());
+			System.out.println(query);
+			
+			success = false;
+			DBConnection.rollbackTransaction();
 		}
-		return true;
+		
+		return success;
 	}
 	private MenuItem buildMenuItem(ResultSet results) throws SQLException {
 		MenuItem menuItem = null;

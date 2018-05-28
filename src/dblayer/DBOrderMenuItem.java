@@ -107,7 +107,7 @@ public class DBOrderMenuItem implements IFDBOrderMenuItem {
 		String query =
 				"UPDATE [Order_Menu_Item] "
 			  + "SET quantity = ?, "
-			  + "is_finished = ; "
+			  + "is_finished = ? "
 			  + "WHERE order_id = ? "
 			  + "AND menu_item_id = ?";
 		try {

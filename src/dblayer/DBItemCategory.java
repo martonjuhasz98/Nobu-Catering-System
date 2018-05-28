@@ -36,7 +36,7 @@ public class DBItemCategory implements IFDBItemCategory {
 			}
 			st.close();
 		} catch (SQLException e) {
-			System.out.println("ItemCategorys were not found!");
+			System.out.println("ItemCategories were not found!");
 			System.out.println(e.getMessage());
 			System.out.println(query);
 		}

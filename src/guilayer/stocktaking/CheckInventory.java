@@ -10,13 +10,10 @@ import ctrllayer.ItemController;
 import ctrllayer.SessionSingleton;
 import guilayer.ManagerWindow;
 import guilayer.interfaces.ItemTableModel;
-import guilayer.invoices.ListInvoiceHistory.SearchWorker;
 import modlayer.Employee;
-import modlayer.Invoice;
 import modlayer.Item;
 
 import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -166,7 +163,6 @@ public class CheckInventory extends JPanel
 		}
 
 		Employee employee = SessionSingleton.getInstance().getEmployee();
-//		Employee employee = ((ManagerWindow) SwingUtilities.getWindowAncestor(this)).getUser();
 
 		if (!itemCtrl.createStocktaking(employee, model.getItems())) {
 			JOptionPane.showMessageDialog(this, "An error occured while creating the Stock-taking!", "Error!",
@@ -284,7 +280,7 @@ public class CheckInventory extends JPanel
 		@Override
 		protected void done() {
 			try {
-				model.setItems(get());
+				mdl_inventory.setItems(get());
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

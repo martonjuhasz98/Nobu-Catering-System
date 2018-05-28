@@ -29,15 +29,14 @@ public class DBInvoice implements IFDBInvoice {
 		ArrayList<Invoice> invoices = new ArrayList<>();
 		
 		String query = "SELECT * FROM [Invoice_View] "
-					+ "WHERE invoiceIsDelivered = ?";
+					+ "WHERE invoiceDateDelivered IS " + (delivered ? "NOT" : "") + " NULL";
 		try {
 			
-			PreparedStatement ps = con.prepareStatement(query);
+			Statement ps = con.createStatement();
 			ps.setQueryTimeout(5);
-			ps.setBoolean(1, delivered);
 			
 			Invoice invoice;
-			ResultSet results = ps.executeQuery();
+			ResultSet results = ps.executeQuery(query);
 			while (results.next()) {
 				invoice = buildInvoice(results);
 				invoices.add(invoice);
@@ -57,7 +56,7 @@ public class DBInvoice implements IFDBInvoice {
 		ArrayList<Invoice> invoices = new ArrayList<Invoice>();
 
 		String query = "SELECT * FROM [Invoice_View] "
-						+ "WHERE invoiceIsDelivered = ? "
+						+ "WHERE invoiceDateDelivered IS " + (delivered ? "NOT" : "") + " NULL "
 						+ "AND (invoiceId LIKE ? "
 						+ "OR employeeName LIKE ? "
 						+ "OR supplierName LIKE ?)";
@@ -65,10 +64,9 @@ public class DBInvoice implements IFDBInvoice {
 		try {
 			PreparedStatement ps = con.prepareStatement(query);
 			ps.setQueryTimeout(5);
-			ps.setBoolean(1, delivered);
+			ps.setString(1, "%" + keyword + "%");
 			ps.setString(2, "%" + keyword + "%");
 			ps.setString(3, "%" + keyword + "%");
-			ps.setString(4, "%" + keyword + "%");
 			
 			Invoice invoice;
 			ResultSet results = ps.executeQuery();
@@ -173,7 +171,6 @@ public class DBInvoice implements IFDBInvoice {
 			
 			//Transaction
 			Transaction transaction = new Transaction();
-			transaction.setId(id);
 			transaction.setAmount(totalPrice);
 			transaction.setType(TransactionType.ACCOUNT);
 			DBTransaction dbTransaction = new DBTransaction();
@@ -267,30 +264,6 @@ public class DBInvoice implements IFDBInvoice {
 		try {
 			PreparedStatement ps;
 			
-			//InvoiceItems
-			query = "DELETE FROM [Invoice_Item] WHERE invoice_id = ?";
-			ps = con.prepareStatement(query);
-			ps.setQueryTimeout(5);
-			ps.setInt(1, invoice.getId());
-			
-			success = ps.executeUpdate() > 0;
-			ps.close();
-			if (!success) {
-				throw new SQLException("InvoiceItems were not deleted!");
-			}
-			
-			//Transaction
-			query = "DELETE FROM [Transaction] WHERE id = ?";
-			ps = con.prepareStatement(query);
-			ps.setQueryTimeout(5);
-			ps.setInt(1, invoice.getId());
-			
-			success = ps.executeUpdate() > 0;
-			ps.close();
-			if (!success) {
-				throw new SQLException("Transaction was not deleted!");
-			}
-			
 			//Invoice
 			query = "DELETE FROM [Invoice] WHERE id = ?";
 			ps = con.prepareStatement(query);
@@ -299,6 +272,18 @@ public class DBInvoice implements IFDBInvoice {
 			
 			success = ps.executeUpdate() > 0;
 			ps.close();
+			
+			//Transaction
+			query = "DELETE FROM [Transaction] WHERE id = ?";
+			ps = con.prepareStatement(query);
+			ps.setQueryTimeout(5);
+			ps.setInt(1, invoice.getTransaction().getId());
+			
+			success = ps.executeUpdate() > 0;
+			ps.close();
+			if (!success) {
+				throw new SQLException("Transaction was not deleted!");
+			}
 		}
 		catch (SQLException e) {
 			System.out.println("Invoice was not deleted!");

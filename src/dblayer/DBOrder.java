@@ -29,7 +29,7 @@ public class DBOrder implements IFDBOrder {
 		ArrayList<Order> orders = new ArrayList<>();
 		
 		String query = "SELECT * FROM [Order_View] "
-					+ "WHERE transactionTimestamp IS " + (payed ? "NOT" : "") + " NULL";
+					+ "WHERE transactionId IS " + (payed ? "NOT" : "") + " NULL";
 		try {
 			
 			Statement st = con.createStatement();
@@ -56,7 +56,7 @@ public class DBOrder implements IFDBOrder {
 		ArrayList<Order> orders = new ArrayList<Order>();
 
 		String query = "SELECT * FROM [Order_View] "
-						+ "WHERE transactionTimestamp IS " + (payed ? "NOT" : "") + " NULL"
+						+ "WHERE transactionId IS " + (payed ? "NOT" : "") + " NULL"
 						+ "AND (orderId LIKE ? "
 						+ "OR employeeName LIKE ? "
 						+ "OR supplierName LIKE ?)";
@@ -162,24 +162,17 @@ public class DBOrder implements IFDBOrder {
 		String query = "";
 		
 		try {
-			DBConnection.startTransaction();
 			
-			PreparedStatement ps = con.prepareStatement(query);
-			ps.setQueryTimeout(5);
-			ps.setBoolean(1, true);
-			ps.setInt(2, order.getId());
-			
-			success = ps.executeUpdate() > 0;
-			ps.close();
-		
-			DBConnection.commitTransaction();
+			DBTransaction dbTransaction = new DBTransaction();
+			success = dbTransaction.insertTransaction(order.getTransaction()) > 0;
+			if (!success) {
+				throw new SQLException("Transaction was not inserted!");
+			}
 		}
 		catch (SQLException e) {
-			System.out.println("Item was not updated!");
+			System.out.println("Order was not payed!");
 			System.out.println(e.getMessage());
 			System.out.println(query);
-			
-			DBConnection.rollbackTransaction();
 		}
 		
 		return success;
@@ -193,38 +186,28 @@ public class DBOrder implements IFDBOrder {
 		try {
 			PreparedStatement ps;
 			
-			//OrderMenuItems
-			query = "DELETE FROM [Order_Item] WHERE order_id = ?";
+			//Order
+			query = "DELETE FROM [Order] WHERE id = ?";
 			ps = con.prepareStatement(query);
 			ps.setQueryTimeout(5);
 			ps.setInt(1, order.getId());
-			
 			success = ps.executeUpdate() > 0;
 			ps.close();
 			if (!success) {
-				throw new SQLException("OrderMenuItems were not deleted!");
+				throw new SQLException("Order was not deleted!");
 			}
 			
 			//Transaction
 			query = "DELETE FROM [Transaction] WHERE id = ?";
 			ps = con.prepareStatement(query);
 			ps.setQueryTimeout(5);
-			ps.setInt(1, order.getId());
+			ps.setInt(1, order.getTransaction().getId());
 			
 			success = ps.executeUpdate() > 0;
 			ps.close();
 			if (!success) {
 				throw new SQLException("Transaction was not deleted!");
 			}
-			
-			//Order
-			query = "DELETE FROM [Order] WHERE id = ?";
-			ps = con.prepareStatement(query);
-			ps.setQueryTimeout(5);
-			ps.setInt(1, order.getId());
-			
-			success = ps.executeUpdate() > 0;
-			ps.close();
 		}
 		catch (SQLException e) {
 			System.out.println("Order was not deleted!");
@@ -262,7 +245,7 @@ public class DBOrder implements IFDBOrder {
 				
 			//Transaction
 			Transaction transaction = new Transaction();
-			transaction.setId(results.getInt("orderId"));
+			transaction.setId(results.getInt("transactionId"));
 			transaction.setAmount(results.getDouble("transactionAmount"));
 			transaction.setType(TransactionType.getType(results.getInt("transactionTypeId")));
 			transaction.setTimestamp(results.getDate("transactionTimestamp"));
