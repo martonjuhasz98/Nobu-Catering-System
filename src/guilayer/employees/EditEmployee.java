@@ -198,6 +198,9 @@ public class EditEmployee extends PerformPanel implements ActionListener, CaretL
 		txtZipCode.addCaretListener(this);
 		txtPhone.addCaretListener(this);
 		txtEmail.addCaretListener(this);
+		txtUsername.addCaretListener(this);
+		passwordField.addCaretListener(this);
+		passwordRepeatField.addCaretListener(this);
 		reset();
 	}
 
@@ -273,6 +276,7 @@ public class EditEmployee extends PerformPanel implements ActionListener, CaretL
 			return false;
 		if (txtCity.getText().trim().isEmpty())
 			return false;
+		System.out.println("#"+txtCity.getText().trim()+"#");
 		if (!txtPhone.getText().trim().matches("^\\+?[0-9]{1,15}$"))  
 			return false;
 		if (!txtEmail.getText().trim().matches(".+@.+\\..+"))
@@ -343,7 +347,8 @@ public class EditEmployee extends PerformPanel implements ActionListener, CaretL
 		if (e.getSource() == txtZipCode) {
 			City c = employeeCtrl.getCity(txtZipCode.getText().trim());
 			txtCity.setText((c == null) ? "" : c.getName());
-		} else if (e.getSource() == txtCpr || e.getSource() == txtName || e.getSource() == txtUsername
+		} 
+		if (e.getSource() == txtCpr || e.getSource() == txtName || e.getSource() == txtUsername
 				|| e.getSource() == passwordField || e.getSource() == passwordRepeatField || e.getSource() == txtAddress
 				|| e.getSource() == txtZipCode || e.getSource() == txtPhone || e.getSource() == txtEmail) {
 			btn_submit.setEnabled(isFilled());

@@ -20,6 +20,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import javax.swing.AbstractAction;
@@ -209,7 +210,7 @@ public class ListMenuItems extends JPanel implements ActionListener, MouseListen
 			case 2:
 				return menuItem.getCategory().getName();
 			case 3:
-				return menuItem.getPrice();
+				return new DecimalFormat("#0.00").format(menuItem.getPrice());
 			case 4:
 				return "Delete";
 			}

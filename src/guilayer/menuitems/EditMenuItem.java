@@ -33,6 +33,7 @@ import modlayer.Unit;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 import javax.swing.JTable;
@@ -95,10 +96,10 @@ public class EditMenuItem extends PerformPanel
 		inventoryModel = new InventoryTableModel();
 		mdl_menuItem = new MenuItemTableModel();
 
-		Label lbl_id = new Label("ID *");
-		lbl_id.setFont(new Font("Dialog", Font.PLAIN, 15));
-		lbl_id.setBounds(16, 16, 129, 22);
-		add(lbl_id);
+		Label label = new Label("ID *");
+		label.setFont(new Font("Dialog", Font.PLAIN, 15));
+		label.setBounds(16, 16, 129, 22);
+		add(label);
 
 		txtId = new JTextField();
 		txtId.setText("");
@@ -107,10 +108,10 @@ public class EditMenuItem extends PerformPanel
 		txtId.setBounds(16, 44, 83, 20);
 		add(txtId);
 
-		Label lbl_name = new Label("Name *");
-		lbl_name.setFont(new Font("Dialog", Font.PLAIN, 15));
-		lbl_name.setBounds(16, 76, 129, 22);
-		add(lbl_name);
+		Label label_1 = new Label("Name *");
+		label_1.setFont(new Font("Dialog", Font.PLAIN, 15));
+		label_1.setBounds(116, 16, 129, 22);
+		add(label_1);
 		rdbtn_group = new ButtonGroup();
 
 		txtName = new JTextField();
@@ -118,11 +119,6 @@ public class EditMenuItem extends PerformPanel
 		txtName.setColumns(10);
 		txtName.setBounds(16, 104, 316, 20);
 		add(txtName);
-		
-		Label lbl_price = new Label("Price *");
-		lbl_price.setFont(new Font("Dialog", Font.PLAIN, 15));
-		lbl_price.setBounds(16, 137, 129, 22);
-		add(lbl_price);
 
 		txtPrice = new JTextField();
 		txtPrice.setText("");
@@ -222,11 +218,6 @@ public class EditMenuItem extends PerformPanel
 		cmb_category.addItemListener(this);
 		rdbtn_selectCategory.addItemListener(this);
 		rdbtn_createCategory.addItemListener(this);
-		
-		Label lbl_category = new Label("Category *");
-		lbl_category.setFont(new Font("Dialog", Font.PLAIN, 15));
-		lbl_category.setBounds(419, 56, 129, 22);
-		add(lbl_category);
 
 		reset();
 	}
@@ -270,7 +261,7 @@ public class EditMenuItem extends PerformPanel
 
 		txtId.setText(String.valueOf(menuItem.getId()));
 		txtName.setText(menuItem.getName());
-		txtPrice.setText(String.valueOf(menuItem.getPrice()));
+		txtPrice.setText(String.valueOf(new DecimalFormat("#0.00").format(menuItem.getPrice())));
 		cmb_category.setSelectedItem(menuItem.getCategory());
 		for (Ingredient i : menuItem.getIngredients())
 			mdl_menuItem.addItem(i);
@@ -406,7 +397,7 @@ public class EditMenuItem extends PerformPanel
 	private void removeFromMenuItem() {
 		int[] selection = tbl_menuItemItem.getSelectedRows();
 
-		for (int i = selection.length - 1; i >= 0; i--) {
+		for (int i = 0; i < selection.length; i++) {
 			selection[i] = tbl_menuItemItem.convertRowIndexToModel(selection[i]);
 			mdl_menuItem.removeItem(mdl_menuItem.getItem(selection[i]));
 		}
