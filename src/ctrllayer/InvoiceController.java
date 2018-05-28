@@ -29,10 +29,10 @@ public class InvoiceController {
 	public Invoice getInvoice(int id) {
 		return dbInvoice.selectInvoice(id);
 	}
-	public boolean createInvoice(Supplier supplier, Employee employee, ArrayList<InvoiceItem> items) {
+	public boolean createInvoice(Supplier supplier, ArrayList<InvoiceItem> items) {
 		Invoice invoice = new Invoice();
 		invoice.setSupplier(supplier);
-		invoice.setPlacedBy(employee);
+		invoice.setPlacedBy(SessionSingleton.getInstance().getUser());
 		invoice.setItems(items);
 		
 		boolean success = dbInvoice.insertInvoice(invoice) > 0;

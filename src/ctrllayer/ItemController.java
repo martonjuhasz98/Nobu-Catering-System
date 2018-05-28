@@ -80,7 +80,7 @@ public class ItemController {
 	}
 	
 	//Stocktaking
-	public boolean createStocktaking(Employee employee, ArrayList<Item> items) {
+	public boolean createStocktaking( ArrayList<Item> items) {
 		ArrayList<Discrepancy> discrepancies = new ArrayList<Discrepancy>();
 		for (Item item : items) {
 			Discrepancy discrepancy = new Discrepancy();
@@ -90,7 +90,7 @@ public class ItemController {
 		}
 		
 		Stocktaking stocktaking = new Stocktaking();
-		stocktaking.setEmployee(employee);
+		stocktaking.setEmployee(SessionSingleton.getInstance().getUser());
 		stocktaking.setDiscrepancies(discrepancies);
 		
 		int id = dbStocktaking.insertStocktaking(stocktaking);

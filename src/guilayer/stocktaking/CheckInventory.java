@@ -162,9 +162,8 @@ public class CheckInventory extends JPanel
 			return;
 		}
 
-		Employee employee = SessionSingleton.getInstance().getEmployee();
 
-		if (!itemCtrl.createStocktaking(employee, model.getItems())) {
+		if (!itemCtrl.createStocktaking(model.getItems())) {
 			JOptionPane.showMessageDialog(this, "An error occured while creating the Stock-taking!", "Error!",
 					JOptionPane.ERROR_MESSAGE);
 			return;
