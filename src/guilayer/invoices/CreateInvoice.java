@@ -16,6 +16,7 @@ import javax.swing.event.TableModelListener;
 
 import ctrllayer.InvoiceController;
 import ctrllayer.ItemController;
+import ctrllayer.SessionSingleton;
 import ctrllayer.SupplierController;
 import guilayer.ManagerWindow;
 import guilayer.interfaces.ItemTableModel;
@@ -182,7 +183,7 @@ public class CreateInvoice extends PerformPanel implements ActionListener, Caret
 		Supplier supplier = (Supplier)cmb_supplier.getSelectedItem();
 		
 		//Employee
-		Employee employee = ((ManagerWindow)SwingUtilities.getWindowAncestor(this)).getUser();
+		Employee employee = SessionSingleton.getInstance().getEmployee();
 		
 		//Items
 		ArrayList<InvoiceItem> items = mdl_invoice.getItems();

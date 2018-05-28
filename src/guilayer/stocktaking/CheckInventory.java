@@ -7,6 +7,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
 import ctrllayer.ItemController;
+import ctrllayer.SessionSingleton;
 import guilayer.ManagerWindow;
 import guilayer.interfaces.ItemTableModel;
 import guilayer.invoices.ListInvoiceHistory.SearchWorker;
@@ -164,7 +165,8 @@ public class CheckInventory extends JPanel
 			return;
 		}
 
-		Employee employee = ((ManagerWindow) SwingUtilities.getWindowAncestor(this)).getUser();
+		Employee employee = SessionSingleton.getInstance().getEmployee();
+//		Employee employee = ((ManagerWindow) SwingUtilities.getWindowAncestor(this)).getUser();
 
 		if (!itemCtrl.createStocktaking(employee, model.getItems())) {
 			JOptionPane.showMessageDialog(this, "An error occured while creating the Stock-taking!", "Error!",

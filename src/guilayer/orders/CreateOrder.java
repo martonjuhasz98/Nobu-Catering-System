@@ -16,6 +16,7 @@ import javax.swing.event.TableModelListener;
 
 import ctrllayer.InvoiceController;
 import ctrllayer.ItemController;
+import ctrllayer.SessionSingleton;
 import ctrllayer.SupplierController;
 import guilayer.ManagerWindow;
 import guilayer.interfaces.ItemTableModel;
@@ -182,7 +183,8 @@ public class CreateOrder extends PerformPanel implements ActionListener, CaretLi
 		Supplier supplier = (Supplier)cmb_supplier.getSelectedItem();
 		
 		//Employee
-		Employee employee = ((ManagerWindow)SwingUtilities.getWindowAncestor(this)).getUser();
+		Employee employee = SessionSingleton.getInstance().getEmployee();
+//		Employee employee = ((ManagerWindow)SwingUtilities.getWindowAncestor(this)).getUser();
 		
 		//Items
 		ArrayList<InvoiceItem> items = mdl_invoice.getItems();

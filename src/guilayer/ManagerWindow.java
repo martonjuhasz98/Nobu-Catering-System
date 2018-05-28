@@ -30,7 +30,7 @@ public class ManagerWindow extends JFrame {
 	private JPanel contentPane;
 	private Employee user;
 	
-	public ManagerWindow(Employee user) {
+	public ManagerWindow() {
 		super();
 		this.user = user;
 		
@@ -114,10 +114,9 @@ public class ManagerWindow extends JFrame {
 			}
 		});
 		
-		setVisible(true);
 	}
 	
-	public Employee getUser() {
-		return user;
-	}
+//	public Employee getUser() {
+//		return user;
+//	}
 }

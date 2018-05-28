@@ -9,13 +9,17 @@ import javax.swing.JPanel;
 import java.awt.BorderLayout;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextField;
 import javax.swing.JPasswordField;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
+import javax.swing.SwingWorker;
 
 import ctrllayer.SessionSingleton;
+import modlayer.MenuItem;
 
 public class LoginWindow {
 
@@ -35,6 +39,8 @@ public class LoginWindow {
 	public static final Font contentFont = new Font("Segoe UI", Font.PLAIN, 14);
 	private JTextField txtUsername;
 	private JPasswordField passwordField;
+	private ManagerWindow managerWindow;
+	boolean loggedIn;
 
 	/**
 	 * Launch the application.
@@ -56,6 +62,7 @@ public class LoginWindow {
 	 * Create the application.
 	 */
 	public LoginWindow() {
+		loggedIn = false;
 		initialize();
 	}
 
@@ -84,8 +91,17 @@ public class LoginWindow {
 		JButton btnNewButton = new JButton("Log in");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				SessionSingleton.getInstance().logIn(txtUsername.getText().trim(),
-						new String(passwordField.getPassword()));
+				if (SessionSingleton.getInstance().logIn(txtUsername.getText().trim(),
+						new String(passwordField.getPassword()))) {
+					if (managerWindow != null) {
+
+						managerWindow.setVisible(true);
+						frame.setVisible(false);
+						frame.dispose();
+					} else
+						loggedIn = true;
+
+				}
 			}
 		});
 		btnNewButton.setBounds(0, 205, 300, 45);
@@ -110,5 +126,34 @@ public class LoginWindow {
 		lblPassword.setBounds(100, 125, 100, 16);
 		panel_1.add(lblPassword);
 
+		new LoadWorker().execute();
+	}
+
+	public class LoadWorker extends SwingWorker<ManagerWindow, Void> {
+
+		@Override
+		protected ManagerWindow doInBackground() throws Exception {
+			// Start
+			return new ManagerWindow();
+		}
+
+		@Override
+		protected void done() {
+			try {
+				System.out.println("loaded");
+				managerWindow = get();
+				if(loggedIn) {
+					managerWindow.setVisible(true);
+					frame.setVisible(false);
+					frame.dispose();
+				}
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 }
