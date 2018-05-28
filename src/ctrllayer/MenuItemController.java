@@ -46,6 +46,11 @@ public class MenuItemController {
 		
 		return success;
 	}
+	public boolean canCreateMenuItem(MenuItem item) {
+		boolean canCreate = dbMenuItem.canCreateMenuItem(item);
+		
+		return canCreate;
+	}
 	
 	//MenuItemCategories
 	public ArrayList<MenuItemCategory> getCategories() {

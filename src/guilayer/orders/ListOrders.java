@@ -2,13 +2,13 @@ package guilayer.orders;
 
 import javax.swing.JPanel;
 
-import ctrllayer.InvoiceController;
+import ctrllayer.OrderController;
 import guilayer.ManagerWindow;
+import guilayer.WaiterWindow;
 import guilayer.interfaces.ButtonColumn;
 import guilayer.interfaces.ItemTableModel;
 import guilayer.interfaces.PerformListener;
-import guilayer.invoices.ListInvoiceHistory.SearchWorker;
-import modlayer.Invoice;
+import modlayer.Order;
 
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
@@ -32,37 +32,35 @@ import javax.swing.JTable;
 public class ListOrders extends JPanel
 		implements ActionListener, MouseListener, PerformListener, CaretListener {
 
-	private InvoiceController invoiceCtrl;
-	private CreateOrder createInvoice;
-	private ShowOrder showInvoice;
-	private PayOrder confirmInvoice;
+	private OrderController orderCtrl;
+	private EditOrder editOrder;
+	private PayOrder payOrder;
 	private JTextField txt_search;
 	private JButton btn_search;
 	private JButton btn_create;
 	private JTable table;
-	private InvoiceTableModel model;
+	private OrderTableModel model;
 	private boolean isSearching;
 	private String lastKeyword;
 
-	public ListOrders(PayOrder confirmInvoice, CreateOrder createInvoice, ShowOrder showInvoice) {
-		this.confirmInvoice = confirmInvoice;
-		this.createInvoice = createInvoice;
-		this.showInvoice = showInvoice;
-		invoiceCtrl = new InvoiceController();
+	public ListOrders(PayOrder payOrder, EditOrder editOrder) {
+		this.payOrder = payOrder;
+		this.editOrder = editOrder;
+		orderCtrl = new OrderController();
 		lastKeyword = "";
 		isSearching = false;
-		showInvoice.addPerformListener(this);
-		createInvoice.addPerformListener(this);
-		confirmInvoice.addPerformListener(this);
+		
+		payOrder.addPerformListener(this);
+		editOrder.addPerformListener(this);
 
 		initialize();
 	}
 
 	private void initialize() {
 		setLayout(null);
-		setBounds(0, 0, ManagerWindow.contentWidth, ManagerWindow.totalHeight - 30);
+		setBounds(0, 0, WaiterWindow.contentWidth, WaiterWindow.totalHeight);
 
-		model = new InvoiceTableModel();
+		model = new OrderTableModel();
 
 		txt_search = new JTextField();
 		txt_search.setBounds(10, 11, 142, 20);
@@ -88,43 +86,43 @@ public class ListOrders extends JPanel
 		table.setModel(model);
 		scrollPane.setViewportView(table);
 
-		AbstractAction confirm = new AbstractAction() {
+		AbstractAction pay = new AbstractAction() {
 			public void actionPerformed(ActionEvent e) {
 				int modelRowIndex = Integer.valueOf(e.getActionCommand());
-				Invoice invoice = model.getItem(modelRowIndex);
+				Order order = model.getItem(modelRowIndex);
 
 				setVisible(false);
-				confirmInvoice.confirm(invoice);
+				payOrder.pay(order);
 			}
 		};
 		AbstractAction cancel = new AbstractAction() {
 			public void actionPerformed(ActionEvent e) {
-				if (JOptionPane.showConfirmDialog(ListOrders.this, "Are you sure?", "Canceling invoice",
+				if (JOptionPane.showConfirmDialog(ListOrders.this, "Are you sure?", "Canceling order",
 						JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
 					return;
 				}
 
 				int modelRowIndex = Integer.valueOf(e.getActionCommand());
-				Invoice invoice = model.getItem(modelRowIndex);
+				Order order = model.getItem(modelRowIndex);
 
-				if (!invoiceCtrl.cancelInvoice(invoice)) {
+				if (!orderCtrl.cancelOrder(order)) {
 					JOptionPane.showMessageDialog(ListOrders.this,
-							"An error occured while canceled the Invoice!", "Error!", JOptionPane.ERROR_MESSAGE);
+							"An error occured while canceled the Order!", "Error!", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
 
-				JOptionPane.showMessageDialog(ListOrders.this, "The Invoice was successfully canceled!",
+				JOptionPane.showMessageDialog(ListOrders.this, "The Order was successfully canceled!",
 						"Success!", JOptionPane.INFORMATION_MESSAGE);
 				reset();
 			}
 		};
 
-		ButtonColumn confirmColumn = new ButtonColumn(table, confirm, model.getColumnCount() - 2);
-		confirmColumn.setMnemonic(KeyEvent.VK_ACCEPT);
+		ButtonColumn payColumn = new ButtonColumn(table, pay, model.getColumnCount() - 2);
+		payColumn.setMnemonic(KeyEvent.VK_ACCEPT);
 		ButtonColumn cancelColumn = new ButtonColumn(table, cancel, model.getColumnCount() - 1);
 		cancelColumn.setMnemonic(KeyEvent.VK_CANCEL);
 
-		confirmInvoice.addPerformListener(this);
+		payOrder.addPerformListener(this);
 		txt_search.addCaretListener(this);
 		btn_search.addActionListener(this);
 		btn_create.addActionListener(this);
@@ -132,12 +130,10 @@ public class ListOrders extends JPanel
 
 		reset();
 	}
-
 	private void reset() {
-		model.setItems(invoiceCtrl.getPendingInvoices());
+		model.setItems(orderCtrl.getUnpaidOrders());
 		txt_search.setText("");
 	}
-
 	private void search() {
 		if (isSearching)
 			return;
@@ -148,88 +144,76 @@ public class ListOrders extends JPanel
 			return;
 		}
 		lastKeyword = keyword;
-		// model.setItems(invoiceCtrl.searchInvoiceHistory(keyword));
+		
 		new SearchWorker(keyword).execute();
 	}
-
+	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == btn_search) {
 			search();
 		}
 		if (e.getSource() == btn_create) {
-			createInvoice.create();
+			editOrder.create();
 			setVisible(false);
 		}
 	}
-
 	@Override
 	public void caretUpdate(CaretEvent e) {
 		if (e.getSource() == txt_search) {
 			search();
 		}
 	}
-
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		if (e.getClickCount() == 2 && e.getSource() == table) {
 			int viewRowIndex = table.getSelectedRow();
 			int modelRowIndex = table.convertRowIndexToModel(viewRowIndex);
-			Invoice invoice = model.getItem(modelRowIndex);
+			Order order = model.getItem(modelRowIndex);
 
-			showInvoice.show(invoice);
+			editOrder.update(order);
 			setVisible(false);
 		}
 	}
-
 	@Override
 	public void performed() {
-		model.setItems(invoiceCtrl.getPendingInvoices());
+		model.setItems(orderCtrl.getUnpaidOrders());
 		setVisible(true);
 	}
-
 	@Override
 	public void cancelled() {
 		setVisible(true);
 	}
-
 	@Override
-	public void mousePressed(MouseEvent e) {
-	}
-
+	public void mousePressed(MouseEvent e) {}
 	@Override
-	public void mouseReleased(MouseEvent e) {
-	}
-
+	public void mouseReleased(MouseEvent e) {}
 	@Override
-	public void mouseEntered(MouseEvent e) {
-	}
-
+	public void mouseEntered(MouseEvent e) {}
 	@Override
-	public void mouseExited(MouseEvent e) {
-	}
+	public void mouseExited(MouseEvent e) {}
 
-	private class InvoiceTableModel extends ItemTableModel<Invoice> {
+	private class OrderTableModel extends ItemTableModel<Order> {
 
-		public InvoiceTableModel() {
+		public OrderTableModel() {
 			super();
 
-			columns = new String[] { "Supplier", "Ordered", "Placed by", "", "" };
+			columns = new String[] { "Id", "Table No.", "Menu items", "", "" };
 		}
 
 		@Override
 		public Object getValueAt(int rowIndex, int columnIndex) {
-			Invoice invoice = items.get(rowIndex);
+			Order order = items.get(rowIndex);
 
 			switch (columnIndex) {
 			case 0:
-				return invoice.getSupplier().getName();
+				return order.getId();
 			case 1:
-				return invoice.getTimestamp();
+				return order.getTableNo();
 			case 2:
-				return invoice.getPlacedBy().getName();
+				return order.getItems().size();
 			case 3:
-				return "Confirm";
+				return "Pay";
 			case 4:
 				return "Cancel";
 			}
@@ -243,7 +227,7 @@ public class ListOrders extends JPanel
 		}
 	}
 
-	public class SearchWorker extends SwingWorker<ArrayList<Invoice>, Void> {
+	public class SearchWorker extends SwingWorker<ArrayList<Order>, Void> {
 		private String keyword;
 
 		public SearchWorker(String keyword) {
@@ -252,9 +236,9 @@ public class ListOrders extends JPanel
 		}
 
 		@Override
-		protected ArrayList<Invoice> doInBackground() throws Exception {
+		protected ArrayList<Order> doInBackground() throws Exception {
 			// Start
-			return invoiceCtrl.searchInvoiceHistory(keyword);
+			return orderCtrl.searchUnpaidOrders(keyword);
 		}
 
 		@Override

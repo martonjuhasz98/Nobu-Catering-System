@@ -3,6 +3,8 @@ package guilayer;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import ctrllayer.SessionSingleton;
+
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Font;
@@ -29,6 +31,7 @@ public class WaiterWindow extends JFrame {
 	
 	public WaiterWindow() {
 		super();
+		SessionSingleton.getInstance().logIn("a", "a");
 		
 		initialize();
 	}
@@ -55,7 +58,7 @@ public class WaiterWindow extends JFrame {
 		menu.setForeground(menuFontColour);
 		menu.setFont(menuFont);
 		menu.setCurrentColour(activeMenuItemSignColour);
-		menu.add("Create");
+		menu.add("Order");
 		menu.add("Pay");
 		contentPane.add(menu);
 		

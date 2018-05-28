@@ -5,6 +5,7 @@ import javax.swing.UIManager;
 import ctrllayer.SessionSingleton;
 import guilayer.LoginWindow;
 import guilayer.ManagerWindow;
+import guilayer.WaiterWindow;
 import modlayer.Employee;
 
 public class Main {
@@ -20,7 +21,8 @@ public class Main {
 					ManagerWindow window = new ManagerWindow();
 					*/
 					
-					LoginWindow window = new LoginWindow();
+					//LoginWindow window = new LoginWindow();
+					new WaiterWindow();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

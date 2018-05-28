@@ -15,7 +15,13 @@ public class ManageOrders extends JPanel {
 		
 		setLayout(null);
 		
-		CreateOrder createOrder = new CreateOrder();
-		add(createOrder);
+		PayOrder payOrder = new PayOrder();
+		add(payOrder);
+		
+		EditOrder editOrder = new EditOrder();
+		add(editOrder);
+		
+		ListOrders listOrders = new ListOrders(payOrder, editOrder);
+		add(listOrders);
 	}
 }
