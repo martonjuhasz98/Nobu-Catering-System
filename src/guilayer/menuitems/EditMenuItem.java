@@ -95,10 +95,10 @@ public class EditMenuItem extends PerformPanel
 		inventoryModel = new InventoryTableModel();
 		mdl_menuItem = new MenuItemTableModel();
 
-		Label label = new Label("ID *");
-		label.setFont(new Font("Dialog", Font.PLAIN, 15));
-		label.setBounds(16, 16, 129, 22);
-		add(label);
+		Label lbl_id = new Label("ID *");
+		lbl_id.setFont(new Font("Dialog", Font.PLAIN, 15));
+		lbl_id.setBounds(16, 16, 129, 22);
+		add(lbl_id);
 
 		txtId = new JTextField();
 		txtId.setText("");
@@ -107,10 +107,10 @@ public class EditMenuItem extends PerformPanel
 		txtId.setBounds(16, 44, 83, 20);
 		add(txtId);
 
-		Label label_1 = new Label("Name *");
-		label_1.setFont(new Font("Dialog", Font.PLAIN, 15));
-		label_1.setBounds(16, 76, 129, 22);
-		add(label_1);
+		Label lbl_name = new Label("Name *");
+		lbl_name.setFont(new Font("Dialog", Font.PLAIN, 15));
+		lbl_name.setBounds(16, 76, 129, 22);
+		add(lbl_name);
 		rdbtn_group = new ButtonGroup();
 
 		txtName = new JTextField();
@@ -118,6 +118,11 @@ public class EditMenuItem extends PerformPanel
 		txtName.setColumns(10);
 		txtName.setBounds(16, 104, 316, 20);
 		add(txtName);
+		
+		Label lbl_price = new Label("Price *");
+		lbl_price.setFont(new Font("Dialog", Font.PLAIN, 15));
+		lbl_price.setBounds(16, 137, 129, 22);
+		add(lbl_price);
 
 		txtPrice = new JTextField();
 		txtPrice.setText("");
@@ -217,6 +222,11 @@ public class EditMenuItem extends PerformPanel
 		cmb_category.addItemListener(this);
 		rdbtn_selectCategory.addItemListener(this);
 		rdbtn_createCategory.addItemListener(this);
+		
+		Label lbl_category = new Label("Category *");
+		lbl_category.setFont(new Font("Dialog", Font.PLAIN, 15));
+		lbl_category.setBounds(419, 56, 129, 22);
+		add(lbl_category);
 
 		reset();
 	}
