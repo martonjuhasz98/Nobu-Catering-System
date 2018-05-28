@@ -176,8 +176,6 @@ public class EditMenuItem extends PerformPanel
 		btn_cancel.setBounds(668, 432, 122, 32);
 		add(btn_cancel);
 
-
-
 		rdbtn_selectCategory = new JRadioButton("Select from existing");
 		rdbtn_selectCategory.setSelected(true);
 		rdbtn_selectCategory.setBounds(419, 84, 376, 19);
@@ -201,7 +199,7 @@ public class EditMenuItem extends PerformPanel
 		txt_category.setColumns(10);
 		txt_category.setBounds(419, 164, 376, 20);
 		add(txt_category);
-		
+
 		btn_search.addActionListener(this);
 		btn_add.addActionListener(this);
 		btn_remove.addActionListener(this);
@@ -377,6 +375,7 @@ public class EditMenuItem extends PerformPanel
 			ingredient.setMenuItem(new MenuItem());
 			ingredient.setItem((Item) inventoryModel.getItem(selection[i]));
 			ingredient.setQuantity(1.0);
+			ingredient.setWaste(0);
 			mdl_menuItem.addItem(ingredient);
 		}
 	}
@@ -423,7 +422,8 @@ public class EditMenuItem extends PerformPanel
 		if (e.getSource() == txt_search) {
 			search();
 		}
-		if (e.getSource() == txtId || e.getSource() == txtName || e.getSource() == txtPrice || e.getSource() == txt_category ) {
+		if (e.getSource() == txtId || e.getSource() == txtName || e.getSource() == txtPrice
+				|| e.getSource() == txt_category) {
 			btn_submit.setEnabled(isFilled());
 		}
 	}
@@ -477,7 +477,7 @@ public class EditMenuItem extends PerformPanel
 		public MenuItemTableModel() {
 			super();
 
-			columns = new String[] { "Name", "Quantity", "Unit", "Category" };
+			columns = new String[] { "Name", "Quantity", "Unit", "Waste %", "Category" };
 		}
 
 		@Override
@@ -493,6 +493,8 @@ public class EditMenuItem extends PerformPanel
 			case 2:
 				return item.getUnit().getAbbr();
 			case 3:
+				return ingredient.getWaste();
+			case 4:
 				return item.getCategory().getName();
 			}
 
@@ -501,7 +503,7 @@ public class EditMenuItem extends PerformPanel
 
 		@Override
 		public boolean isCellEditable(int rowIndex, int columnIndex) {
-			return (columnIndex == 1) ? true : false;
+			return (columnIndex == 1||columnIndex == 3);
 		}
 
 		@Override
@@ -510,6 +512,12 @@ public class EditMenuItem extends PerformPanel
 				double quantity = (double) value;
 				if (quantity > 0) {
 					getItem(rowIndex).setQuantity(quantity);
+				}
+			}
+			if (columnIndex == 3) {
+				double waste = (double) value;
+				if (waste >= 0 && waste <= 100) {
+					getItem(rowIndex).setWaste(waste);
 				}
 			}
 		}
