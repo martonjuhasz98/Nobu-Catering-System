@@ -189,9 +189,9 @@ public class DBEmployee implements IFDBEmployee{
 			PreparedStatement ps = con.prepareStatement(query);
 			ps.setQueryTimeout(5);
 			ps.setString(1, employee.getName());
-			ps.setString(2, employee.getUsername());
-			ps.setString(3, employee.getPassword());
-			ps.setString(4, employee.getAddress());
+			ps.setString(2, employee.getAddress());
+			ps.setString(3, employee.getUsername());
+			ps.setString(4, employee.getPassword());
 			ps.setString(5, employee.getCity().getZipCode());
 			ps.setString(6, employee.getPhone());
 			ps.setString(7, employee.getEmail());

@@ -29,7 +29,7 @@ public class DBOrder implements IFDBOrder {
 		ArrayList<Order> orders = new ArrayList<>();
 		
 		String query = "SELECT * FROM [Order_View] "
-					+ "WHERE transactionId IS " + (payed ? "NOT" : "") + " NULL";
+					+ "WHERE transactionTimestamp IS " + (payed ? "NOT" : "") + " NULL";
 		try {
 			
 			Statement st = con.createStatement();
@@ -56,7 +56,7 @@ public class DBOrder implements IFDBOrder {
 		ArrayList<Order> orders = new ArrayList<Order>();
 
 		String query = "SELECT * FROM [Order_View] "
-						+ "WHERE transactionId IS " + (payed ? "NOT" : "") + " NULL"
+						+ "WHERE transactionTimestamp IS " + (payed ? "NOT" : "") + " NULL"
 						+ "AND (orderId LIKE ? "
 						+ "OR employeeName LIKE ? "
 						+ "OR supplierName LIKE ?)";
@@ -262,7 +262,7 @@ public class DBOrder implements IFDBOrder {
 				
 			//Transaction
 			Transaction transaction = new Transaction();
-			transaction.setId(results.getInt("transactionId"));
+			transaction.setId(results.getInt("orderId"));
 			transaction.setAmount(results.getDouble("transactionAmount"));
 			transaction.setType(TransactionType.getType(results.getInt("transactionTypeId")));
 			transaction.setTimestamp(results.getDate("transactionTimestamp"));

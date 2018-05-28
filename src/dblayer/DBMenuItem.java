@@ -298,7 +298,9 @@ public class DBMenuItem implements IFDBMenuItem {
 	public boolean canCreateMenuItem(MenuItem menuItem) {
 		boolean canCreate = false;
 		
-		String query = "SELECT (it.quantity - ing.quantity >= 0) FROM [Ingredient] AS ing "
+		String query = "SELECT "
+					+ "SUM (CASE WHEN (it.quantity - ing.quantity > 0) THEN 1 ELSE 0 + END) - COUNT(*) AS can_create  "
+					+ "FROM [Ingredient] AS ing "
 					+ "INNER JOIN [Item] AS it "
 					+ "ON ing.item_barcode = it.barcode "
 					+ "WHERE ing.menu_item_id = ?";
@@ -308,11 +310,14 @@ public class DBMenuItem implements IFDBMenuItem {
 			ps.setQueryTimeout(5);
 			ps.setInt(1, menuItem.getId());
 			
-			canCreate = ps.executeUpdate() > 0;
+			ResultSet results = ps.executeQuery();
+			if (results.next()) {
+				canCreate = results.getInt("can_create") == 0;
+			}
 			ps.close();
 		}
 		catch (SQLException e) {
-			System.out.println("MenuItem was not deleted!");
+			System.out.println("MenuItem was not checked!");
 			System.out.println(e.getMessage());
 			System.out.println(query);
 		}

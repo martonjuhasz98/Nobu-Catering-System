@@ -396,7 +396,7 @@ public class EditMenuItem extends PerformPanel
 	private void removeFromMenuItem() {
 		int[] selection = tbl_menuItemItem.getSelectedRows();
 
-		for (int i = 0; i < selection.length; i++) {
+		for (int i = selection.length - 1; i >= 0; i--) {
 			selection[i] = tbl_menuItemItem.convertRowIndexToModel(selection[i]);
 			mdl_menuItem.removeItem(mdl_menuItem.getItem(selection[i]));
 		}
