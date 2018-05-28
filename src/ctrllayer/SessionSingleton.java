@@ -6,7 +6,7 @@ public class SessionSingleton {
 
 	private static final int ACCESSLEVEL = 3;
 	private static SessionSingleton instance;
-	Employee loggedIn;
+	private Employee user;
     
 	private SessionSingleton() {
 	}
@@ -18,11 +18,14 @@ public class SessionSingleton {
 	}
 
 	public boolean logIn(String username, String password) {
-		loggedIn = new EmployeeController().getEmployee(username, password);
-		return (loggedIn != null && loggedIn.getAccessLevel() <= ACCESSLEVEL) ? true : false;
+		user = new EmployeeController().getEmployee(username, password);
+		return (user != null && user.getAccessLevel() <= ACCESSLEVEL) ? true : false;
 	}
 	
-	public Employee getEmployee() {
-		return loggedIn;
+//	public Employee getEmployee() {
+//		return user;
+//	}
+	public Employee getUser() {
+		return user;
 	}
 }

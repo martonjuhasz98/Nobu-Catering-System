@@ -183,13 +183,13 @@ public class CreateOrder extends PerformPanel implements ActionListener, CaretLi
 		Supplier supplier = (Supplier)cmb_supplier.getSelectedItem();
 		
 		//Employee
-		Employee employee = SessionSingleton.getInstance().getEmployee();
+//		Employee employee = SessionSingleton.getInstance().getEmployee();
 //		Employee employee = ((ManagerWindow)SwingUtilities.getWindowAncestor(this)).getUser();
 		
 		//Items
 		ArrayList<InvoiceItem> items = mdl_invoice.getItems();
 		
-		if (!invoiceCtrl.createInvoice(supplier, employee, items)) {
+		if (!invoiceCtrl.createInvoice(supplier, items)) {
 			JOptionPane.showMessageDialog(this,
 				    "An error occured while creating the Invoice!",
 				    "Error!",

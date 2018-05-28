@@ -29,7 +29,8 @@ public class InvoiceController {
 	public Invoice getInvoice(int id) {
 		return dbInvoice.selectInvoice(id);
 	}
-	public boolean createInvoice(Supplier supplier, Employee employee, ArrayList<InvoiceItem> items) {
+	
+	public boolean createInvoice(Supplier supplier, ArrayList<InvoiceItem> items) {
 		double totalPrice = 0;
 		for (InvoiceItem item : items) {
 			totalPrice += item.getQuantity() * item.getQuantity();
@@ -41,7 +42,7 @@ public class InvoiceController {
 		
 		Invoice invoice = new Invoice();
 		invoice.setSupplier(supplier);
-		invoice.setPlacedBy(employee);
+		invoice.setPlacedBy(SessionSingleton.getInstance().getUser());
 		invoice.setItems(items);
 		invoice.setTransaction(transaction);
 		

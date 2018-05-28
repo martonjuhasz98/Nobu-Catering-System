@@ -15,6 +15,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.JTextField;
 import javax.swing.JPasswordField;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
 
@@ -100,6 +101,10 @@ public class LoginWindow extends JFrame {
 				} else {
 					btnNewButton.setEnabled(true);
 					btnNewButton.setText("Log in");
+					JOptionPane.showMessageDialog(LoginWindow.this,
+						    "Incorrect username or password.",
+						    "Login failed",
+						    JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});
