@@ -10,7 +10,6 @@ import java.awt.Font;
 import guilayer.contentpanels.*;
 import guilayer.menu.Menu;
 import guilayer.menu.MenuItemListener;
-import modlayer.Employee;
 
 public class ManagerWindow extends JFrame {
 	
@@ -28,11 +27,9 @@ public class ManagerWindow extends JFrame {
 	public static final Font menuFont = new Font("Segoe UI", Font.BOLD, 16);
 	public static final Font contentFont = new Font("Segoe UI", Font.PLAIN, 14);
 	private JPanel contentPane;
-	private Employee user;
 	
 	public ManagerWindow() {
 		super();
-		this.user = user;
 		
 		initialize();
 	}

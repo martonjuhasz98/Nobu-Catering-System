@@ -6,7 +6,6 @@ import java.util.Date;
 public class Invoice {
 
 	private int id;
-	private boolean isDelivered;
 	private Date timestamp;
 	private Date dateDelivered;
 	private Employee createdBy;
@@ -20,9 +19,6 @@ public class Invoice {
 
 	public int getId() {
 		return id;
-	}
-	public boolean isDelivered() {
-		return isDelivered;
 	}
 	public Date getTimestamp() {
 		return timestamp;
@@ -44,9 +40,6 @@ public class Invoice {
 	} 
 	public void setId(int id) {
 		this.id = id;
-	}
-	public void setDelivered(boolean isDelivered) {
-		this.isDelivered = isDelivered;
 	}
 	public void setTimestamp(Date timestamp) {
 		this.timestamp = timestamp;

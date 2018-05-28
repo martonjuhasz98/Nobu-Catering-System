@@ -341,7 +341,6 @@ public class DBInvoice implements IFDBInvoice {
 			
 			//Invoice
 			invoice.setId(results.getInt("invoiceId"));
-			invoice.setDelivered(results.getBoolean("invoiceIsDelivered"));
 			invoice.setTimestamp(results.getDate("invoiceTimestamp"));
 			invoice.setDateDelivered(results.getDate("invoiceDateDelivered"));
 			invoice.setPlacedBy(employee);

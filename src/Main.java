@@ -14,8 +14,6 @@ public class Main {
 				try {
 					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 					
-//					Employee user = new Employee();
-//					user.setCpr("0905982257");
 					SessionSingleton.getInstance().logIn("a", "a");
 					
 					ManagerWindow window = new ManagerWindow();
