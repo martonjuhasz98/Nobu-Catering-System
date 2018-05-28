@@ -40,7 +40,6 @@ public class InvoiceController {
 		return success;
 	}
 	public boolean confirmInvoice(Invoice invoice) {
-		invoice.setDelivered(true);
 		boolean success = dbInvoice.confirmInvoice(invoice);
 		
 		return success;
