@@ -109,7 +109,7 @@ public class EditMenuItem extends PerformPanel
 
 		Label label_1 = new Label("Name *");
 		label_1.setFont(new Font("Dialog", Font.PLAIN, 15));
-		label_1.setBounds(116, 16, 129, 22);
+		label_1.setBounds(16, 76, 129, 22);
 		add(label_1);
 		rdbtn_group = new ButtonGroup();
 
