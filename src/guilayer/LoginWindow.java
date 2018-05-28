@@ -21,9 +21,8 @@ import javax.swing.SwingWorker;
 import ctrllayer.SessionSingleton;
 import modlayer.MenuItem;
 
-public class LoginWindow {
+public class LoginWindow extends JFrame {
 
-	private JFrame frame;
 	public static final int totalWidth = 1000;
 	public static final int totalHeight = 500;
 	public static final int menuWidth = 200;
@@ -41,16 +40,13 @@ public class LoginWindow {
 	private JPasswordField passwordField;
 	private ManagerWindow managerWindow;
 	boolean loggedIn;
+	private JButton btnNewButton;
 
-	/**
-	 * Launch the application.
-	 */
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
 					LoginWindow window = new LoginWindow();
-					window.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -58,27 +54,25 @@ public class LoginWindow {
 		});
 	}
 
-	/**
-	 * Create the application.
-	 */
 	public LoginWindow() {
+		super();
 		loggedIn = false;
+		
 		initialize();
 	}
 
-	/**
-	 * Initialize the contents of the frame.
-	 */
 	private void initialize() {
-		frame = new JFrame();
-		frame.setBounds(100, 100, totalWidth + 4, totalHeight + 28);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setTitle("Nobu inventory system");
-		frame.setFont(contentFont);
-		frame.setResizable(false);
+		
+		setVisible(true);
+		
+		setBounds(100, 100, totalWidth + 4, totalHeight + 28);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setTitle("Nobu inventory system");
+		setFont(contentFont);
+		setResizable(false);
 
 		JPanel panel = new JPanel();
-		frame.getContentPane().add(panel, BorderLayout.CENTER);
+		getContentPane().add(panel, BorderLayout.CENTER);
 		panel.setBackground(contentBackgroundColour);
 		panel.setLayout(null);
 
@@ -88,19 +82,24 @@ public class LoginWindow {
 		panel.add(panel_1);
 		panel_1.setLayout(null);
 
-		JButton btnNewButton = new JButton("Log in");
+		btnNewButton = new JButton("Log in");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				btnNewButton.setEnabled(false);
+				btnNewButton.setText("Logging in...");
+				
 				if (SessionSingleton.getInstance().logIn(txtUsername.getText().trim(),
 						new String(passwordField.getPassword()))) {
 					if (managerWindow != null) {
-
 						managerWindow.setVisible(true);
-						frame.setVisible(false);
-						frame.dispose();
-					} else
+						setVisible(false);
+						dispose();
+					} else {
 						loggedIn = true;
-
+					}
+				} else {
+					btnNewButton.setEnabled(true);
+					btnNewButton.setText("Log in");
 				}
 			}
 		});
@@ -131,21 +130,25 @@ public class LoginWindow {
 
 	public class LoadWorker extends SwingWorker<ManagerWindow, Void> {
 
+		private long time;
+		
 		@Override
 		protected ManagerWindow doInBackground() throws Exception {
 			// Start
+			time = System.nanoTime();
 			return new ManagerWindow();
 		}
 
 		@Override
 		protected void done() {
 			try {
-				System.out.println("loaded");
+				time = System.nanoTime() - time;
+				System.out.println(String.format("Loaded in %f ms.", time / Math.pow(10, 6)));
 				managerWindow = get();
 				if(loggedIn) {
 					managerWindow.setVisible(true);
-					frame.setVisible(false);
-					frame.dispose();
+					setVisible(false);
+					dispose();
 				}
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
