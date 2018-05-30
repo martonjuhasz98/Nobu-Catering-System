@@ -102,8 +102,10 @@ public class DBMenuItem implements IFDBMenuItem {
 	@Override
 	public MenuItem selectMenuItem(int id) {
 		MenuItem menuItem = null;
+		String query = "";
 		
-		String query = "SELECT "
+		try {
+			query = "SELECT "
 					+ "i.id AS itemId, "
 					+ "i.name AS itemName, "
 					+ "i.price AS itemPrice, "
@@ -111,10 +113,8 @@ public class DBMenuItem implements IFDBMenuItem {
 					+ "c.name AS categoryName "
 					+ "FROM [Menu_Item] AS i "
 					+ "INNER JOIN [Menu_Item_Category] AS c "
-					+ "ON i.category_id = c.id"
-					+ "WHERE itemId = ?";
-		try {
-			
+					+ "ON i.category_id = c.id "
+					+ "WHERE i.id = ?";
 			PreparedStatement ps = con.prepareStatement(query);
 			ps.setQueryTimeout(5);
 			ps.setInt(1, id);

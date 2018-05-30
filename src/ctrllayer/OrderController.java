@@ -33,16 +33,16 @@ public class OrderController {
 	public Order getOrder(int id) {
 		return dbOrder.selectOrder(id);
 	}
-	public boolean createOrder(int tableNo) {
+	public int createOrder(int tableNo) {
 		Employee employee = SessionSingleton.getInstance().getUser();
 		
 		Order order = new Order();
 		order.setTableNo(tableNo);
 		order.setEmployee(employee);
 		
-		boolean success = dbOrder.insertOrder(order) > 0;
+		int id = dbOrder.insertOrder(order);
 		
-		return success;
+		return id;
 	}
 	public boolean updateOrder(Order order) {
 		boolean success = dbOrder.updateOrder(order);
@@ -65,6 +65,16 @@ public class OrderController {
 	}
 	
 	//OrderMenuItems
+	public boolean canAddOrderMenuItem(OrderMenuItem item) {
+		boolean canCreate = dbItem.canCreateOrderMenuItem(item);
+		
+		return canCreate;
+	}
+	public boolean hasOrderMenuItem(OrderMenuItem item) {
+		boolean success = dbItem.hasOrderMenuItem(item);
+		
+		return success;
+	}
 	public boolean addOrderMenuItem(OrderMenuItem item) {
 		boolean success = dbItem.insertOrderMenuItem(item);
 		

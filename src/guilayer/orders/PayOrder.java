@@ -3,49 +3,49 @@ package guilayer.orders;
 import java.util.ArrayList;
 
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.JTable;
 
-import ctrllayer.InvoiceController;
+import ctrllayer.OrderController;
 import guilayer.ManagerWindow;
 import guilayer.interfaces.ItemTableModel;
 import guilayer.interfaces.PerformPanel;
-import modlayer.Invoice;
-import modlayer.InvoiceItem;
-import modlayer.Item;
+import modlayer.Order;
+import modlayer.OrderMenuItem;
+import modlayer.TransactionType;
+import modlayer.MenuItem;
 
 import javax.swing.ListSelectionModel;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
+import javax.swing.SwingConstants;
+import javax.swing.text.NumberFormatter;
 import javax.swing.JButton;
+import javax.swing.JFormattedTextField;
 import javax.swing.JOptionPane;
 
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.text.NumberFormat;
 import java.awt.event.ActionEvent;
-import javax.swing.JTextField;
-import javax.swing.event.CaretListener;
-import javax.swing.event.CaretEvent;
-import javax.swing.JLabel;
 import java.awt.Font;
 import java.awt.Label;
+import javax.swing.JComboBox;
 
-public class PayOrder extends PerformPanel implements ActionListener, CaretListener, ListSelectionListener {
+public class PayOrder extends PerformPanel implements ActionListener, ItemListener {
 
-	private InvoiceController invoiceCtrl;
-	private Invoice invoice;
-	private JTextField txt_search;
-	private JButton btn_search;
-	private JTable tbl_ordered;
-	private OrderedTableModel mdl_ordered;
-	private JButton btn_add;
-	private JButton btn_remove;
-	private JTable tbl_delivered;
-	private DeliveredTableModel mdl_delivered;
-	private JButton btn_confirm;
+	private OrderController orderCtrl;
+	private Order order;
+	private JTable table;
+	private OrderTableModel model;
+	private JButton btn_pay;
 	private JButton btn_cancel;
-	private JTextField txt_supplier;
+	private JFormattedTextField txt_subtotal;
+	private JFormattedTextField txt_tax;
+	private JFormattedTextField txt_total;
+	private JComboBox<TransactionType> cmb_payment;
 	
 	public PayOrder() {
-		invoiceCtrl = new InvoiceController();
+		orderCtrl = new OrderController();
 		
 		initialize();
 	}
@@ -56,262 +56,205 @@ public class PayOrder extends PerformPanel implements ActionListener, CaretListe
 		setVisible(false);
 		setBounds(0, 0, ManagerWindow.contentWidth, ManagerWindow.totalHeight - 30);
 		
-		mdl_ordered = new OrderedTableModel();
-		mdl_delivered = new DeliveredTableModel();
-		
-		Label lbl_supplier = new Label("Supplier");
-		lbl_supplier.setFont(new Font("Dialog", Font.PLAIN, 15));
-		lbl_supplier.setBounds(10, 11, 129, 22);
-		add(lbl_supplier);
-		
-		txt_supplier = new JTextField();
-		txt_supplier.setEditable(false);
-		txt_supplier.setColumns(10);
-		txt_supplier.setBounds(10, 39, 341, 20);
-		add(txt_supplier);
+		model = new OrderTableModel();
 		
 		Label lbl_items = new Label("Items");
 		lbl_items.setFont(new Font("Dialog", Font.PLAIN, 15));
-		lbl_items.setBounds(10, 80, 129, 22);
+		lbl_items.setBounds(10, 11, 129, 22);
 		add(lbl_items);
 		
-		txt_search = new JTextField();
-		txt_search.setBounds(10, 110, 217, 20);
-		txt_search.setColumns(10);
-		add(txt_search);
+
+		NumberFormat format = NumberFormat.getCurrencyInstance();
+		format.setMaximumFractionDigits(0);
+
+		NumberFormatter formatter = new NumberFormatter(format);
+		formatter.setMinimum(0.0);
+		formatter.setMaximum(10000000.0);
+		formatter.setAllowsInvalid(false);
+		formatter.setOverwriteMode(true);
 		
-		btn_search = new JButton("Search");
-		btn_search.setBounds(237, 110, 73, 20);
-		add(btn_search);
+		Label lbl_subtotal = new Label("Subtotal");
+		lbl_subtotal.setFont(new Font("Dialog", Font.PLAIN, 15));
+		lbl_subtotal.setBounds(10, 40, 97, 22);
+		add(lbl_subtotal);
 		
-		JScrollPane scrlPane_ordered = new JScrollPane();
-		scrlPane_ordered.setBounds(10, 141, 300, 310);
-		add(scrlPane_ordered);
+		txt_subtotal = new JFormattedTextField(formatter);
+		txt_subtotal.setHorizontalAlignment(SwingConstants.RIGHT);
+		txt_subtotal.setEditable(false);
+		txt_subtotal.setBounds(240, 40, 179, 22);
+		add(txt_subtotal);
 		
-		tbl_ordered = new JTable();
-		tbl_ordered.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-		tbl_ordered.getTableHeader().setReorderingAllowed(false);
-		tbl_ordered.setAutoCreateRowSorter(true);
-		tbl_ordered.setModel(mdl_ordered);
-		scrlPane_ordered.setViewportView(tbl_ordered);
+		Label lbl_tax = new Label("Tax");
+		lbl_tax.setFont(new Font("Dialog", Font.PLAIN, 15));
+		lbl_tax.setBounds(10, 64, 97, 22);
+		add(lbl_tax);
 		
-		btn_add = new JButton("Add");
-		btn_add.setBounds(316, 272, 73, 23);
-		add(btn_add);
+		txt_tax = new JFormattedTextField(formatter);
+		txt_tax.setHorizontalAlignment(SwingConstants.RIGHT);
+		txt_tax.setEditable(false);
+		txt_tax.setBounds(240, 64, 179, 22);
+		add(txt_tax);
 		
-		btn_remove = new JButton("Remove");
-		btn_remove.setBounds(316, 306, 73, 23);
-		add(btn_remove);
+		JSeparator separator = new JSeparator();
+		separator.setBounds(10, 92, 409, 2);
+		add(separator);
 		
-		JScrollPane scrlPane_delivered = new JScrollPane();
-		scrlPane_delivered.setBounds(399, 141, 391, 310);
-		add(scrlPane_delivered);
+		Label lbl_total = new Label("Total");
+		lbl_total.setFont(new Font("Dialog", Font.PLAIN, 15));
+		lbl_total.setBounds(10, 100, 97, 22);
+		add(lbl_total);
 		
-		tbl_delivered = new JTable();
-		tbl_delivered.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-		tbl_delivered.getTableHeader().setReorderingAllowed(false);
-		tbl_delivered.setAutoCreateRowSorter(true);
-		tbl_delivered.setModel(mdl_delivered);
-		scrlPane_delivered.setViewportView(tbl_delivered);
+		txt_total = new JFormattedTextField(formatter);
+		txt_total.setHorizontalAlignment(SwingConstants.RIGHT);
+		txt_total.setEditable(false);
+		txt_total.setBounds(240, 97, 179, 22);
+		add(txt_total);
 		
-		btn_confirm = new JButton("Confirm");
-		btn_confirm.setBounds(635, 11, 73, 23);
-		btn_confirm.setEnabled(true);
-		add(btn_confirm);
+		JScrollPane scrlPane = new JScrollPane();
+		scrlPane.setBounds(10, 133, 409, 318);
+		add(scrlPane);
+		
+		table = new JTable();
+		table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+		table.getTableHeader().setReorderingAllowed(false);
+		table.setAutoCreateRowSorter(true);
+		table.setModel(model);
+		scrlPane.setViewportView(table);
+		
+		Label lbl_payment = new Label("Payment");
+		lbl_payment.setFont(new Font("Dialog", Font.PLAIN, 15));
+		lbl_payment.setBounds(491, 11, 129, 22);
+		add(lbl_payment);
+		
+		cmb_payment = new JComboBox<TransactionType>(TransactionType.values());
+		cmb_payment.setBounds(491, 42, 217, 20);
+		add(cmb_payment);
+		
+		btn_pay = new JButton("Pay");
+		btn_pay.setBounds(635, 428, 73, 23);
+		btn_pay.setEnabled(true);
+		add(btn_pay);
 		
 		btn_cancel = new JButton("Cancel");
 		btn_cancel.setEnabled(true);
-		btn_cancel.setBounds(717, 11, 73, 23);
+		btn_cancel.setBounds(717, 428, 73, 23);
 		add(btn_cancel);
 		
-		txt_search.addCaretListener(this);
-		btn_search.addActionListener(this);
-		tbl_ordered.getSelectionModel().addListSelectionListener(this);
-		tbl_delivered.getSelectionModel().addListSelectionListener(this);
-		btn_add.addActionListener(this);
-		btn_remove.addActionListener(this);
-		btn_confirm.addActionListener(this);
+		cmb_payment.addItemListener(this);
+		btn_pay.addActionListener(this);
 		btn_cancel.addActionListener(this);
 		
-		resetForm();
+		reset();
 	}
-	private void resetForm() {
-		txt_supplier.setText("");
-		txt_search.setText("");
-		mdl_ordered.setItems(new ArrayList<InvoiceItem>());
-		mdl_delivered.setItems(new ArrayList<InvoiceItem>());
+	private void reset() {
+		model.setItems(new ArrayList<OrderMenuItem>());
+		cmb_payment.setSelectedIndex(-1);
+		txt_subtotal.setValue(new Double(0.0));
+		txt_tax.setValue(new Double(0.0));
+		txt_total.setValue(new Double(0.0));
 		
-		btn_add.setEnabled(false);
-		btn_remove.setEnabled(false);
+		btn_pay.setEnabled(false);
 	}
-	public void confirm(Invoice invoice) {
-		resetForm();
+	public void pay(Order order) {
+		reset();
 		
-		this.invoice = invoice;
-		txt_supplier.setText(invoice.getSupplier().toString());
-		mdl_ordered.setItems(invoice.getItems());
+		this.order = order;
+		model.setItems(order.getItems());
+		updatePrices();
 		
 		setVisible(true);
+	}
+	private void cancel() {
+		triggerCancelListeners();
+		close();
 	}
 	private void close() {
 		setVisible(false);
 	}
-	
-	private void searchOrdered() {
-		String keyword = txt_search.getText().trim();
-		ArrayList<InvoiceItem> results = new ArrayList<InvoiceItem>();
-		for (InvoiceItem invoiceItem : invoice.getItems()) {
-			Item item = invoiceItem.getItem(); 
-			if (item.getBarcode().contains(keyword) ||
-					item.getName().contains(keyword)) {
-				results.add(invoiceItem);
-			}
-		}
-		mdl_ordered.setItems(results);
-	}
-	private void addToDelivered() {
-		int[] selection = tbl_ordered.getSelectedRows();
+	private boolean isFilled() {
+		if (cmb_payment.getSelectedIndex() < 0)
+			return false;
 		
-		for (int i = 0; i < selection.length; i++) {
-			selection[i] = tbl_ordered.convertRowIndexToModel(selection[i]);
-			mdl_delivered.addItem(mdl_ordered.getItem(selection[i]));
-		}
+		return true;
 	}
-	private void removeFromDelivered() {
-		int[] selection = tbl_delivered.getSelectedRows();
-		
-		for (int i = 0; i < selection.length; i++) {
-			selection[i] = tbl_delivered.convertRowIndexToModel(selection[i]);
-			mdl_delivered.removeItem(mdl_ordered.getItem(selection[i]));
-		}
-	}
-	private void confirmInvoice() {
-		if (JOptionPane.showConfirmDialog(this, "Are you sure?", "Confirming invoice", JOptionPane.YES_NO_OPTION)
+	private void payOrder() {
+		if (JOptionPane.showConfirmDialog(this, "Are you sure?", "Paying order", JOptionPane.YES_NO_OPTION)
 				!= JOptionPane.YES_OPTION) {
 			return;
 		}
 		
-		invoice.setItems(mdl_delivered.getItems());
-		
-		if (!invoiceCtrl.confirmInvoice(invoice)) {
+		TransactionType payment = (TransactionType)cmb_payment.getSelectedItem();
+		if (!orderCtrl.payOrder(payment, order)) {
 			JOptionPane.showMessageDialog(this,
-				    "An error occured while confirming the Invoice!",
+				    "An error occured while paying the Order!",
 				    "Error!",
 				    JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 		
 		JOptionPane.showMessageDialog(this,
-				"The Invoice was successfully confirmed!",
+				"The Order was successfully payed!",
 			    "Success!",
 			    JOptionPane.INFORMATION_MESSAGE);
 		
 		triggerPerformListeners();
 		close();
 	}
-	private void cancel() {
-		triggerCancelListeners();
-		close();
+	private void updatePrices() {
+		double subtotal = 0, tax = 0, total = 0;
+		for (OrderMenuItem item : model.getItems()) {
+			subtotal += item.getQuantity() * item.getMenuItem().getPrice();
+		}
+		total = subtotal * 1.25;
+		tax = total - subtotal;
+		
+		txt_subtotal.setValue(subtotal);
+		txt_tax.setValue(tax);
+		txt_total.setValue(total);
 	}
 	
 	@Override
-	public void caretUpdate(CaretEvent e) {
-		if (e.getSource() == txt_search) {
-			searchOrdered();
-		}
-	}
-	@Override
-	public void valueChanged(ListSelectionEvent e) {
-		ListSelectionModel source = (ListSelectionModel)e.getSource();
-		boolean empty = source.isSelectionEmpty();
-		
-		if (source == tbl_ordered.getSelectionModel()) {
-			btn_add.setEnabled(!empty);
-		} else if (source == tbl_delivered.getSelectionModel()) {
-			btn_remove.setEnabled(!empty);
-		}
-	}
-	@Override
 	public void actionPerformed(ActionEvent e) {
-		if (e.getSource() == btn_search) {
-			searchOrdered();
-		} else if (e.getSource() == btn_add) {
-			addToDelivered();
-		} else if (e.getSource() == btn_remove) {
-			removeFromDelivered();
-		} else if (e.getSource() == btn_confirm) {
-			confirmInvoice();
+		if (e.getSource() == btn_pay) {
+			payOrder();
 		} else if (e.getSource() == btn_cancel) {
 			cancel();
 		}
 	}
+	@Override
+	public void itemStateChanged(ItemEvent e) {
+		if (e.getSource() == cmb_payment) {
+			btn_pay.setEnabled(isFilled());
+		}
+	}
 	
-	private class OrderedTableModel extends ItemTableModel<InvoiceItem> {
+	private class OrderTableModel extends ItemTableModel<OrderMenuItem> {
 
-		public OrderedTableModel() {
+		public OrderTableModel() {
 			super();
 			
-			columns = new String[] { "Barcode", "Name", "Quantity", "Unit", "Unit price", "Category" };
+			columns = new String[] { "Item No.", "Name", "Price", "Quantity", "Total"};
 		}
 		
 		@Override
 		public Object getValueAt(int rowIndex, int columnIndex) {
-			InvoiceItem invoiceItem = items.get(rowIndex);
-			Item item = invoiceItem.getItem();
+			OrderMenuItem orderItem = getItem(rowIndex);
+			MenuItem item = orderItem.getMenuItem();
 			
 			switch(columnIndex) {
 				case 0:
-					return item.getBarcode();
+					return item.getId();
 				case 1:
 					return item.getName();
 				case 2:
-					return invoiceItem.getQuantity();
+					return item.getPrice();
 				case 3:
-					return item.getUnit().getAbbr();
+					return orderItem.getQuantity();
 				case 4:
-					return invoiceItem.getUnitPrice();
-				case 5:
-					return item.getCategory().getName();
+					return item.getPrice() * orderItem.getQuantity();
 			}
 			
 			return null;
-		}
-		@Override
-		public void setValueAt(Object value, int rowIndex, int columnIndex) {
-			switch (columnIndex) {
-				case 1:
-					double quantity = (double)value;
-					if (quantity > 0) {
-						getItem(rowIndex).setQuantity(quantity);
-					}
-					break;
-				case 3:
-					double price = (double)value;
-					if (price > 0) {
-						getItem(rowIndex).setUnitPrice(price);
-					}
-					break;
-			}
-		}
-	}
-	private class DeliveredTableModel extends OrderedTableModel {
-		
-		public DeliveredTableModel() {
-			super();
-		}
-		
-		@Override
-		public boolean isCellEditable(int rowIndex, int columnIndex) {
-			return columnIndex == 2;
-		}
-		@Override
-		public void setValueAt(Object value, int rowIndex, int columnIndex) {
-			try {
-				double quantity = (double)value;
-				if (quantity >= 0) {
-					super.items.get(rowIndex).setQuantity(quantity);
-				}
-			} catch(Exception e) {}
 		}
 	}
 }

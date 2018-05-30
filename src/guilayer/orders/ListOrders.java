@@ -107,7 +107,7 @@ public class ListOrders extends JPanel
 
 				if (!orderCtrl.cancelOrder(order)) {
 					JOptionPane.showMessageDialog(ListOrders.this,
-							"An error occured while canceled the Order!", "Error!", JOptionPane.ERROR_MESSAGE);
+							"An error occured while canceling the Order!", "Error!", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
 

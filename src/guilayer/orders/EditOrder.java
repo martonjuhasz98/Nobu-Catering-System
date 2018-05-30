@@ -10,6 +10,7 @@ import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.ListDataListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.text.NumberFormatter;
@@ -25,12 +26,15 @@ import modlayer.MenuItem;
 import modlayer.Order;
 
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 import javax.swing.JTable;
 import javax.swing.AbstractAction;
+import javax.swing.ComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JScrollPane;
 import javax.swing.JOptionPane;
@@ -39,29 +43,35 @@ import javax.swing.JSeparator;
 import javax.swing.JFormattedTextField;
 import javax.swing.SwingConstants;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.JComboBox;
 
-public class EditOrder extends PerformPanel implements ActionListener, CaretListener, TableModelListener, ChangeListener {
+public class EditOrder extends PerformPanel implements ActionListener, CaretListener, TableModelListener, ItemListener {
 
 	private OrderController orderCtrl;
 	private MenuItemController itemCtrl;
+	private Order order;
+	private boolean isCreating;
+	private JComboBox<String> cmb_table;
 	private JTextField txt_search;
 	private JButton btn_search;
 	private JTable tbl_menu;
 	private InventoryTableModel mdl_menu;
 	private JTable tbl_order;
 	private OrderTableModel mdl_order;
-	private JButton btn_create;
-	private JButton btn_cancel;
 	private boolean isSearching;
 	private String lastKeyword;
 	private JFormattedTextField txt_subtotal;
 	private JFormattedTextField txt_tax;
 	private JFormattedTextField txt_total;
-	private JSpinner spnr_table;
+	private JButton btn_submit;
+	private JButton btn_back;
+	private boolean reseting;
 	
 	public EditOrder() {
 		orderCtrl = new OrderController();
 		itemCtrl = new MenuItemController();
+		order = null;
+		isCreating = true;
 		lastKeyword = "";
 		isSearching = false;
 		
@@ -82,10 +92,14 @@ public class EditOrder extends PerformPanel implements ActionListener, CaretList
 		lbl_table.setBounds(10, 10, 129, 22);
 		add(lbl_table);
 		
-		spnr_table = new JSpinner();
-		spnr_table.setModel(new SpinnerNumberModel(new Integer(1), new Integer(0), null, new Integer(1)));
-		spnr_table.setBounds(10, 38, 179, 20);
-		add(spnr_table);
+		String[] tables = new String[15];
+		for (int i = 0; i < tables.length; i++) {
+			tables[i] = String.format("Table No. %d", i+1); 
+		}
+		cmb_table = new JComboBox<String>(tables);
+		cmb_table.setSelectedIndex(-1);
+		cmb_table.setBounds(10, 38, 179, 20);
+		add(cmb_table);
 		
 		Label lbl_items = new Label("Menu items *");
 		lbl_items.setFont(new Font("Dialog", Font.PLAIN, 15));
@@ -171,13 +185,13 @@ public class EditOrder extends PerformPanel implements ActionListener, CaretList
 		tbl_order.setModel(mdl_order);
 		scrlPane_order.setViewportView(tbl_order);
 		
-		btn_create = new JButton("Create");
-		btn_create.setBounds(536, 427, 122, 32);
-		add(btn_create);
+		btn_submit = new JButton("Create");
+		btn_submit.setBounds(536, 427, 122, 32);
+		add(btn_submit);
 		
-		btn_cancel = new JButton("Cancel");
-		btn_cancel.setBounds(668, 427, 122, 32);
-		add(btn_cancel);
+		btn_back = new JButton("Back");
+		btn_back.setBounds(668, 427, 122, 32);
+		add(btn_back);
 		
 		reset();
 		
@@ -187,8 +201,29 @@ public class EditOrder extends PerformPanel implements ActionListener, CaretList
 				MenuItem item = mdl_menu.getItem(modelRowIndex);
 				OrderMenuItem orderItem = new OrderMenuItem();
 				orderItem.setMenuItem(item);
-				orderItem.setOrder(new Order());
+				orderItem.setOrder(order);
 				orderItem.setQuantity(1);
+				
+				if (orderCtrl.hasOrderMenuItem(orderItem)) {
+					return;
+				}
+				
+				if (!orderCtrl.canAddOrderMenuItem(orderItem)) {
+					if (JOptionPane.showConfirmDialog(EditOrder.this, 
+							"There are not enough ingredients for this Menu item in the inventory!\nDo you still want to add it to the Order?", 
+							"Add Menu item", JOptionPane.YES_NO_OPTION)
+							!= JOptionPane.YES_OPTION) {
+						return;
+					}
+				}
+				
+				if (!orderCtrl.addOrderMenuItem(orderItem)) {
+					JOptionPane.showMessageDialog(EditOrder.this,
+						    "The Menu item was not added!",
+						    "Error!",
+						    JOptionPane.ERROR_MESSAGE);
+					return;
+				}
 				
 				mdl_order.addItem(orderItem);
 			}
@@ -197,6 +232,14 @@ public class EditOrder extends PerformPanel implements ActionListener, CaretList
 			public void actionPerformed(ActionEvent e) {
 				int modelRowIndex = Integer.valueOf(e.getActionCommand());
 				OrderMenuItem orderItem = mdl_order.getItem(modelRowIndex);
+				
+				if (!orderCtrl.removeOrderMenuItem(orderItem)) {
+					JOptionPane.showMessageDialog(EditOrder.this,
+						    "The Menu item was not removed!",
+						    "Error!",
+						    JOptionPane.ERROR_MESSAGE);
+					return;
+				}
 				
 				mdl_order.removeItem(orderItem);
 			}
@@ -207,23 +250,53 @@ public class EditOrder extends PerformPanel implements ActionListener, CaretList
 		ButtonColumn removeColumn = new ButtonColumn(tbl_order, remove, mdl_order.getColumnCount() - 1);
 		removeColumn.setMnemonic(KeyEvent.VK_CANCEL);
 		
+		cmb_table.addItemListener(this);
 		txt_search.addCaretListener(this);
 		btn_search.addActionListener(this);
-		btn_create.addActionListener(this);
-		btn_cancel.addActionListener(this);
+		btn_submit.addActionListener(this);
+		btn_back.addActionListener(this);
 		mdl_order.addTableModelListener(this);
-		spnr_table.addChangeListener(this);
 	}
 	private void reset() {
+		reseting = true;
+		order = null;
+		isCreating = true;
+		
+		cmb_table.removeItemListener(this);
+		cmb_table.setSelectedIndex(-1);
+		cmb_table.addItemListener(this);
+		tbl_menu.setEnabled(false);
+		tbl_order.setEnabled(false);
 		mdl_menu.setItems(itemCtrl.getMenuItems());
 		mdl_order.setItems(new ArrayList<OrderMenuItem>());
-		spnr_table.setValue(new Integer(1));
 		updatePrices();
 		
 		txt_search.setText("");
-		btn_create.setEnabled(false);
+		btn_submit.setText("Create");
+		btn_submit.setEnabled(false);
+		reseting = false;
+	}
+	private void fill(Order order) {
+		this.order = order;
+		isCreating = false;
+		
+		cmb_table.setSelectedIndex(order.getTableNo()-1);
+		tbl_menu.setEnabled(true);
+		tbl_order.setEnabled(true);
+		mdl_order.setItems(order.getItems());
+		updatePrices();
+		
+		btn_submit.setText("Update");
 	}
 	public void create() {
+		open();
+	}
+	public void update(Order order) {
+		open();
+		fill(order);
+	}
+	private void open() {
+		reset();
 		setVisible(true);
 	}
 	private void close() {
@@ -231,13 +304,20 @@ public class EditOrder extends PerformPanel implements ActionListener, CaretList
 		reset();
 	}
 	private void createOrder() {
-		if (JOptionPane.showConfirmDialog(this, "Are you sure?", "Creating order", JOptionPane.YES_NO_OPTION)
+		order = new Order();
+		order.setId(orderCtrl.createOrder(0));
+	}
+	private void updateOrder() {
+		orderCtrl.updateOrder(order);
+	}
+	private void submitOrder() {
+		if (JOptionPane.showConfirmDialog(this, "Are you sure?", (isCreating ? "Creating" : "Updating") + " order", JOptionPane.YES_NO_OPTION)
 				!= JOptionPane.YES_OPTION) {
 			return;
 		}
 		
 		JOptionPane.showMessageDialog(this,
-			    "The Order was successfully created!",
+			    "The Order was successfully " + (isCreating ? "creating" : "updating") + "!",
 			    "Success!",
 			    JOptionPane.INFORMATION_MESSAGE);
 
@@ -245,10 +325,16 @@ public class EditOrder extends PerformPanel implements ActionListener, CaretList
 		triggerPerformListeners();
 	}
 	private void cancel() {
+		if (order != null) {
+			orderCtrl.cancelOrder(order);
+		}
+		
 		close();
 		triggerCancelListeners();
 	}
 	private boolean isFilled() {
+		if (cmb_table.getSelectedIndex() < 0)
+			return false;
 		if (mdl_order.getItems().isEmpty())
 			return false;
 		
@@ -284,10 +370,24 @@ public class EditOrder extends PerformPanel implements ActionListener, CaretList
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == btn_search) {
 			search();
-		} else if (e.getSource() == btn_create) {
-			createOrder();
-		} else if (e.getSource() == btn_cancel) {
+		} else if (e.getSource() == btn_submit) {
+			submitOrder();
+		} else if (e.getSource() == btn_back) {
 			cancel();
+		}
+	}
+	@Override
+	public void itemStateChanged(ItemEvent e) {
+		if (reseting) return;
+		if (e.getSource() == cmb_table) {
+			if (isCreating && order == null) {
+				createOrder();
+			}
+			order.setTableNo(cmb_table.getSelectedIndex()+1);
+			updateOrder();
+
+			tbl_menu.setEnabled(true);
+			tbl_order.setEnabled(true);
 		}
 	}
 	@Override
@@ -297,15 +397,10 @@ public class EditOrder extends PerformPanel implements ActionListener, CaretList
 		}
 	}
 	@Override
-	public void stateChanged(ChangeEvent e) {
-		if (e.getSource() == spnr_table) {
-			btn_create.setEnabled(isFilled());
-		}
-	}
-	@Override
 	public void tableChanged(TableModelEvent e) {
+		if (reseting) return;
 		if (e.getSource() == mdl_order) {
-			btn_create.setEnabled(isFilled());
+			btn_submit.setEnabled(isFilled());
 			updatePrices();
 		}
 	}
@@ -378,11 +473,35 @@ public class EditOrder extends PerformPanel implements ActionListener, CaretList
 		@Override
 		public void setValueAt(Object value, int rowIndex, int columnIndex) {
 			if (columnIndex == 3) {
+				OrderMenuItem item = getItem(rowIndex);
+				int prevQuantity = item.getQuantity();
 				int quantity = (int)value;
-				if (quantity > 0) {
-					getItem(rowIndex).setQuantity(quantity);
+				if (quantity <= 0) return;
+				
+				if (quantity > prevQuantity) {
+					item.setQuantity(quantity - prevQuantity);
+					if (!orderCtrl.canAddOrderMenuItem(item)) {
+						if (JOptionPane.showConfirmDialog(EditOrder.this, 
+								"There are not enough ingredients for this Menu item in the inventory!\nDo you still want to update the quantity?", 
+								"Update Menu item", JOptionPane.YES_NO_OPTION)
+								!= JOptionPane.YES_OPTION) {
+							item.setQuantity(prevQuantity);
+							return;
+						}
+					}
+				}
+				item.setQuantity(quantity);
+					
+				if (!orderCtrl.editOrderMenuItem(item)) {
+					JOptionPane.showMessageDialog(EditOrder.this,
+						    "The Menu item was not updated!",
+						    "Error!",
+						    JOptionPane.ERROR_MESSAGE);
+					item.setQuantity(prevQuantity);
+					return;
 				}
 				
+				update();
 				updatePrices();
 			}
 		}

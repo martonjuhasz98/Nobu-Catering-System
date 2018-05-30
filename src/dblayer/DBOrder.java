@@ -57,17 +57,15 @@ public class DBOrder implements IFDBOrder {
 		ArrayList<Order> orders = new ArrayList<Order>();
 
 		String query = "SELECT * FROM [Order_View] "
-						+ "WHERE transactionId IS " + (payed ? "NOT" : "") + " NULL"
+						+ "WHERE transactionId IS " + (payed ? "NOT" : "") + " NULL "
 						+ "AND (orderId LIKE ? "
-						+ "OR employeeName LIKE ? "
-						+ "OR supplierName LIKE ?)";
+						+ "OR employeeName LIKE ?)";
 		
 		try {
 			PreparedStatement ps = con.prepareStatement(query);
 			ps.setQueryTimeout(5);
 			ps.setString(1, "%" + keyword + "%");
 			ps.setString(2, "%" + keyword + "%");
-			ps.setString(3, "%" + keyword + "%");
 			
 			Order order;
 			ResultSet results = ps.executeQuery();
@@ -260,7 +258,7 @@ public class DBOrder implements IFDBOrder {
 					+ "ON o.id = omi.order_id "
 					+ "INNER JOIN [Menu_Item] AS mi "
 					+ "ON omi.menu_item_id = mi.id "
-					+ "WHERE o.id = 2";
+					+ "WHERE o.id = ?";
 			PreparedStatement ps = con.prepareStatement(query);
 			ps.setQueryTimeout(5);
 			ps.setInt(1, order.getId());
@@ -284,6 +282,8 @@ public class DBOrder implements IFDBOrder {
 		String query = "";
 		try {
 			order = new Order();
+			order.setId(results.getInt("orderId"));
+			order.setTableNo(results.getInt("orderTableNo"));
 			
 			//City
 			City city = new City();
@@ -313,9 +313,6 @@ public class DBOrder implements IFDBOrder {
 			DBOrderMenuItem dbOrderMenuItem = new DBOrderMenuItem();
 			ArrayList<OrderMenuItem> items = dbOrderMenuItem.getOrderMenuItems(order.getId());
 			
-			//Order
-			order.setId(results.getInt("orderId"));
-			order.setTableNo(results.getInt("orderTableNo"));
 			order.setEmployee(employee);
 			order.setTransaction(transaction);
 			order.setItems(items);
