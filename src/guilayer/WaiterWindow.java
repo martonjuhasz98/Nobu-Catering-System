@@ -31,7 +31,6 @@ public class WaiterWindow extends JFrame {
 	
 	public WaiterWindow() {
 		super();
-		SessionSingleton.getInstance().logIn("a", "a");
 		
 		initialize();
 	}
