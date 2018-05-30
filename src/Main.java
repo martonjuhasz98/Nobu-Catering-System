@@ -21,8 +21,13 @@ public class Main {
 					ManagerWindow window = new ManagerWindow();
 					*/
 					
-					//LoginWindow window = new LoginWindow();
+					
+					LoginWindow window = new LoginWindow();
+					
+					
+					/*
 					new WaiterWindow();
+					*/
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

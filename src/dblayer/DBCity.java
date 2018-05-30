@@ -12,10 +12,12 @@ import modlayer.City;
 
 public class DBCity implements IFDBCity {
 
+	private DBConnection dbCon;
 	private Connection con;
-	
+
 	public DBCity() {
-		con = DBConnection.getConnection();
+		dbCon = DBConnection.getInstance();
+		con = dbCon.getConnection();
 	}
 	
 	@Override

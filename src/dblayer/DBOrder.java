@@ -8,7 +8,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 
 import dblayer.interfaces.IFDBOrder;
-import modlayer.Supplier;
 import modlayer.Transaction;
 import modlayer.TransactionType;
 import modlayer.City;
@@ -18,10 +17,12 @@ import modlayer.OrderMenuItem;
 
 public class DBOrder implements IFDBOrder {
 	
+	private DBConnection dbCon;
 	private Connection con;
-	
+
 	public DBOrder() {
-		con = DBConnection.getConnection();
+		dbCon = DBConnection.getInstance();
+		con = dbCon.getConnection();
 	}
 	
 	@Override
@@ -116,8 +117,6 @@ public class DBOrder implements IFDBOrder {
 		String query = "";
 		
 		try {
-			DBConnection.startTransaction();
-			
 			query = "INSERT INTO [Order] "
 					+ "(table_no, employee_cpr) "
 					+ "VALUES (?, ?)";
@@ -134,26 +133,41 @@ public class DBOrder implements IFDBOrder {
 	            }
 			}
 			ps.close();
-			
-			//OrderMenuItems
-			DBOrderMenuItem dbOrderMenuItem = new DBOrderMenuItem();
-			for (OrderMenuItem item : order.getItems()) {
-				item.setOrder(order);
-				dbOrderMenuItem.insertOrderMenuItem(item);
-			}
-			
-			DBConnection.commitTransaction();
 		}
 		catch (SQLException e) {
 			System.out.println("Order was not inserted!");
 			System.out.println(e.getMessage());
 			System.out.println(query);
-			
-			DBConnection.rollbackTransaction();
-			return -1;
 		}
 		
 		return id;
+	}
+	
+	@Override
+	public boolean updateOrder(Order order) {
+		boolean success = false;
+		String query = "";
+		
+		try {
+			PreparedStatement ps;
+			
+			query = "UPDATE [Order] "
+					+ "SET table_no = ? "
+					+ "WHERE id = ?";
+			ps = con.prepareStatement(query);
+			ps.setQueryTimeout(5);
+			ps.setInt(1, order.getTableNo());
+			ps.setInt(2, order.getId());
+			success = ps.executeUpdate() > 0;
+			ps.close();
+		}
+		catch (SQLException e) {
+			System.out.println("Order was not payed!");
+			System.out.println(e.getMessage());
+			System.out.println(query);
+		}
+		
+		return success;
 	}
 	
 	@Override
@@ -162,17 +176,50 @@ public class DBOrder implements IFDBOrder {
 		String query = "";
 		
 		try {
+			dbCon.startTransaction();
 			
-			DBTransaction dbTransaction = new DBTransaction();
-			success = dbTransaction.insertTransaction(order.getTransaction()) > 0;
-			if (!success) {
+			DBOrderMenuItem dbItem = new DBOrderMenuItem();
+			for	(OrderMenuItem item : order.getItems()) {
+				if (!dbItem.confirmOrderMenuItem(item)) {
+					throw new SQLException("OrderMenuItem was not updated!");
+				}
+			}
+
+			PreparedStatement ps;
+			DBTransaction dbTransaction;
+			Transaction transaction;
+			int transactionId = -1;
+			double amount = countAmount(order);
+			transaction = order.getTransaction();
+			transaction.setAmount(amount);
+			dbTransaction = new DBTransaction();
+			transactionId = dbTransaction.insertTransaction(transaction);
+			if (transactionId < 1) {
 				throw new SQLException("Transaction was not inserted!");
 			}
+			
+			query = "UPDATE [Order] "
+					+ "SET transaction_id = ? "
+					+ "WHERE id = ?";
+			ps = con.prepareStatement(query);
+			ps.setQueryTimeout(5);
+			ps.setInt(1, transactionId);
+			ps.setInt(2, order.getId());
+			success = ps.executeUpdate() > 0;
+			ps.close();
+			if (!success) {
+				throw new SQLException("Order was not updated!");
+			}
+			
+			dbCon.commitTransaction();
 		}
 		catch (SQLException e) {
 			System.out.println("Order was not payed!");
 			System.out.println(e.getMessage());
 			System.out.println(query);
+			
+			dbCon.rollbackTransaction();
+			success = false;
 		}
 		
 		return success;
@@ -187,27 +234,12 @@ public class DBOrder implements IFDBOrder {
 			PreparedStatement ps;
 			
 			//Order
-			query = "DELETE FROM [Order] WHERE id = ?";
+			query = "DELETE FROM [Order] WHERE id = ? AND transaction_id IS NULL";
 			ps = con.prepareStatement(query);
 			ps.setQueryTimeout(5);
 			ps.setInt(1, order.getId());
 			success = ps.executeUpdate() > 0;
 			ps.close();
-			if (!success) {
-				throw new SQLException("Order was not deleted!");
-			}
-			
-			//Transaction
-			query = "DELETE FROM [Transaction] WHERE id = ?";
-			ps = con.prepareStatement(query);
-			ps.setQueryTimeout(5);
-			ps.setInt(1, order.getTransaction().getId());
-			
-			success = ps.executeUpdate() > 0;
-			ps.close();
-			if (!success) {
-				throw new SQLException("Transaction was not deleted!");
-			}
 		}
 		catch (SQLException e) {
 			System.out.println("Order was not deleted!");
@@ -217,7 +249,34 @@ public class DBOrder implements IFDBOrder {
 			
 		return success;
 	}
-
+	
+	private double countAmount(Order order) {
+		double amount = 0.0;
+		String query = "";
+		try {
+			query = "SELECT SUM(omi.quantity * mi.price) AS amount "
+					+ "FROM [Order] AS o "
+					+ "INNER JOIN [Order_Menu_Item] AS omi "
+					+ "ON o.id = omi.order_id "
+					+ "INNER JOIN [Menu_Item] AS mi "
+					+ "ON omi.menu_item_id = mi.id "
+					+ "WHERE o.id = 2";
+			PreparedStatement ps = con.prepareStatement(query);
+			ps.setQueryTimeout(5);
+			ps.setInt(1, order.getId());
+			
+			ResultSet results = ps.executeQuery();
+			if (results.next()) {
+				amount = results.getDouble("amount");
+			}
+		} catch (SQLException e) {
+			System.out.println("Order was not found!");
+			System.out.println(e.getMessage());
+			System.out.println(query);
+		}
+		
+		return amount;
+	}
 	
 	private Order buildOrder(ResultSet results) throws SQLException {
 		Order order = null;

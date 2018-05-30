@@ -18,10 +18,12 @@ import modlayer.MenuItemCategory;
 
 public class DBMenuItem implements IFDBMenuItem {
 
+	private DBConnection dbCon;
 	private Connection con;
-	
+
 	public DBMenuItem() {
-		con = DBConnection.getConnection();
+		dbCon = DBConnection.getInstance();
+		con = dbCon.getConnection();
 	}
 
 	@Override
@@ -139,7 +141,7 @@ public class DBMenuItem implements IFDBMenuItem {
 				+ "(id, name, price, category_id) "
 				+ "VALUES (?, ?, ?, ?)";
 		try {
-			DBConnection.startTransaction();
+			dbCon.startTransaction();
 			
 			//Create new MenuItemCategory if needed
 			if (menuItem.getCategory().getId() < 1) {
@@ -170,7 +172,7 @@ public class DBMenuItem implements IFDBMenuItem {
 				throw new SQLException("Ingredients were not inserted!");
 			}
 			
-			DBConnection.commitTransaction();
+			dbCon.commitTransaction();
 		}
 		catch (SQLException e) {
 			System.out.println("MenuItem was not inserted!");
@@ -178,7 +180,7 @@ public class DBMenuItem implements IFDBMenuItem {
 			System.out.println(query);
 			
 			id = -1;
-			DBConnection.rollbackTransaction();
+			dbCon.rollbackTransaction();
 		}
 		
 		return id;
@@ -190,7 +192,7 @@ public class DBMenuItem implements IFDBMenuItem {
 		String query = "";
 		
 		try {
-			DBConnection.startTransaction();
+			dbCon.startTransaction();
 			
 			//Create new ItemCategory if needed
 			if (menuItem.getCategory().getId() < 1) {
@@ -249,7 +251,7 @@ public class DBMenuItem implements IFDBMenuItem {
 				throw new SQLException("Ingredients were not inserted!");
 			}
 			
-			DBConnection.commitTransaction();
+			dbCon.commitTransaction();
 		}
 		catch (SQLException e) {
 			System.out.println("MenuItem was not updated!");
@@ -257,7 +259,7 @@ public class DBMenuItem implements IFDBMenuItem {
 			System.out.println(query);
 			
 			success = false;
-			DBConnection.rollbackTransaction();
+			dbCon.rollbackTransaction();
 		}
 		
 		return success;
@@ -287,43 +289,12 @@ public class DBMenuItem implements IFDBMenuItem {
 		return success;
 	}
 	
-	@Override
-	public boolean canCreateMenuItem(MenuItem menuItem) {
-		boolean canCreate = false;
-		
-		String query = "SELECT "
-					+ "SUM (CASE WHEN (it.quantity - ing.quantity > 0) THEN 1 ELSE 0 + END) - COUNT(*) AS can_create  "
-					+ "FROM [Ingredient] AS ing "
-					+ "INNER JOIN [Item] AS it "
-					+ "ON ing.item_barcode = it.barcode "
-					+ "WHERE ing.menu_item_id = ?";
-		try {
-			
-			PreparedStatement ps = con.prepareStatement(query);
-			ps.setQueryTimeout(5);
-			ps.setInt(1, menuItem.getId());
-			
-			ResultSet results = ps.executeQuery();
-			if (results.next()) {
-				canCreate = results.getInt("can_create") == 0;
-			}
-			ps.close();
-		}
-		catch (SQLException e) {
-			System.out.println("MenuItem was not checked!");
-			System.out.println(e.getMessage());
-			System.out.println(query);
-		}
-			
-		return canCreate;
-	}
-	
 	private boolean insertIngredientsToMenuItem(MenuItem menuItem) {
 		boolean success = true;
 		String query = "";
 		
 		try {
-			DBConnection.startTransaction();
+			dbCon.startTransaction();
 			
 			PreparedStatement ps;
 			String barcode;
@@ -351,14 +322,14 @@ public class DBMenuItem implements IFDBMenuItem {
 				ps.close();
 			}
 			
-			DBConnection.commitTransaction();
+			dbCon.commitTransaction();
 		} catch (SQLException e) {
 			System.out.println("Ingredients were not inserted!");
 			System.out.println(e.getMessage());
 			System.out.println(query);
 			
 			success = false;
-			DBConnection.rollbackTransaction();
+			dbCon.rollbackTransaction();
 		}
 		
 		return success;

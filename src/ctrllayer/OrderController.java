@@ -4,16 +4,20 @@ import java.util.ArrayList;
 
 import dblayer.*;
 import dblayer.interfaces.IFDBOrder;
+import dblayer.interfaces.IFDBOrderMenuItem;
 import modlayer.*;
 
 public class OrderController {
 
 	private IFDBOrder dbOrder;
+	private IFDBOrderMenuItem dbItem;
 
 	public OrderController() {
 		dbOrder = new DBOrder();
+		dbItem = new DBOrderMenuItem();
 	}
 
+	//Orders
 	public ArrayList<Order> getUnpaidOrders() {
 		return dbOrder.getOrders(false);
 	}
@@ -29,27 +33,24 @@ public class OrderController {
 	public Order getOrder(int id) {
 		return dbOrder.selectOrder(id);
 	}
-	
-	public boolean createOrder(int tableNo, ArrayList<OrderMenuItem> items) {
+	public boolean createOrder(int tableNo) {
 		Employee employee = SessionSingleton.getInstance().getUser();
 		
 		Order order = new Order();
 		order.setTableNo(tableNo);
 		order.setEmployee(employee);
-		order.setItems(items);
 		
 		boolean success = dbOrder.insertOrder(order) > 0;
 		
 		return success;
 	}
-	public boolean payOrder(TransactionType payment, Order order) {
-		double totalPrice = 0;
-		for (OrderMenuItem item : order.getItems()) {
-			totalPrice += item.getQuantity() * item.getMenuItem().getPrice();
-		}
+	public boolean updateOrder(Order order) {
+		boolean success = dbOrder.updateOrder(order);
 		
+		return success;
+	}
+	public boolean payOrder(TransactionType payment, Order order) {
 		Transaction transaction = new Transaction();
-		transaction.setAmount(totalPrice);
 		transaction.setType(payment);
 		order.setTransaction(transaction);
 		
@@ -59,6 +60,28 @@ public class OrderController {
 	}
 	public boolean cancelOrder(Order order) {
 		boolean success = dbOrder.cancelOrder(order);
+		
+		return success;
+	}
+	
+	//OrderMenuItems
+	public boolean addOrderMenuItem(OrderMenuItem item) {
+		boolean success = dbItem.insertOrderMenuItem(item);
+		
+		return success;
+	}
+	public boolean editOrderMenuItem(OrderMenuItem item) {
+		boolean success = dbItem.updateOrderMenuItem(item);
+		
+		return success;
+	}
+	public boolean confirmOrderMenuItem(OrderMenuItem item) {
+		boolean success = dbItem.confirmOrderMenuItem(item);
+		
+		return success;
+	}
+	public boolean removeOrderMenuItem(OrderMenuItem item) {
+		boolean success = dbItem.deleteOrderMenuItem(item);
 		
 		return success;
 	}

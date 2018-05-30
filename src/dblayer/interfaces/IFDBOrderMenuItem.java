@@ -9,5 +9,6 @@ public interface IFDBOrderMenuItem {
     public OrderMenuItem selectOrderMenuItem(int orderId, int menuItemId); 
     public boolean insertOrderMenuItem(OrderMenuItem item);
     public boolean updateOrderMenuItem(OrderMenuItem item);
+    public boolean confirmOrderMenuItem(OrderMenuItem item);
     public boolean deleteOrderMenuItem(OrderMenuItem item);
 }

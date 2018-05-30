@@ -236,25 +236,10 @@ public class EditOrder extends PerformPanel implements ActionListener, CaretList
 			return;
 		}
 		
-		//Table number
-		int tableNo = (Integer)spnr_table.getValue();
-		
-		//Items
-		ArrayList<OrderMenuItem> items = mdl_order.getItems();
-		
-		if (!orderCtrl.createOrder(tableNo, items)) {
-			JOptionPane.showMessageDialog(this,
-				    "An error occured while creating the Order!",
-				    "Error!",
-				    JOptionPane.ERROR_MESSAGE);
-			return;
-		}
-		
 		JOptionPane.showMessageDialog(this,
 			    "The Order was successfully created!",
 			    "Success!",
 			    JOptionPane.INFORMATION_MESSAGE);
-		
 
 		close();
 		triggerPerformListeners();

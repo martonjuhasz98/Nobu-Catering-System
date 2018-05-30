@@ -11,5 +11,4 @@ public interface IFDBMenuItem {
     public int insertMenuItem(MenuItem menuItem);
     public boolean updateMenuItem(MenuItem menuItem);
     public boolean deleteMenuItem(MenuItem menuItem);
-    public boolean canCreateMenuItem(MenuItem menuItem);
 }

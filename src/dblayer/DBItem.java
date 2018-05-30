@@ -14,10 +14,12 @@ import modlayer.Unit;
 
 public class DBItem implements IFDBItem {
 	
+	private DBConnection dbCon;
 	private Connection con;
 
 	public DBItem() {
-		con = DBConnection.getConnection();
+		dbCon = DBConnection.getInstance();
+		con = dbCon.getConnection();
 	}
 	
 	@Override
@@ -147,7 +149,7 @@ public class DBItem implements IFDBItem {
 				+ "(barcode, name, quantity, unit, category_id) "
 				+ "VALUES (?, ?, ?, ?, ?)";
 		try {
-			DBConnection.startTransaction();
+			dbCon.startTransaction();
 			
 			//Create new ItemCategory if needed
 			if (item.getCategory().getId() < 1) {
@@ -175,14 +177,14 @@ public class DBItem implements IFDBItem {
 			}
 			ps.close();
 			
-			DBConnection.commitTransaction();
+			dbCon.commitTransaction();
 		}
 		catch (SQLException e) {
 			System.out.println("Item was not inserted!");
 			System.out.println(e.getMessage());
 			System.out.println(query);
 			
-			DBConnection.rollbackTransaction();
+			dbCon.rollbackTransaction();
 			return null;
 		}
 		

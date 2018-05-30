@@ -12,10 +12,12 @@ import modlayer.Stocktaking;
 
 public class DBStocktaking implements IFDBStocktaking {
 	
+	private DBConnection dbCon;
 	private Connection con;
-	
+
 	public DBStocktaking() {
-		con = DBConnection.getConnection();
+		dbCon = DBConnection.getInstance();
+		con = dbCon.getConnection();
 	}
 	
 	@Override
@@ -24,7 +26,7 @@ public class DBStocktaking implements IFDBStocktaking {
 		
 		String query = "INSERT INTO [Stocktaking] (employee_cpr) VALUES (?)";
 		try {
-			DBConnection.startTransaction();
+			dbCon.startTransaction();
 			
 			PreparedStatement ps = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 			ps.setQueryTimeout(5);
@@ -73,14 +75,14 @@ public class DBStocktaking implements IFDBStocktaking {
 				}
 			}
 			
-			DBConnection.commitTransaction();
+			dbCon.commitTransaction();
 		}
 		catch (SQLException e) {
 			System.out.println("Stocktaking was not inserted!");
 			System.out.println(e.getMessage());
 			System.out.println(query);
 			
-			DBConnection.rollbackTransaction();
+			dbCon.rollbackTransaction();
 			return -1;
 		}
 		

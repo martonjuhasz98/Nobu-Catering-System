@@ -8,8 +8,7 @@ public class DBConnection
     private static Connection con;
     private static DBConnection instance = null;
 
-    private DBConnection()
-    {
+    private DBConnection() {
     	final String server 	= "kraka.ucn.dk";
     	final String port 		= "1433";
     	final String user 		= "dmaj0917_1067616";
@@ -33,23 +32,17 @@ public class DBConnection
         }
     }
     
-    public static DBConnection getInstance()
-    {
-        if (instance == null)
-        {
+    public static DBConnection getInstance() {
+        if (instance == null) {
         	instance = new DBConnection();
         }
         return instance;
     }
-    public static Connection getConnection()
-    {
-    	DBConnection.getInstance();
-    	
+    public Connection getConnection() {
     	return con;
     }
     
-    public static void closeConnection()
-    {
+    public void closeConnection() {
 	   	try {
 	        con.close();
 	        
@@ -60,8 +53,7 @@ public class DBConnection
 	   		System.out.println("Error message: " + e.getMessage());
 	   	}	
     }
-    public static void startTransaction()
-    {
+    public void startTransaction() {
     	try {
     		con.setAutoCommit(false);
     		
@@ -72,7 +64,7 @@ public class DBConnection
 	        System.out.println("Error message: " + e.getMessage());
     	}
     }
-    public static void commitTransaction()
+    public void commitTransaction()
     {
     	try {
     		con.commit();
@@ -85,7 +77,7 @@ public class DBConnection
 	        System.out.println("Error message: " + e.getMessage());
     	}
     }
-    public static void rollbackTransaction()
+    public void rollbackTransaction()
     {
     	try {
     		con.rollback();

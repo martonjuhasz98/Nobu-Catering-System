@@ -13,10 +13,12 @@ import modlayer.Employee;
 
 public class DBEmployee implements IFDBEmployee{
 
+	private DBConnection dbCon;
 	private Connection con;
-	
+
 	public DBEmployee() {
-		con = DBConnection.getConnection();
+		dbCon = DBConnection.getInstance();
+		con = dbCon.getConnection();
 	}
 	
 	@Override

@@ -12,10 +12,12 @@ import modlayer.ItemCategory;
 
 public class DBItemCategory implements IFDBItemCategory {
 	
+	private DBConnection dbCon;
 	private Connection con;
-	
+
 	public DBItemCategory() {
-		con = DBConnection.getConnection();
+		dbCon = DBConnection.getInstance();
+		con = dbCon.getConnection();
 	}
 	
 	@Override

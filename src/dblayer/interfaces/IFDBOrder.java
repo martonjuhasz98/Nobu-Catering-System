@@ -9,6 +9,7 @@ public interface IFDBOrder {
     public ArrayList<Order> searchOrders(String keyword, boolean payed);
     public Order selectOrder(int id);
     public int insertOrder(Order order);
+    public boolean updateOrder(Order order);
     public boolean payOrder(Order order);
     public boolean cancelOrder(Order order);
 }

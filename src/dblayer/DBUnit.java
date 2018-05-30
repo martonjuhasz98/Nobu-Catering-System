@@ -12,10 +12,12 @@ import modlayer.Unit;
 
 public class DBUnit implements IFDBUnit {
 	
+	private DBConnection dbCon;
 	private Connection con;
-	
+
 	public DBUnit() {
-		con = DBConnection.getConnection();
+		dbCon = DBConnection.getInstance();
+		con = dbCon.getConnection();
 	}
 	
 	@Override

@@ -11,10 +11,13 @@ import dblayer.interfaces.IFDBAnalytics;
 import modlayer.Order;
 
 public class DBAnalytics implements IFDBAnalytics {
+	
+	private DBConnection dbCon;
 	private Connection con;
 
 	public DBAnalytics() {
-		con = DBConnection.getConnection();
+		dbCon = DBConnection.getInstance();
+		con = dbCon.getConnection();
 	}
 
 	@Override

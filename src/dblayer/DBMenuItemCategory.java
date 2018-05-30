@@ -12,10 +12,12 @@ import modlayer.MenuItemCategory;
 
 public class DBMenuItemCategory implements IFDBMenuItemCategory {
 	
+	private DBConnection dbCon;
 	private Connection con;
-	
+
 	public DBMenuItemCategory() {
-		con = DBConnection.getConnection();
+		dbCon = DBConnection.getInstance();
+		con = dbCon.getConnection();
 	}
 	
 	@Override

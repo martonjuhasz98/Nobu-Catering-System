@@ -13,10 +13,12 @@ import modlayer.OrderMenuItem;
 
 public class DBOrderMenuItem implements IFDBOrderMenuItem {
 	
+	private DBConnection dbCon;
 	private Connection con;
-	
+
 	public DBOrderMenuItem() {
-		con = DBConnection.getConnection();
+		dbCon = DBConnection.getInstance();
+		con = dbCon.getConnection();
 	}
 	
 	@Override
@@ -74,27 +76,39 @@ public class DBOrderMenuItem implements IFDBOrderMenuItem {
 	}
 	
 	@Override
-	public boolean insertOrderMenuItem(OrderMenuItem orderMenuItem) {
+	public boolean insertOrderMenuItem(OrderMenuItem item) {
 		boolean success = false;
 		String query = "";
 		
 		try {
+			dbCon.startTransaction();
+			
+			boolean canCreate = canCreateOrderMenuItem(item);
+			if (!canCreate) {
+				throw new SQLException("Not enough ingredients!");
+			}
+			
 			query = "INSERT INTO [Order_Menu_Item] "
 					+ "(menu_item_id, order_id, quantity) "
 					+ "VALUES (?, ?, ?)";
 			PreparedStatement ps = con.prepareStatement(query);
 			ps.setQueryTimeout(5);
-			ps.setInt(1, orderMenuItem.getMenuItem().getId());
-			ps.setInt(2, orderMenuItem.getOrder().getId());
-			ps.setDouble(3, orderMenuItem.getQuantity());
+			ps.setInt(1, item.getMenuItem().getId());
+			ps.setInt(2, item.getOrder().getId());
+			ps.setDouble(3, item.getQuantity());
 			
 			success = ps.executeUpdate() > 0;
 			ps.close();
+			
+			dbCon.commitTransaction();
 		}
 		catch (SQLException e) {
 			System.out.println("OrderMenuItem was not inserted!");
 			System.out.println(e.getMessage());
 			System.out.println(query);
+			
+			dbCon.rollbackTransaction();
+			success = false;
 		}
 		
 		return success;
@@ -106,8 +120,7 @@ public class DBOrderMenuItem implements IFDBOrderMenuItem {
 		
 		String query =
 				"UPDATE [Order_Menu_Item] "
-			  + "SET quantity = ?, "
-			  + "is_finished = ? "
+			  + "SET quantity = ? "
 			  + "WHERE order_id = ? "
 			  + "AND menu_item_id = ?";
 		try {
@@ -115,9 +128,8 @@ public class DBOrderMenuItem implements IFDBOrderMenuItem {
 			PreparedStatement ps = con.prepareStatement(query);
 			ps.setQueryTimeout(5);
 			ps.setInt(1, orderMenuItem.getQuantity());
-			ps.setBoolean(2, orderMenuItem.isFinished());
-			ps.setInt(3, orderMenuItem.getOrder().getId());
-			ps.setInt(4, orderMenuItem.getMenuItem().getId());
+			ps.setInt(2, orderMenuItem.getOrder().getId());
+			ps.setInt(3, orderMenuItem.getMenuItem().getId());
 			
 			success = ps.executeUpdate() > 0;
 			ps.close();
@@ -126,6 +138,64 @@ public class DBOrderMenuItem implements IFDBOrderMenuItem {
 			System.out.println("Item was not updated!");
 			System.out.println(e.getMessage());
 			System.out.println(query);
+		}
+		
+		return success;
+	}
+	
+	@Override
+	public boolean confirmOrderMenuItem(OrderMenuItem item) {
+		boolean success = false;
+		String query = "";
+		
+		try {
+			dbCon.startTransaction();
+			PreparedStatement ps;
+			
+			query = "UPDATE [Order_Menu_Item] "
+				  + "SET is_finished = ? "
+				  + "WHERE order_id = ? "
+				  + "AND menu_item_id = ?";
+			ps = con.prepareStatement(query);
+			ps.setQueryTimeout(5);
+			ps.setBoolean(1, item.isFinished());
+			ps.setInt(2, item.getOrder().getId());
+			ps.setInt(3, item.getMenuItem().getId());
+			
+			success = ps.executeUpdate() > 0;
+			ps.close();
+			if (!success) {
+				throw new SQLException("Item was not updated!");
+			}
+			
+			query = "UPDATE it "
+					+ "SET it.quantity = it.quantity - (omi.quantity * ing.quantity) "
+					+ "FROM [Item] AS it "
+					+ "INNER JOIN [Ingredient] AS ing "
+					+ "ON it.barcode = ing.item_barcode "
+					+ "INNER JOIN [Menu_Item] AS mi "
+					+ "ON mi.id = ing.menu_item_id "
+					+ "INNER JOIN [Order_Menu_Item] AS omi "
+					+ "ON omi.menu_item_id = mi.id "
+					+ "WHERE omi.order_id = ? "
+					+ "AND omi.menu_item_id = ?";
+			ps = con.prepareStatement(query);
+			ps.setQueryTimeout(5);
+			ps.setInt(1, item.getOrder().getId());
+			ps.setInt(2, item.getMenuItem().getId());
+			
+			success = ps.executeUpdate() > 0;
+			ps.close();
+			
+			dbCon.commitTransaction();
+		}
+		catch (SQLException e) {
+			System.out.println("Item was not confirmed!");
+			System.out.println(e.getMessage());
+			System.out.println(query);
+			
+			dbCon.rollbackTransaction();
+			success = false;
 		}
 		
 		return success;
@@ -159,6 +229,50 @@ public class DBOrderMenuItem implements IFDBOrderMenuItem {
 		return success;
 	}
 
+	private boolean canCreateOrderMenuItem(OrderMenuItem menuItem) {
+		boolean canCreate = false;
+		
+		String query = "SELECT "
+					+ "SUM (CASE WHEN ((inventory.available - inventory.reserved) - (ordered.quantity * ?) >= 0) THEN 1 ELSE 0 END) - COUNT(*) AS can_create "
+					+ "FROM [Ingredient] AS ordered "
+					+ "INNER JOIN ( "
+					+ "	SELECT "
+					+ "	it.barcode AS barcode, "
+					+ "	it.quantity AS available, "
+					+ "	SUM(ing.quantity * omi.quantity) AS reserved "
+					+ "	FROM [Order_Menu_Item] as omi "
+					+ "	INNER JOIN [Menu_Item] as mi "
+					+ "	ON omi.menu_item_id = mi.id "
+					+ "	INNER JOIN [Ingredient] as ing "
+					+ "	ON ing.menu_item_id = mi.id "
+					+ "	INNER JOIN [Item] as it "
+					+ "	ON ing.item_barcode = it.barcode "
+					+ "	WHERE omi.is_finished = 0 "
+					+ "	GROUP BY ing.quantity, it.quantity, it.name, it.barcode "
+					+ ") inventory "
+					+ "ON inventory.barcode = ordered.item_barcode "
+					+ "WHERE ordered.menu_item_id = ?";
+		try {
+			
+			PreparedStatement ps = con.prepareStatement(query);
+			ps.setQueryTimeout(5);
+			ps.setInt(1, menuItem.getQuantity());
+			ps.setInt(2, menuItem.getMenuItem().getId());
+			
+			ResultSet results = ps.executeQuery();
+			if (results.next()) {
+				canCreate = results.getInt("can_create") == 0;
+			}
+			ps.close();
+		}
+		catch (SQLException e) {
+			System.out.println("MenuItem was not checked!");
+			System.out.println(e.getMessage());
+			System.out.println(query);
+		}
+			
+		return canCreate;
+	}
 	
 	private OrderMenuItem buildOrderMenuItem(ResultSet results) throws SQLException {
 		OrderMenuItem orderMenuItem = null;

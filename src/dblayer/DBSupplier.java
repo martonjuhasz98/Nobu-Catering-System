@@ -13,10 +13,12 @@ import modlayer.Supplier;
 
 public class DBSupplier implements IFDBSupplier {
 
+	private DBConnection dbCon;
 	private Connection con;
-	
+
 	public DBSupplier() {
-		con = DBConnection.getConnection();
+		dbCon = DBConnection.getInstance();
+		con = dbCon.getConnection();
 	}
 
 	@Override

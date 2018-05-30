@@ -18,10 +18,12 @@ import modlayer.InvoiceItem;
 
 public class DBInvoice implements IFDBInvoice {
 	
+	private DBConnection dbCon;
 	private Connection con;
-	
+
 	public DBInvoice() {
-		con = DBConnection.getConnection();
+		dbCon = DBConnection.getInstance();
+		con = dbCon.getConnection();
 	}
 	
 	@Override
@@ -116,7 +118,7 @@ public class DBInvoice implements IFDBInvoice {
 		String query = "";
 		
 		try {
-			DBConnection.startTransaction();
+			dbCon.startTransaction();
 			PreparedStatement ps;
 			
 			//Transaction
@@ -179,14 +181,14 @@ public class DBInvoice implements IFDBInvoice {
 				}
 			}
 			
-			DBConnection.commitTransaction();
+			dbCon.commitTransaction();
 		}
 		catch (SQLException e) {
 			System.out.println("Invoice was not inserted!");
 			System.out.println(e.getMessage());
 			System.out.println(query);
 			
-			DBConnection.rollbackTransaction();
+			dbCon.rollbackTransaction();
 			return -1;
 		}
 		
@@ -202,7 +204,7 @@ public class DBInvoice implements IFDBInvoice {
 			  + "SET date_delivered = GETDATE() "
 			  + "WHERE id = ?";
 		try {
-			DBConnection.startTransaction();
+			dbCon.startTransaction();
 			
 			PreparedStatement ps = con.prepareStatement(query);
 			ps.setQueryTimeout(5);
@@ -241,14 +243,14 @@ public class DBInvoice implements IFDBInvoice {
 				}
 			}
 		
-			DBConnection.commitTransaction();
+			dbCon.commitTransaction();
 		}
 		catch (SQLException e) {
 			System.out.println("Item was not updated!");
 			System.out.println(e.getMessage());
 			System.out.println(query);
 			
-			DBConnection.rollbackTransaction();
+			dbCon.rollbackTransaction();
 		}
 		
 		return success;
@@ -260,7 +262,7 @@ public class DBInvoice implements IFDBInvoice {
 		String query = "";
 		
 		try {
-			DBConnection.startTransaction();
+			dbCon.startTransaction();
 			PreparedStatement ps;
 			
 			//Invoice
@@ -288,7 +290,7 @@ public class DBInvoice implements IFDBInvoice {
 				throw new SQLException("Transaction was not deleted!");
 			}
 			
-			DBConnection.commitTransaction();
+			dbCon.commitTransaction();
 		}
 		catch (SQLException e) {
 			System.out.println("Invoice was not deleted!");
@@ -296,7 +298,7 @@ public class DBInvoice implements IFDBInvoice {
 			System.out.println(query);
 			
 			success = false;
-			DBConnection.rollbackTransaction();
+			dbCon.rollbackTransaction();
 		}
 			
 		return success;

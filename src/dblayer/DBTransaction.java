@@ -11,10 +11,12 @@ import modlayer.TransactionType;
 
 public class DBTransaction implements IFDBTransaction {
 
+	private DBConnection dbCon;
 	private Connection con;
-	
+
 	public DBTransaction() {
-		con = DBConnection.getConnection();
+		dbCon = DBConnection.getInstance();
+		con = dbCon.getConnection();
 	}
 
 	@Override
