@@ -134,7 +134,7 @@ public class CheckInventory extends JPanel
 			return;
 		}
 		lastKeyword = keyword;
-		// model.setItems(invoiceCtrl.searchInvoiceHistory(keyword));
+
 		new SearchWorker(keyword).execute();
 	}
 
@@ -152,7 +152,7 @@ public class CheckInventory extends JPanel
 
 		for (int i = 0; i < selection.length; i++) {
 			selection[i] = tbl_stocktaking.convertRowIndexToModel(selection[i]);
-			model.addItem(model.getItem(selection[i]));
+			model.removeItem(model.getItem(selection[i]));
 		}
 	}
 
