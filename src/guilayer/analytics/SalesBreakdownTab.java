@@ -25,11 +25,8 @@ import java.awt.event.ActionEvent;
 
 public class SalesBreakdownTab extends JPanel {
 	private JTable table;
-	private ItemController ic = new ItemController(); // TODO: replace with MenuItemController
 	private AnalyticsController ac = new AnalyticsController();
 	private SalesTableModel model = new SalesTableModel();
-	private String datePattern = "yyyy-MM-dd";
-	private SimpleDateFormat dateFormatter = new SimpleDateFormat(datePattern);
 
 	/**
 	 * Create the panel.
@@ -55,10 +52,6 @@ public class SalesBreakdownTab extends JPanel {
 		toDatePicker.getFormattedTextField().setText("to");
 		toDatePicker.setBounds(195, 0, 150, 30);
 		add(toDatePicker);
-
-		JComboBox filterBox = new JComboBox(ic.getCategories().toArray());
-		filterBox.setBounds(360, 0, 150, 30);
-		add(filterBox);
 
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setBounds(0, 30, 778, 425);

@@ -122,9 +122,8 @@ public class LoginWindow extends JFrame {
 		@Override
 		protected Boolean doInBackground() throws Exception {
 			time = System.nanoTime();
-			//window = new ManagerWindow();
-			window = new WaiterWindow();
-			
+			window = new ManagerWindow();
+//			window = new WaiterWindow();	
 			return true;
 		}
 

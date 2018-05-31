@@ -22,36 +22,67 @@ public class DBAnalytics implements IFDBAnalytics {
 
 	@Override
 	public String[][] getSalesBbreakdown(Date from, Date to) {
-		// TODO: select
-//		 SELECT 
-//				Menu_item.id as ID, 
-//				Menu_item.name
-//				Menu_item_category.name
-//				SUM(Order_menu_item.quantity) as sold
-//		 FROM Order_menu_item 
-//				INNER JOIN Order ON Order_menu_item.order_id = Order.id
-//				INNER JOIN Menu_item ON Order_menu_item.menu_item_id = Menu_item.id
-//				INNER JOIN Menu_item_category ON Menu_item.category_id = Menu_item_category.id
-//		 WHERE Order_menu_item.is_finished = 1 AND Order.timestamp > fromDate AND Order.timestamp < toDate
-//		 GROUP BY ingredient.item_barcode
-		//
+//		SELECT menu_item.id            AS ID, 
+//	       menu_item.NAME          AS NAME, 
+//	       menu_item_category.NAME AS category, 
+//	       menu_item.price         AS price, 
+//	       COALESCE(sold.sold, 0)       AS sold 
+//	FROM   menu_item 
+//	       LEFT JOIN menu_item_category 
+//	              ON menu_item.category_id = menu_item_category.id 
+//	       LEFT JOIN (SELECT order_menu_item.menu_item_id  AS id, 
+//	                         Sum(order_menu_item.quantity) AS sold 
+//	                  FROM   order_menu_item 
+//	                         INNER JOIN [order] 
+//	                                 ON order_menu_item.order_id = [order].id 
+//	                  WHERE  order_menu_item.is_finished = 0 
+//	                         AND Cast([order].timestamp AS DATE) >= Getdate() 
+//	                         AND Cast([order].timestamp AS DATE) <= Getdate() 
+//	                  GROUP  BY order_menu_item.menu_item_id) AS sold 
+//	              ON menu_item.id = sold.id 
 		
 		
 		ArrayList<String[]> data = new ArrayList<String[]>();
 
 		String query =
-				  "		 SELECT \n" + 
-				  "				Menu_item.id as ID, \n" + 
-				  "				MIN(Menu_item.name) AS name,\n" + 
-				  "				MIN(Menu_item_category.name) AS category,\n" + 
-				  "				MIN(Menu_item.price) AS price,\n" + 
-				  "				SUM(Order_menu_item.quantity) as sold\n" + 
-				  "		 FROM Order_menu_item \n" + 
-				  "				INNER JOIN [Order] ON Order_menu_item.order_id = [Order].id\n" + 
-				  "				INNER JOIN Menu_item ON Order_menu_item.menu_item_id = Menu_item.id\n" + 
-				  "				INNER JOIN Menu_item_category ON Menu_item.category_id = Menu_item_category.id\n" + 
-				  "		 WHERE Order_menu_item.is_finished = 1 AND CAST([Order].timestamp AS DATE) >= ? AND CAST([Order].timestamp AS DATE) <= ? \n" + 
-				  "		 GROUP BY Menu_item.id";
+				  "		SELECT menu_item.id            AS ID, \n" + 
+				  "       menu_item.NAME          AS NAME, \n" + 
+				  "       menu_item_category.NAME AS category, \n" + 
+				  "       menu_item.price         AS price, \n" + 
+				  "       COALESCE(sold.sold, 0)       AS sold \n" + 
+				  "FROM   menu_item \n" + 
+				  "       LEFT JOIN menu_item_category \n" + 
+				  "              ON menu_item.category_id = menu_item_category.id \n" + 
+				  "       LEFT JOIN (SELECT order_menu_item.menu_item_id  AS id, \n" + 
+				  "                         Sum(order_menu_item.quantity) AS sold \n" + 
+				  "                  FROM   order_menu_item \n" + 
+				  "                         INNER JOIN [order] \n" + 
+				  "                                 ON order_menu_item.order_id = [order].id \n" + 
+				  "                  WHERE  order_menu_item.is_finished = 1 \n" + 
+				  "                         AND Cast([order].timestamp AS DATE) >= ? \n" + 
+				  "                         AND Cast([order].timestamp AS DATE) <= ? \n" + 
+				  "                  GROUP  BY order_menu_item.menu_item_id) AS sold \n" + 
+				  "              ON menu_item.id = sold.id ";
+		
+//		query =
+//				  "		SELECT menu_item.id            AS ID, \n" + 
+//				  "       menu_item.NAME          AS NAME, \n" + 
+//				  "       menu_item_category.NAME AS category, \n" + 
+//				  "       menu_item.price         AS price, \n" + 
+//				  "       COALESCE(sold.sold, 0)       AS sold \n" + 
+//				  "FROM   menu_item \n" + 
+//				  "       LEFT JOIN menu_item_category \n" + 
+//				  "              ON menu_item.category_id = menu_item_category.id \n" + 
+//				  "       LEFT JOIN (SELECT order_menu_item.menu_item_id  AS id, \n" + 
+//				  "                         Sum(order_menu_item.quantity) AS sold \n" + 
+//				  "                  FROM   order_menu_item \n" + 
+//				  "                         INNER JOIN [order] \n" + 
+//				  "                                 ON order_menu_item.order_id = [order].id \n" + 
+//				  "                  WHERE  order_menu_item.is_finished = 1 \n" + 
+//				  "                         AND [order].timestamp  >= ? \n" + 
+//				  "                         AND [order].timestamp  <= ? \n" + 
+//				  "                  GROUP  BY order_menu_item.menu_item_id) AS sold \n" + 
+//				  "              ON menu_item.id = sold.id ";
 		try {
 			PreparedStatement ps = con.prepareStatement(query);
 			ps.setQueryTimeout(5);
@@ -87,79 +118,75 @@ public class DBAnalytics implements IFDBAnalytics {
 	public String[][] getWaste(Date from, Date to) {
 		// TODO Auto-generated method stub
 		//
-		// SELECT
-		// item.barcode AS barcode,
-		// item.name AS name,
-		// item.unit AS unit,
-		// item_usage.usage AS usage,
-		// (item_waste.waste+item_usage.recipe_waste) AS waste,
-		// ((item_usage.recipe_waste+item_waste.waste)/(item_usage.usage+item_waste.waste+item_usage.recipe_waste)*100)
-		// AS [waste%]
-		// FROM item
-		// LEFT JOIN
-		// (SELECT
-		// ingredient.item_barcode,
-		// SUM(ingredient.quantity*Menu_item_usage.usage) as usage,
-		// SUM(ingredient.quantity*ingredient.waste/100) AS recipe_waste
-		// FROM ingredient
-		// INNER JOIN (SELECT
-		// Order_menu_item.menu_item_id AS menu_item_id,
-		// SUM(Order_menu_item.quantity) as usage
-		// FROM Order_menu_item
-		// INNER JOIN [Order] ON Order_menu_item.order_id = [Order].id
-		// WHERE Order_menu_item.is_finished = 1 AND [Order].timestamp > GETDATE() AND
-		// [Order].timestamp < GETDATE()
-		// GROUP BY Order_menu_item.menu_item_id)
-		// AS Menu_item_usage ON ingredient.menu_item_id = Menu_item_usage.menu_item_id
-		// GROUP BY ingredient.item_barcode)
-		// AS item_usage
-		// ON item.barcode = item_usage.item_barcode
-		// LEFT JOIN
-		// (SELECT
-		// item_barcode,
-		// SUM(quantity) as waste
-		// FROM discrepancy
-		// INNER JOIN stocktaking ON discrepancy.stocktaking_id = stocktaking.id
-		// WHERE stocktaking.timestamp > GETDATE() AND stocktaking.timestamp < GETDATE()
-		// GROUP BY discrepancy.item_barcode)
-		// AS item_waste ON item.barcode = item_waste.item_barcode
+//		SELECT i.barcode AS barcode,
+//	       i.name AS name,
+//	       i.unit AS unit,
+//	       coalesce(iu.usage, 0) AS USAGE,
+//	       coalesce(iw.waste,0)+coalesce(iu.recipe_waste,0) AS waste,
+//	       case when (coalesce(iw.waste,0)+coalesce(iu.recipe_waste,0))=0
+//		   then 0
+//		   else case when (coalesce(iw.waste,0)+coalesce(iu.recipe_waste,0))>0
+//		   then ( coalesce(iw.waste,0)+coalesce(iu.recipe_waste,0))
+//		   /(coalesce(iu.usage,0)+coalesce(iw.waste,0)+coalesce(iu.recipe_waste,0))*100 
+//		   else ABS( coalesce(iw.waste,0)+coalesce(iu.recipe_waste,0))
+//		   /(coalesce(iu.usage,0)+ABS(coalesce(iw.waste,0)+coalesce(iu.recipe_waste,0)))*(-100)
+//		   end end AS [waste%]
+//	FROM item as i
+//	LEFT JOIN
+//	  (SELECT ing.item_barcode,
+//	          SUM(ing.quantity*miu.usage*(100-ing.waste)/100) AS [usage],
+//	          SUM(ing.quantity*miu.usage*ing.waste/100) AS recipe_waste
+//	   FROM ingredient AS ing
+//	   INNER JOIN
+//	     (SELECT omi.menu_item_id AS menu_item_id,
+//	             SUM(omi.quantity) AS [usage]
+//	      FROM Order_menu_item AS omi
+//	      INNER JOIN [Order] ON omi.order_id = [Order].id
+//	      WHERE omi.is_finished = 1 AND [Order].timestamp > GETDATE() AND [Order].timestamp < GETDATE()
+//	      GROUP BY omi.menu_item_id) AS miu ON ing.menu_item_id = miu.menu_item_id
+//	   GROUP BY ing.item_barcode) AS iu ON i.barcode = iu.item_barcode
+//	LEFT JOIN
+//	  (SELECT item_barcode,
+//	          SUM(-quantity) AS waste
+//	   FROM discrepancy AS d
+//	   INNER JOIN stocktaking ON d.stocktaking_id = stocktaking.id  WHERE stocktaking.timestamp >= GETDATE() AND stocktaking.timestamp <= GETDATE()
+//	   GROUP BY d.item_barcode) AS iw ON i.barcode = iw.item_barcode
 
 		ArrayList<String[]> data = new ArrayList<String[]>();
 
-		String query = "		 SELECT\n" 
-				+ "		    	item.barcode AS barcode,\n"
-				+ "		 		item.name AS name,\n" 
-				+ "				item.unit AS unit,\n"
-				+ "				item_usage.usage AS usage,\n"
-				+ "				(item_waste.waste+item_usage.recipe_waste) AS waste,\n"
-				+ "				((item_usage.recipe_waste+item_waste.waste)/(item_usage.usage+item_waste.waste+item_usage.recipe_waste)*100) AS [waste%]\n"
-				+ "		 FROM item\n" 
-				+ "		 		LEFT JOIN 		 \n" 
-				+ "				(SELECT \n"
-				+ "				ingredient.item_barcode, \n"
-				+ "				SUM(ingredient.quantity*Menu_item_usage.usage) as usage,\n"
-				+ "		      SUM(ingredient.quantity*ingredient.waste/100) AS recipe_waste\n"
-				+ "		 FROM ingredient \n" 
-				+ "				INNER JOIN 		 (SELECT \n"
-				+ "				Order_menu_item.menu_item_id AS menu_item_id, \n"
-				+ "				SUM(Order_menu_item.quantity) as usage\n" 
-				+ "		 FROM Order_menu_item \n"
-				+ "				INNER JOIN [Order] ON Order_menu_item.order_id = [Order].id\n"
-				+ "		 WHERE Order_menu_item.is_finished = 1 AND [Order].timestamp > GETDATE() AND [Order].timestamp < GETDATE()\n"
-				+ "		 GROUP BY Order_menu_item.menu_item_id) \n"
-				+ "		 AS Menu_item_usage ON ingredient.menu_item_id = Menu_item_usage.menu_item_id\n"
-				+ "		 GROUP BY ingredient.item_barcode) \n" 
-				+ "		 AS item_usage\n"
-				+ "		  ON item.barcode = item_usage.item_barcode\n" 
-				+ "		 		LEFT JOIN 		 \n"
-				+ "		 (SELECT\n" 
-				+ "		 		item_barcode,\n" 
-				+ "				SUM(quantity) as waste\n"
-				+ "		 FROM discrepancy\n"
-				+ "		 		INNER JOIN stocktaking ON discrepancy.stocktaking_id = stocktaking.id\n"
-				+ "		 WHERE stocktaking.timestamp > GETDATE() AND stocktaking.timestamp < GETDATE()\n"
-				+ "		 GROUP BY discrepancy.item_barcode)\n"
-				+ "		 AS item_waste ON item.barcode = item_waste.item_barcode";
+		String query = "SELECT i.barcode AS barcode,\n" + 
+				"       i.name AS name,\n" + 
+				"       i.unit AS unit,\n" + 
+				"       coalesce(iu.usage, 0) AS USAGE,\n" + 
+				"       coalesce(iw.waste,0)+coalesce(iu.recipe_waste,0) AS waste,\n" + 
+				"       cast( case when (coalesce(iw.waste,0)+coalesce(iu.recipe_waste,0))=0\n" + 
+				"	   then 0\n" + 
+				"	   else case when (coalesce(iw.waste,0)+coalesce(iu.recipe_waste,0))>0\n" + 
+				"	   then ( coalesce(iw.waste,0)+coalesce(iu.recipe_waste,0))\n" + 
+				"	   /(coalesce(iu.usage,0)+coalesce(iw.waste,0)+coalesce(iu.recipe_waste,0))*100 \n" + 
+				"	   else ABS( coalesce(iw.waste,0)+coalesce(iu.recipe_waste,0))\n" + 
+				"	   /(coalesce(iu.usage,0)+ABS(coalesce(iw.waste,0)+coalesce(iu.recipe_waste,0)))*(-100)\n" + 
+				"	   end end  as numeric(5,2)) AS [waste%]\n" + 
+				"FROM item as i\n" + 
+				"LEFT JOIN\n" + 
+				"  (SELECT ing.item_barcode,\n" + 
+				"          SUM(ing.quantity*miu.usage*(100-ing.waste)/100) AS [usage],\n" + 
+				"          SUM(ing.quantity*miu.usage*ing.waste/100) AS recipe_waste\n" + 
+				"   FROM ingredient AS ing\n" + 
+				"   INNER JOIN\n" + 
+				"     (SELECT omi.menu_item_id AS menu_item_id,\n" + 
+				"             SUM(omi.quantity) AS [usage]\n" + 
+				"      FROM Order_menu_item AS omi\n" + 
+				"      INNER JOIN [Order] ON omi.order_id = [Order].id\n" + 
+				"      WHERE omi.is_finished = 1 AND [Order].timestamp > ? AND [Order].timestamp < ? \n" + 
+				"      GROUP BY omi.menu_item_id) AS miu ON ing.menu_item_id = miu.menu_item_id\n" + 
+				"   GROUP BY ing.item_barcode) AS iu ON i.barcode = iu.item_barcode\n" + 
+				"LEFT JOIN\n" + 
+				"  (SELECT item_barcode,\n" + 
+				"          SUM(-quantity) AS waste\n" + 
+				"   FROM discrepancy AS d\n" + 
+				"   INNER JOIN stocktaking ON d.stocktaking_id = stocktaking.id  WHERE stocktaking.timestamp >= ? AND stocktaking.timestamp <= ? \n" + 
+				"   GROUP BY d.item_barcode) AS iw ON i.barcode = iw.item_barcode";
 		try {
 			PreparedStatement ps = con.prepareStatement(query);
 			ps.setQueryTimeout(5);
@@ -190,16 +217,7 @@ public class DBAnalytics implements IFDBAnalytics {
 	}
 
 	public String[][] getSales(Date from, Date to) {
-		// TODO: select
-		// SELECT
-		// MIN(CAST([Transaction].timestamp AS DATE)) as date,
-		// SUM(case when amount >= 0 then amount else 0 end) as revenue,
-		// SUM(case when amount < 0 then amount else 0 end) as costs,
-		// SUM(amount) as profit
-		// FROM [Transaction]
-		// WHERE timestamp > GETDATE() AND timestamp < GETDATE()
-		// GROUP BY CAST([Transaction].timestamp AS DATE)
-		//
+
 
 		ArrayList<String[]> data = new ArrayList<String[]>();
 
@@ -207,7 +225,7 @@ public class DBAnalytics implements IFDBAnalytics {
 				+ "				SUM(case when amount >= 0 then amount else 0 end) as revenue,\n"
 				+ "				SUM(case when amount < 0 then amount else 0 end) as costs,\n"
 				+ "				SUM(amount) as profit\n" + "		 FROM [Transaction] \n"
-				+ "		 WHERE CAST(imestamp AS DATE) >= ? AND CAST(timestamp AS DATE) <= ? \n"
+				+ "		 WHERE CAST(timestamp AS DATE) >= ? AND CAST(timestamp AS DATE) <= ? \n"
 				+ "		 GROUP BY CAST([Transaction].timestamp AS DATE) ";
 		try {
 			PreparedStatement ps = con.prepareStatement(query);

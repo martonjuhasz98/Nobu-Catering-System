@@ -3,10 +3,11 @@ package guilayer.analytics;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Date;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Arrays;
 import java.util.Locale;
 
 import javax.swing.JButton;
@@ -27,7 +28,7 @@ public class SalesGraph extends JPanel {
 	private ItemController ic = new ItemController(); // TODO: replace with MenuItemController
 	private AnalyticsController ac = new AnalyticsController();
 	// private String datePattern = "yyyy-MM-dd";
-//	private SimpleDateFormat dateFormatter = new SimpleDateFormat(datePattern);
+	// private SimpleDateFormat dateFormatter = new SimpleDateFormat(datePattern);
 
 	/**
 	 * Create the panel.
@@ -61,8 +62,15 @@ public class SalesGraph extends JPanel {
 
 		final CategoryChart chart = new CategoryChartBuilder().width(778).height(42).xAxisTitle("Date")
 				.yAxisTitle("% wasted").build();
-		chart.addSeries("a", new double[] { 0, 0, 0, 0, 0 }, new double[] { 0, 0, 0, 0, 0 });
+		DateFormat format = new SimpleDateFormat("yyyy-mm-dd", Locale.ENGLISH);
 		chart.getStyler().setLegendVisible(false);
+		chart.getStyler().setDatePattern("yyyy-MM-dd");
+		ArrayList<java.util.Date> xData = new ArrayList<>();
+		ArrayList<Double> yData = new ArrayList<>();
+		xData.add(new java.util.Date());
+		yData.add(0.00);
+		
+		chart.addSeries("a", xData, yData);
 		// chart.addSeries("b", new double[] { 0, 2, 4, 6, 9 }, new double[] { -1, 6, 4,
 		// 0, 4 });
 		JPanel chartPanel = new XChartPanel<CategoryChart>(chart);
@@ -75,37 +83,43 @@ public class SalesGraph extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				DateFormat format = new SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH);
 				try {
+					
 					String[][] data = ac.getSales(
-							new java.sql.Date(format.parse(fromDatePicker.getFormattedTextField().getText()).getTime()),
+							new java.sql.Date(format.parse(fromDatePicker.getFormattedTextField().getText()).getTime()), 
 							new java.sql.Date(format.parse(toDatePicker.getFormattedTextField().getText()).getTime()));
-					
-					ArrayList<Date> xData = new ArrayList<Date>();
-					for (String s : data[0])
-						xData.add(format.parse(s));
-					
-					ArrayList<Double> revenue = new ArrayList<Double>();
-					for (String s : data[1])
-						revenue.add(Double.valueOf((s.equals("NULL"))?"0":s));
-					chart.addSeries("Revenue", xData,revenue );
-					
-					ArrayList<Double> costs = new ArrayList<Double>();
-					for (String s : data[1])
-						costs.add(Double.valueOf((s.equals("NULL"))?"0":s));
-					chart.addSeries("Costs", xData,costs );
-					
-					ArrayList<Double> profit = new ArrayList<Double>();
-					for (String s : data[1])
-						profit.add(Double.valueOf((s.equals("NULL"))?"0":s));
-					chart.addSeries("Profit", xData,profit );
-					
 
-					 chartPanel.revalidate();
-//					results.getString("date"),
-//					results.getString("revenue"),
-//					results.getString("costs"),
-//					results.getString("profit")
+					chart.removeSeries("a");
+					chart.getStyler().setLegendVisible(true);
+
+					System.out.println(Arrays.deepToString(data));
+					format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+					ArrayList<java.util.Date> xData = new ArrayList<java.util.Date>();
+					for (String[] row : data)
+						xData.add(format.parse(row[0]));
+
+					ArrayList<Double> revenue = new ArrayList<Double>();
+					for (String[] row : data)
+						revenue.add(Double.valueOf((row[1].equals("NULL")) ? "0" : row[1]));
+					chart.addSeries("Revenue", xData, revenue);
+
+					ArrayList<Double> costs = new ArrayList<Double>();
+					for (String[] row : data)
+						costs.add(Double.valueOf((row[2].equals("NULL")) ? "0" : row[2]));
+					chart.addSeries("Costs", xData, costs);
+
+					ArrayList<Double> profit = new ArrayList<Double>();
+					for (String[] row : data)
+						profit.add(Double.valueOf((row[3].equals("NULL")) ? "0" : row[3]));
+					chart.addSeries("Profit", xData, profit);
+
+					chartPanel.revalidate();
+					chartPanel.repaint();
+					// results.getString("date"),
+					// results.getString("revenue"),
+					// results.getString("costs"),
+					// results.getString("profit")
 				} catch (Exception e1) {
-					JOptionPane.showMessageDialog(null, "Please pick dates");
+					e1.printStackTrace();
 				}
 
 			}

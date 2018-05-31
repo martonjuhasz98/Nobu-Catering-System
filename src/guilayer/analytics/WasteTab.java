@@ -24,7 +24,6 @@ import ctrllayer.ItemController;
 
 public class WasteTab extends JPanel {
 	private JTable table;
-	private ItemController ic = new ItemController();
 	private AnalyticsController ac = new AnalyticsController();
 	private SalesTableModel model = new SalesTableModel(); 
     private String datePattern = "yyyy-MM-dd";
@@ -52,10 +51,6 @@ public class WasteTab extends JPanel {
 		toDatePicker.getFormattedTextField().setText("to");
 		toDatePicker.setBounds(195, 0, 150, 30);
 		add(toDatePicker);
-		
-		JComboBox filterBox = new JComboBox(ic.getCategories().toArray());
-		filterBox.setBounds(360, 0, 150, 30);
-		add(filterBox);
 		
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setBounds(0, 30, 778, 425);
