@@ -71,11 +71,11 @@ public class ListInventory extends JPanel implements ActionListener, MouseListen
 		add(btn_search);
 		
 		btn_create = new JButton("Create");
-		btn_create.setBounds(517, 3, 73, 23);
+		btn_create.setBounds(707, 3, 73, 23);
 		add(btn_create);
 		
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(10, 28, 580, 473);
+		scrollPane.setBounds(10, 28, 770, 450);
 		add(scrollPane);
 		
 		table = new JTable();

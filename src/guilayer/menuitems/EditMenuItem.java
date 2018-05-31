@@ -96,48 +96,53 @@ public class EditMenuItem extends PerformPanel
 		inventoryModel = new InventoryTableModel();
 		mdl_menuItem = new MenuItemTableModel();
 
-		Label label = new Label("ID *");
-		label.setFont(new Font("Dialog", Font.PLAIN, 15));
-		label.setBounds(16, 16, 129, 22);
-		add(label);
+		Label lbl_id = new Label("ID *");
+		lbl_id.setFont(new Font("Dialog", Font.PLAIN, 15));
+		lbl_id.setBounds(29, 16, 83, 22);
+		add(lbl_id);
 
 		txtId = new JTextField();
 		txtId.setText("");
 		txtId.setEnabled(true);
 		txtId.setColumns(10);
-		txtId.setBounds(16, 44, 83, 20);
+		txtId.setBounds(29, 44, 83, 20);
 		add(txtId);
 
-		Label label_1 = new Label("Name *");
-		label_1.setFont(new Font("Dialog", Font.PLAIN, 15));
-		label_1.setBounds(116, 16, 129, 22);
-		add(label_1);
+		Label lbl_name = new Label("Name *");
+		lbl_name.setFont(new Font("Dialog", Font.PLAIN, 15));
+		lbl_name.setBounds(29, 76, 83, 22);
+		add(lbl_name);
 		rdbtn_group = new ButtonGroup();
 
 		txtName = new JTextField();
 		txtName.setText("");
 		txtName.setColumns(10);
-		txtName.setBounds(16, 104, 316, 20);
+		txtName.setBounds(29, 104, 316, 20);
 		add(txtName);
+		
+		Label lbl_price = new Label("Price *");
+		lbl_price.setFont(new Font("Dialog", Font.PLAIN, 15));
+		lbl_price.setBounds(29, 136, 83, 22);
+		add(lbl_price);
 
 		txtPrice = new JTextField();
 		txtPrice.setText("");
 		txtPrice.setEnabled(true);
 		txtPrice.setColumns(10);
-		txtPrice.setBounds(16, 164, 83, 20);
+		txtPrice.setBounds(29, 164, 83, 20);
 		add(txtPrice);
 
 		txt_search = new JTextField();
-		txt_search.setBounds(16, 224, 179, 20);
+		txt_search.setBounds(29, 224, 179, 20);
 		add(txt_search);
 		txt_search.setColumns(10);
 
 		btn_search = new JButton("Search");
-		btn_search.setBounds(195, 224, 73, 20);
+		btn_search.setBounds(208, 224, 73, 20);
 		add(btn_search);
 
 		scrlPane_inventory = new JScrollPane();
-		scrlPane_inventory.setBounds(10, 256, 316, 167);
+		scrlPane_inventory.setBounds(23, 256, 316, 167);
 		add(scrlPane_inventory);
 
 		tbl_inventory = new JTable();
@@ -149,15 +154,15 @@ public class EditMenuItem extends PerformPanel
 		scrlPane_inventory.setViewportView(tbl_inventory);
 
 		btn_add = new JButton("Add");
-		btn_add.setBounds(334, 307, 73, 23);
+		btn_add.setBounds(347, 307, 73, 23);
 		add(btn_add);
 
 		btn_remove = new JButton("Remove");
-		btn_remove.setBounds(334, 341, 73, 23);
+		btn_remove.setBounds(347, 341, 73, 23);
 		add(btn_remove);
 
 		scrlPane_menuItemItem = new JScrollPane();
-		scrlPane_menuItemItem.setBounds(419, 256, 371, 167);
+		scrlPane_menuItemItem.setBounds(432, 256, 316, 167);
 		add(scrlPane_menuItemItem);
 
 		tbl_menuItemItem = new JTable();
@@ -169,26 +174,26 @@ public class EditMenuItem extends PerformPanel
 		scrlPane_menuItemItem.setViewportView(tbl_menuItemItem);
 
 		btn_submit = new JButton("Create");
-		btn_submit.setBounds(536, 432, 122, 32);
+		btn_submit.setBounds(494, 427, 122, 32);
 		add(btn_submit);
 
 		btn_cancel = new JButton("Cancel");
-		btn_cancel.setBounds(668, 432, 122, 32);
+		btn_cancel.setBounds(626, 427, 122, 32);
 		add(btn_cancel);
 
 		rdbtn_selectCategory = new JRadioButton("Select from existing");
 		rdbtn_selectCategory.setSelected(true);
-		rdbtn_selectCategory.setBounds(419, 84, 376, 19);
+		rdbtn_selectCategory.setBounds(432, 84, 316, 19);
 		rdbtn_group.add(rdbtn_selectCategory);
 		add(rdbtn_selectCategory);
 
 		cmb_category = new JComboBox<MenuItemCategory>();
 		cmb_category.setSelectedIndex(-1);
-		cmb_category.setBounds(419, 110, 376, 20);
+		cmb_category.setBounds(432, 110, 316, 20);
 		add(cmb_category);
 
 		rdbtn_createCategory = new JRadioButton("Create new");
-		rdbtn_createCategory.setBounds(419, 137, 376, 20);
+		rdbtn_createCategory.setBounds(432, 137, 316, 20);
 		rdbtn_group.add(rdbtn_createCategory);
 
 		add(rdbtn_createCategory);
@@ -197,7 +202,7 @@ public class EditMenuItem extends PerformPanel
 		txt_category.setText("");
 		txt_category.setEnabled(false);
 		txt_category.setColumns(10);
-		txt_category.setBounds(419, 164, 376, 20);
+		txt_category.setBounds(432, 164, 316, 20);
 		add(txt_category);
 
 		btn_search.addActionListener(this);
@@ -216,6 +221,11 @@ public class EditMenuItem extends PerformPanel
 		cmb_category.addItemListener(this);
 		rdbtn_selectCategory.addItemListener(this);
 		rdbtn_createCategory.addItemListener(this);
+		
+		Label lbl_category = new Label("Category *");
+		lbl_category.setFont(new Font("Dialog", Font.PLAIN, 15));
+		lbl_category.setBounds(432, 56, 83, 22);
+		add(lbl_category);
 
 		reset();
 	}

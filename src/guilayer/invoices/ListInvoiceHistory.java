@@ -62,15 +62,15 @@ public class ListInvoiceHistory extends JPanel
 		add(txt_search);
 
 		btn_search = new JButton("Search");
-		btn_search.setBounds(160, 11, 65, 23);
+		btn_search.setBounds(160, 11, 73, 23);
 		add(btn_search);
 
 		btn_create = new JButton("Create");
-		btn_create.setBounds(717, 11, 73, 23);
+		btn_create.setBounds(697, 11, 73, 23);
 		add(btn_create);
 
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(10, 41, 780, 418);
+		scrollPane.setBounds(10, 42, 760, 400);
 		add(scrollPane);
 
 		table = new JTable(model);

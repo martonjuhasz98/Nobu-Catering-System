@@ -121,11 +121,11 @@ public class ShowInvoice extends PerformPanel implements ActionListener{
 		add(txt_empPhone);
 		
 		btn_ok = new JButton("Ok");
-		btn_ok.setBounds(668, 427, 122, 32);
+		btn_ok.setBounds(654, 420, 122, 32);
 		add(btn_ok);
 		
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(16, 257, 774, 166);
+		scrollPane.setBounds(16, 257, 760, 160);
 		add(scrollPane);
 		
 		table = new JTable();

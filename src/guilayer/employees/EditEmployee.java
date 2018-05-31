@@ -184,12 +184,12 @@ public class EditEmployee extends PerformPanel implements ActionListener, CaretL
 		add(spinnerAccLvl);
 
 		btn_submit = new JButton("Create");
-		btn_submit.setBounds(536, 457, 122, 32);
+		btn_submit.setBounds(522, 444, 122, 32);
 		add(btn_submit);
 		btn_submit.addActionListener(this);
 
 		btn_cancel = new JButton("Cancel");
-		btn_cancel.setBounds(668, 457, 122, 32);
+		btn_cancel.setBounds(654, 444, 122, 32);
 		add(btn_cancel);
 		btn_cancel.addActionListener(this);
 		

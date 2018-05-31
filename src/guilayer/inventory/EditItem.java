@@ -126,11 +126,11 @@ public class EditItem extends PerformPanel implements ActionListener, CaretListe
 		txt_category.setColumns(10);
 		
 		btn_submit = new JButton("Create");
-		btn_submit.setBounds(536, 457, 122, 32);
+		btn_submit.setBounds(520, 444, 122, 32);
 		add(btn_submit);
 		
 		btn_cancel = new JButton("Cancel");
-		btn_cancel.setBounds(668, 457, 122, 32);
+		btn_cancel.setBounds(654, 444, 122, 32);
 		add(btn_cancel);
 		
 		reset();

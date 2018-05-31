@@ -103,7 +103,7 @@ public class CreateInvoice extends PerformPanel implements ActionListener, Caret
 		add(btn_search);
 		
 		JScrollPane scrlPane_inventory = new JScrollPane();
-		scrlPane_inventory.setBounds(10, 123, 316, 336);
+		scrlPane_inventory.setBounds(10, 123, 330, 330);
 		add(scrlPane_inventory);
 		
 		tbl_inventory = new JTable();
@@ -115,15 +115,15 @@ public class CreateInvoice extends PerformPanel implements ActionListener, Caret
 		scrlPane_inventory.setViewportView(tbl_inventory);
 		
 		btn_add = new JButton("Add");
-		btn_add.setBounds(336, 244, 73, 23);
+		btn_add.setBounds(350, 244, 73, 23);
 		add(btn_add);
 		
 		btn_remove = new JButton("Remove");
-		btn_remove.setBounds(336, 278, 73, 23);
+		btn_remove.setBounds(350, 278, 73, 23);
 		add(btn_remove);
 		
 		JScrollPane scrlPane_invoiceItem = new JScrollPane();
-		scrlPane_invoiceItem.setBounds(419, 123, 371, 336);
+		scrlPane_invoiceItem.setBounds(433, 123, 330, 330);
 		add(scrlPane_invoiceItem);
 		
 		tbl_invoiceItem = new JTable();
@@ -135,11 +135,11 @@ public class CreateInvoice extends PerformPanel implements ActionListener, Caret
 		scrlPane_invoiceItem.setViewportView(tbl_invoiceItem);
 		
 		btn_create = new JButton("Create");
-		btn_create.setBounds(536, 10, 122, 32);
+		btn_create.setBounds(509, 10, 122, 32);
 		add(btn_create);
 		
 		btn_cancel = new JButton("Cancel");
-		btn_cancel.setBounds(668, 10, 122, 32);
+		btn_cancel.setBounds(641, 10, 122, 32);
 		add(btn_cancel);
 		
 		reset();

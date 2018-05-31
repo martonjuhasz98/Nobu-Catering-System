@@ -61,20 +61,20 @@ public class CheckInventory extends JPanel
 		model = new StocktakingTableModel();
 
 		txt_search = new JTextField();
-		txt_search.setBounds(10, 4, 179, 20);
+		txt_search.setBounds(10, 12, 142, 20);
 		txt_search.setColumns(10);
 		add(txt_search);
 
 		btn_search = new JButton("Search");
-		btn_search.setBounds(199, 4, 73, 20);
+		btn_search.setBounds(160, 11, 75, 20);
 		add(btn_search);
 
 		btn_confirm = new JButton("Confirm");
-		btn_confirm.setBounds(718, 3, 73, 23);
+		btn_confirm.setBounds(688, 11, 75, 23);
 		add(btn_confirm);
 
 		JScrollPane scrlPane_inventory = new JScrollPane();
-		scrlPane_inventory.setBounds(10, 28, 300, 461);
+		scrlPane_inventory.setBounds(10, 42, 330, 440);
 		add(scrlPane_inventory);
 
 		tbl_inventory = new JTable();
@@ -85,15 +85,15 @@ public class CheckInventory extends JPanel
 		scrlPane_inventory.setViewportView(tbl_inventory);
 
 		btn_add = new JButton("Add");
-		btn_add.setBounds(320, 236, 73, 23);
+		btn_add.setBounds(350, 236, 73, 23);
 		add(btn_add);
 
 		btn_remove = new JButton("Remove");
-		btn_remove.setBounds(320, 270, 73, 23);
+		btn_remove.setBounds(350, 270, 73, 23);
 		add(btn_remove);
 
 		JScrollPane scrlPane_stocktaking = new JScrollPane();
-		scrlPane_stocktaking.setBounds(400, 28, 391, 461);
+		scrlPane_stocktaking.setBounds(433, 42, 330, 440);
 		add(scrlPane_stocktaking);
 
 		tbl_stocktaking = new JTable();

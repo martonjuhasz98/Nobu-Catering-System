@@ -52,25 +52,25 @@ public class ListMenuItems extends JPanel implements ActionListener, MouseListen
 
 	private void initialize() {
 		setLayout(null);
-		setBounds(0, 0, ManagerWindow.contentWidth, ManagerWindow.totalHeight - 30);
+		setBounds(0, 0, 800, 487);
 
 		model = new MenuItemTableModel();
 
 		txt_search = new JTextField();
-		txt_search.setBounds(10, 11, 142, 20);
+		txt_search.setBounds(10, 4, 179, 20);
 		txt_search.setColumns(10);
 		add(txt_search);
 
 		btn_search = new JButton("Search");
-		btn_search.setBounds(162, 10, 65, 23);
+		btn_search.setBounds(199, 4, 73, 20);
 		add(btn_search);
 
 		btn_create = new JButton("Create");
-		btn_create.setBounds(725, 10, 65, 23);
+		btn_create.setBounds(707, 3, 73, 23);
 		add(btn_create);
 
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(10, 42, 780, 417);
+		scrollPane.setBounds(10, 28, 770, 450);
 		add(scrollPane);
 
 		table = new JTable();

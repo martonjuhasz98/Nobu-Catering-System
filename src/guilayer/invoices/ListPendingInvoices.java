@@ -65,20 +65,20 @@ public class ListPendingInvoices extends JPanel
 		model = new InvoiceTableModel();
 
 		txt_search = new JTextField();
-		txt_search.setBounds(10, 11, 142, 20);
+		txt_search.setBounds(10, 12, 142, 20);
 		txt_search.setColumns(10);
 		add(txt_search);
 
 		btn_search = new JButton("Search");
-		btn_search.setBounds(162, 10, 65, 23);
+		btn_search.setBounds(160, 11, 73, 23);
 		add(btn_search);
 
 		btn_create = new JButton("Create");
-		btn_create.setBounds(725, 10, 65, 23);
+		btn_create.setBounds(697, 11, 73, 23);
 		add(btn_create);
 
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(10, 42, 780, 417);
+		scrollPane.setBounds(10, 42, 760, 400);
 		add(scrollPane);
 
 		table = new JTable();
