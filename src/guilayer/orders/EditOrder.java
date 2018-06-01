@@ -68,8 +68,8 @@ public class EditOrder extends PerformPanel implements ActionListener, CaretList
 	private boolean reseting;
 	
 	public EditOrder() {
-		orderCtrl = new OrderController();
 		itemCtrl = new MenuItemController();
+		orderCtrl = new OrderController();
 		order = null;
 		isCreating = true;
 		lastKeyword = "";
