@@ -123,7 +123,6 @@ public class EditOrder extends PerformPanel implements ActionListener, CaretList
 		tbl_menu.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		tbl_menu.getTableHeader().setReorderingAllowed(false);
 		tbl_menu.setAutoCreateRowSorter(true);
-		mdl_menu.setItems(itemCtrl.getMenuItems());
 		tbl_menu.setModel(mdl_menu);
 		scrlPane_menu.setViewportView(tbl_menu);
 		
@@ -181,7 +180,6 @@ public class EditOrder extends PerformPanel implements ActionListener, CaretList
 		tbl_order.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		tbl_order.getTableHeader().setReorderingAllowed(false);
 		tbl_order.setAutoCreateRowSorter(true);
-		mdl_order.setItems(new ArrayList<OrderMenuItem>());
 		tbl_order.setModel(mdl_order);
 		scrlPane_order.setViewportView(tbl_order);
 		
@@ -192,8 +190,6 @@ public class EditOrder extends PerformPanel implements ActionListener, CaretList
 		btn_back = new JButton("Back");
 		btn_back.setBounds(668, 427, 122, 32);
 		add(btn_back);
-		
-		reset();
 		
 		AbstractAction add = new AbstractAction() {
 			public void actionPerformed(ActionEvent e) {

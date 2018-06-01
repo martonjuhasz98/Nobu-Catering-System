@@ -37,6 +37,7 @@ public class WaiterWindow extends JFrame {
 
 	private void initialize() {
 		
+		setVisible(false);
 		setBounds(100, 100, totalWidth + 4, totalHeight + 28);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setTitle("Nobu order system");
@@ -86,7 +87,5 @@ public class WaiterWindow extends JFrame {
 				}
 			}
 		});
-		
-		setVisible(true);
 	}
 }

@@ -39,7 +39,7 @@ public class CheckInventory extends JPanel
 	private JButton btn_add;
 	private JButton btn_remove;
 	private JTable tbl_stocktaking;
-	private StocktakingTableModel model;
+	private StocktakingTableModel mdl_stocktaking;
 	private JButton btn_confirm;
 	private boolean isSearching;
 	private String lastKeyword;
@@ -58,7 +58,7 @@ public class CheckInventory extends JPanel
 		setBounds(0, 0, ManagerWindow.contentWidth, ManagerWindow.totalHeight);
 
 		mdl_inventory = new InventoryTableModel();
-		model = new StocktakingTableModel();
+		mdl_stocktaking = new StocktakingTableModel();
 
 		txt_search = new JTextField();
 		txt_search.setBounds(10, 12, 142, 20);
@@ -100,7 +100,7 @@ public class CheckInventory extends JPanel
 		tbl_stocktaking.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		tbl_stocktaking.getTableHeader().setReorderingAllowed(false);
 		tbl_stocktaking.setAutoCreateRowSorter(true);
-		tbl_stocktaking.setModel(model);
+		tbl_stocktaking.setModel(mdl_stocktaking);
 		scrlPane_stocktaking.setViewportView(tbl_stocktaking);
 
 		txt_search.addCaretListener(this);
@@ -110,14 +110,14 @@ public class CheckInventory extends JPanel
 		tbl_stocktaking.getSelectionModel().addListSelectionListener(this);
 		btn_add.addActionListener(this);
 		btn_remove.addActionListener(this);
-		model.addTableModelListener(this);
+		mdl_stocktaking.addTableModelListener(this);
 
 		reset();
 	}
 
 	private void reset() {
 		mdl_inventory.setItems(itemCtrl.getItems());
-		model.setItems(new ArrayList<Item>());
+		mdl_stocktaking.setItems(new ArrayList<Item>());
 
 		btn_add.setEnabled(false);
 		btn_remove.setEnabled(false);
@@ -143,7 +143,7 @@ public class CheckInventory extends JPanel
 
 		for (int i = 0; i < selection.length; i++) {
 			selection[i] = tbl_inventory.convertRowIndexToModel(selection[i]);
-			model.addItem(mdl_inventory.getItem(selection[i]));
+			mdl_stocktaking.addItem(mdl_inventory.getItem(selection[i]));
 		}
 	}
 
@@ -152,7 +152,7 @@ public class CheckInventory extends JPanel
 
 		for (int i = 0; i < selection.length; i++) {
 			selection[i] = tbl_stocktaking.convertRowIndexToModel(selection[i]);
-			model.removeItem(model.getItem(selection[i]));
+			mdl_stocktaking.removeItem(mdl_stocktaking.getItem(selection[i]));
 		}
 	}
 
@@ -163,7 +163,7 @@ public class CheckInventory extends JPanel
 		}
 
 
-		if (!itemCtrl.createStocktaking(model.getItems())) {
+		if (!itemCtrl.createStocktaking(mdl_stocktaking.getItems())) {
 			JOptionPane.showMessageDialog(this, "An error occured while creating the Stock-taking!", "Error!",
 					JOptionPane.ERROR_MESSAGE);
 			return;
@@ -195,8 +195,8 @@ public class CheckInventory extends JPanel
 
 	@Override
 	public void tableChanged(TableModelEvent e) {
-		if (e.getSource() == model) {
-			boolean empty = model.getItems().isEmpty();
+		if (e.getSource() == mdl_stocktaking) {
+			boolean empty = mdl_stocktaking.getItems().isEmpty();
 			btn_confirm.setEnabled(!empty);
 		}
 	}
@@ -256,7 +256,7 @@ public class CheckInventory extends JPanel
 		public void setValueAt(Object value, int rowIndex, int columnIndex) {
 			try {
 				double quantity = (double) value;
-				super.items.get(rowIndex).setQuantity(quantity);
+				getItem(rowIndex).setQuantity(quantity);
 			} catch (Exception e) {
 			}
 		}

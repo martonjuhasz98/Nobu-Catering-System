@@ -345,7 +345,7 @@ public class DBInvoice implements IFDBInvoice {
 			//Transaction
 			Transaction transaction = new Transaction();
 			transaction.setId(results.getInt("transactionId"));
-			transaction.setAmount(results.getDouble("transactionAmount"));
+			transaction.setAmount(results.getDouble("transactionAmount") * -1);
 			transaction.setType(TransactionType.getType(results.getInt("transactionTypeId")));
 			transaction.setTimestamp(results.getDate("transactionTimestamp"));
 			

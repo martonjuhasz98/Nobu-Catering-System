@@ -56,7 +56,7 @@ public class DBTransaction implements IFDBTransaction {
 		try {
 			PreparedStatement ps = con.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
 			ps.setQueryTimeout(5);
-			ps.setDouble(1, transaction.getAmount());
+			ps.setDouble(1, transaction.getAmount() * -1);
 			ps.setInt(2, transaction.getType().getId());
 			
 			if (ps.executeUpdate() > 0) {
@@ -87,7 +87,7 @@ public class DBTransaction implements IFDBTransaction {
 
 			transaction = new Transaction();
 			transaction.setId(results.getInt("id"));
-			transaction.setAmount(results.getDouble("amount"));
+			transaction.setAmount(results.getDouble("amount") * -1);
 			transaction.setType(TransactionType.getType(results.getInt("transaction_type")));
 			transaction.setTimestamp(results.getDate("timestamp"));
 		}
