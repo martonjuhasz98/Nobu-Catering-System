@@ -75,13 +75,13 @@ public class OrderController {
 		
 		return success;
 	}
-	public boolean addOrderMenuItem(OrderMenuItem item) {
-		boolean success = dbItem.insertOrderMenuItem(item);
+	public boolean addOrderMenuItem(OrderMenuItem item, boolean force) {
+		boolean success = dbItem.insertOrderMenuItem(item, force);
 		
 		return success;
 	}
-	public boolean editOrderMenuItem(OrderMenuItem item) {
-		boolean success = dbItem.updateOrderMenuItem(item);
+	public boolean editOrderMenuItem(OrderMenuItem item, boolean force) {
+		boolean success = dbItem.updateOrderMenuItem(item, force);
 		
 		return success;
 	}

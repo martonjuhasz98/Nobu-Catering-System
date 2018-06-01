@@ -153,11 +153,17 @@ public class DBOrderMenuItem implements IFDBOrderMenuItem {
 	}
 	
 	@Override
-	public boolean insertOrderMenuItem(OrderMenuItem item) {
+	public boolean insertOrderMenuItem(OrderMenuItem item, boolean force) {
 		boolean success = false;
 		String query = "";
 		
 		try {
+			dbCon.startTransaction();
+			
+			if (!force && !canCreateOrderMenuItem(item)) {
+				throw new SQLException("There are not enough ingredients for this Order Menu Item!");
+			}
+			
 			query = "INSERT INTO [Order_Menu_Item] "
 					+ "(menu_item_id, order_id, quantity) "
 					+ "VALUES (?, ?, ?)";
@@ -169,40 +175,61 @@ public class DBOrderMenuItem implements IFDBOrderMenuItem {
 			
 			success = ps.executeUpdate() > 0;
 			ps.close();
+			
+			dbCon.commitTransaction();
 		}
 		catch (SQLException e) {
 			System.out.println("OrderMenuItem was not inserted!");
 			System.out.println(e.getMessage());
 			System.out.println(query);
+			
+			dbCon.rollbackTransaction();
+			success = false;
 		}
 		
 		return success;
 	}
 	
 	@Override
-	public boolean updateOrderMenuItem(OrderMenuItem orderMenuItem) {
+	public boolean updateOrderMenuItem(OrderMenuItem item, boolean force) {
 		boolean success = false;
+		String query = "";
 		
-		String query =
-				"UPDATE [Order_Menu_Item] "
-			  + "SET quantity = ? "
-			  + "WHERE order_id = ? "
-			  + "AND menu_item_id = ?";
 		try {
+			dbCon.startTransaction();
 			
+			OrderMenuItem prevItem = selectOrderMenuItem(item.getOrder().getId(), item.getMenuItem().getId());
+			int diffQuantity = prevItem.getQuantity() - item.getQuantity();
+			if (!force && diffQuantity > 0) {
+				prevItem.setQuantity(diffQuantity);
+				if (!canCreateOrderMenuItem(prevItem)) {
+					throw new SQLException("There are not enough ingredients for this Order Menu Item!");
+				}
+			}
+			
+			query =
+					"UPDATE [Order_Menu_Item] "
+				  + "SET quantity = ? "
+				  + "WHERE order_id = ? "
+				  + "AND menu_item_id = ?";
 			PreparedStatement ps = con.prepareStatement(query);
 			ps.setQueryTimeout(5);
-			ps.setInt(1, orderMenuItem.getQuantity());
-			ps.setInt(2, orderMenuItem.getOrder().getId());
-			ps.setInt(3, orderMenuItem.getMenuItem().getId());
+			ps.setInt(1, item.getQuantity());
+			ps.setInt(2, item.getOrder().getId());
+			ps.setInt(3, item.getMenuItem().getId());
 			
 			success = ps.executeUpdate() > 0;
 			ps.close();
+			
+			dbCon.commitTransaction();
 		}
 		catch (SQLException e) {
 			System.out.println("Item was not updated!");
 			System.out.println(e.getMessage());
 			System.out.println(query);
+			
+			dbCon.rollbackTransaction();
+			success = false;
 		}
 		
 		return success;

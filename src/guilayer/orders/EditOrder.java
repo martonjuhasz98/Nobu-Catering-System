@@ -203,7 +203,7 @@ public class EditOrder extends PerformPanel implements ActionListener, CaretList
 				if (orderCtrl.hasOrderMenuItem(orderItem)) {
 					return;
 				}
-				
+				boolean forced = false;
 				if (!orderCtrl.canAddOrderMenuItem(orderItem)) {
 					if (JOptionPane.showConfirmDialog(EditOrder.this, 
 							"There are not enough ingredients for this Menu item in the inventory!\nDo you still want to add it to the Order?", 
@@ -211,9 +211,10 @@ public class EditOrder extends PerformPanel implements ActionListener, CaretList
 							!= JOptionPane.YES_OPTION) {
 						return;
 					}
+					forced = true;
 				}
 				
-				if (!orderCtrl.addOrderMenuItem(orderItem)) {
+				if (!orderCtrl.addOrderMenuItem(orderItem, forced)) {
 					JOptionPane.showMessageDialog(EditOrder.this,
 						    "The Menu item was not added!",
 						    "Error!",
@@ -297,7 +298,6 @@ public class EditOrder extends PerformPanel implements ActionListener, CaretList
 	}
 	private void close() {
 		setVisible(false);
-		reset();
 	}
 	private void createOrder() {
 		order = new Order();
@@ -474,6 +474,7 @@ public class EditOrder extends PerformPanel implements ActionListener, CaretList
 				int quantity = (int)value;
 				if (quantity <= 0) return;
 				
+				boolean forced = false;
 				if (quantity > prevQuantity) {
 					item.setQuantity(quantity - prevQuantity);
 					if (!orderCtrl.canAddOrderMenuItem(item)) {
@@ -484,11 +485,12 @@ public class EditOrder extends PerformPanel implements ActionListener, CaretList
 							item.setQuantity(prevQuantity);
 							return;
 						}
+						forced = true;
 					}
 				}
 				item.setQuantity(quantity);
 					
-				if (!orderCtrl.editOrderMenuItem(item)) {
+				if (!orderCtrl.editOrderMenuItem(item, forced)) {
 					JOptionPane.showMessageDialog(EditOrder.this,
 						    "The Menu item was not updated!",
 						    "Error!",
