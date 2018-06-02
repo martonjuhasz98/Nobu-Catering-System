@@ -89,30 +89,34 @@ public class LoginWindow extends JFrame {
 		btn_login = new JButton("Log in");
 		btn_login.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				btn_login.setEnabled(false);
-				btn_login.setText("Logging in...");
-				
-				if (SessionSingleton.getInstance().logIn(txt_username.getText().trim(),
-						new String(txt_password.getPassword()))) {
-					if (window != null) {
-						window.setVisible(true);
-						setVisible(false);
-						dispose();
-					} else {
-						loggedIn = true;
-					}
-				} else {
-					btn_login.setEnabled(true);
-					btn_login.setText("Log in");
-					JOptionPane.showMessageDialog(LoginWindow.this,
-						    "Incorrect username or password.",
-						    "Login failed",
-						    JOptionPane.ERROR_MESSAGE);
-				}
+				login();
 			}
 		});
 		btn_login.setBounds(0, 205, 300, 45);
 		center.add(btn_login);
+	}
+	
+	private void login() {
+		btn_login.setEnabled(false);
+		btn_login.setText("Logging in...");
+		
+		if (SessionSingleton.getInstance().logIn(txt_username.getText().trim(),
+				new String(txt_password.getPassword()))) {
+			if (window != null) {
+				window.setVisible(true);
+				setVisible(false);
+				dispose();
+			} else {
+				loggedIn = true;
+			}
+		} else {
+			btn_login.setEnabled(true);
+			btn_login.setText("Log in");
+			JOptionPane.showMessageDialog(LoginWindow.this,
+				    "Incorrect username or password.",
+				    "Login failed",
+				    JOptionPane.ERROR_MESSAGE);
+		}
 	}
 
 	public class LoadWorker extends SwingWorker<Boolean, Void> {
