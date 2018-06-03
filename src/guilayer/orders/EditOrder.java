@@ -200,29 +200,7 @@ public class EditOrder extends PerformPanel implements ActionListener, CaretList
 				orderItem.setOrder(order);
 				orderItem.setQuantity(1);
 				
-				if (orderCtrl.hasOrderMenuItem(orderItem)) {
-					return;
-				}
-				boolean forced = false;
-				if (!orderCtrl.canAddOrderMenuItem(orderItem)) {
-					if (JOptionPane.showConfirmDialog(EditOrder.this, 
-							"There are not enough ingredients for this Menu item in the inventory!\nDo you still want to add it to the Order?", 
-							"Add Menu item", JOptionPane.YES_NO_OPTION)
-							!= JOptionPane.YES_OPTION) {
-						return;
-					}
-					forced = true;
-				}
-				
-				if (!orderCtrl.addOrderMenuItem(orderItem, forced)) {
-					JOptionPane.showMessageDialog(EditOrder.this,
-						    "The Menu item was not added!",
-						    "Error!",
-						    JOptionPane.ERROR_MESSAGE);
-					return;
-				}
-				
-				mdl_order.addItem(orderItem);
+				addOrderMenuItem(orderItem);
 			}
 		};
 		AbstractAction remove = new AbstractAction() {
@@ -230,15 +208,7 @@ public class EditOrder extends PerformPanel implements ActionListener, CaretList
 				int modelRowIndex = Integer.valueOf(e.getActionCommand());
 				OrderMenuItem orderItem = mdl_order.getItem(modelRowIndex);
 				
-				if (!orderCtrl.removeOrderMenuItem(orderItem)) {
-					JOptionPane.showMessageDialog(EditOrder.this,
-						    "The Menu item was not removed!",
-						    "Error!",
-						    JOptionPane.ERROR_MESSAGE);
-					return;
-				}
-				
-				mdl_order.removeItem(orderItem);
+				removeOrderMenuItem(orderItem);
 			}
 		};
 
@@ -348,6 +318,42 @@ public class EditOrder extends PerformPanel implements ActionListener, CaretList
 		lastKeyword = keyword;
 		
 		new SearchWorker(keyword).execute();
+	}
+	private void addOrderMenuItem(OrderMenuItem orderItem) {
+		if (orderCtrl.hasOrderMenuItem(orderItem)) {
+			return;
+		}
+		boolean forced = false;
+		if (!orderCtrl.canAddOrderMenuItem(orderItem)) {
+			if (JOptionPane.showConfirmDialog(this, 
+					"There are not enough ingredients for this Menu item in the inventory!\nDo you still want to add it to the Order?", 
+					"Add Menu item", JOptionPane.YES_NO_OPTION)
+					!= JOptionPane.YES_OPTION) {
+				return;
+			}
+			forced = true;
+		}
+		
+		if (!orderCtrl.addOrderMenuItem(orderItem, forced)) {
+			JOptionPane.showMessageDialog(this,
+				    "The Menu item was not added!",
+				    "Error!",
+				    JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		
+		mdl_order.addItem(orderItem);
+	}
+	private void removeOrderMenuItem(OrderMenuItem orderItem) {
+		if (!orderCtrl.removeOrderMenuItem(orderItem)) {
+			JOptionPane.showMessageDialog(this,
+				    "The Menu item was not removed!",
+				    "Error!",
+				    JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		
+		mdl_order.removeItem(orderItem);
 	}
 	private void updatePrices() {
 		double subtotal = 0, tax = 0, total = 0;
