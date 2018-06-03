@@ -8,9 +8,9 @@ import javax.swing.JTable;
 
 import ctrllayer.ItemController;
 import guilayer.ManagerWindow;
-import guilayer.interfaces.ButtonColumn;
-import guilayer.interfaces.ItemTableModel;
-import guilayer.interfaces.PerformListener;
+import guilayer.essentials.ButtonColumn;
+import guilayer.essentials.ItemTableModel;
+import guilayer.essentials.PerformListener;
 import guilayer.inventory.ListInventory;
 import guilayer.invoices.ListInvoiceHistory.SearchWorker;
 import modlayer.Invoice;

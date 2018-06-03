@@ -9,7 +9,7 @@ import javax.swing.JTextField;
 
 import ctrllayer.SupplierController;
 import guilayer.ManagerWindow;
-import guilayer.interfaces.PerformPanel;
+import guilayer.essentials.PerformPanel;
 import modlayer.City;
 import modlayer.Supplier;
 

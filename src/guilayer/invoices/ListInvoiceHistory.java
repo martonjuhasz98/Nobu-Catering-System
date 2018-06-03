@@ -15,8 +15,8 @@ import javax.swing.JTable;
 
 import ctrllayer.InvoiceController;
 import guilayer.ManagerWindow;
-import guilayer.interfaces.ItemTableModel;
-import guilayer.interfaces.PerformListener;
+import guilayer.essentials.ItemTableModel;
+import guilayer.essentials.PerformListener;
 import modlayer.Invoice;
 import javax.swing.JTextField;
 import javax.swing.SwingWorker;

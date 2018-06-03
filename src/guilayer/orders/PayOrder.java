@@ -8,8 +8,8 @@ import javax.swing.JTable;
 
 import ctrllayer.OrderController;
 import guilayer.ManagerWindow;
-import guilayer.interfaces.ItemTableModel;
-import guilayer.interfaces.PerformPanel;
+import guilayer.essentials.ItemTableModel;
+import guilayer.essentials.PerformPanel;
 import modlayer.Order;
 import modlayer.OrderMenuItem;
 import modlayer.TransactionType;

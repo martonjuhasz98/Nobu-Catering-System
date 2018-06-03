@@ -4,9 +4,9 @@ import javax.swing.JPanel;
 
 import ctrllayer.InvoiceController;
 import guilayer.ManagerWindow;
-import guilayer.interfaces.ButtonColumn;
-import guilayer.interfaces.ItemTableModel;
-import guilayer.interfaces.PerformListener;
+import guilayer.essentials.ButtonColumn;
+import guilayer.essentials.ItemTableModel;
+import guilayer.essentials.PerformListener;
 import guilayer.invoices.ListInvoiceHistory.SearchWorker;
 import modlayer.Invoice;
 

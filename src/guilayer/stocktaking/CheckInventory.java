@@ -9,7 +9,7 @@ import javax.swing.JTable;
 import ctrllayer.ItemController;
 import ctrllayer.SessionSingleton;
 import guilayer.ManagerWindow;
-import guilayer.interfaces.ItemTableModel;
+import guilayer.essentials.ItemTableModel;
 import modlayer.Employee;
 import modlayer.Item;
 

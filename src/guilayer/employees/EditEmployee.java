@@ -11,7 +11,7 @@ import javax.swing.SpinnerNumberModel;
 
 import ctrllayer.EmployeeController;
 import guilayer.ManagerWindow;
-import guilayer.interfaces.PerformPanel;
+import guilayer.essentials.PerformPanel;
 import modlayer.City;
 import modlayer.Employee;
 

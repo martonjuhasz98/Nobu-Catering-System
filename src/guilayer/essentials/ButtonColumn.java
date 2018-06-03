@@ -1,4 +1,4 @@
-package guilayer.interfaces;
+package guilayer.essentials;
 
 import java.awt.*;
 import java.awt.event.*;

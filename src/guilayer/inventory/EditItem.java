@@ -13,7 +13,7 @@ import javax.swing.JTextField;
 import ctrllayer.ItemController;
 import guilayer.ManagerWindow;
 import guilayer.employees.ListEmployees;
-import guilayer.interfaces.PerformPanel;
+import guilayer.essentials.PerformPanel;
 import modlayer.Item;
 import modlayer.ItemCategory;
 import modlayer.Unit;

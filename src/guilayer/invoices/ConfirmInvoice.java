@@ -7,8 +7,8 @@ import javax.swing.JTable;
 
 import ctrllayer.InvoiceController;
 import guilayer.ManagerWindow;
-import guilayer.interfaces.ItemTableModel;
-import guilayer.interfaces.PerformPanel;
+import guilayer.essentials.ItemTableModel;
+import guilayer.essentials.PerformPanel;
 import modlayer.Invoice;
 import modlayer.InvoiceItem;
 import modlayer.Item;

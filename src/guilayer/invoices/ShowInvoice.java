@@ -6,8 +6,8 @@ import java.awt.Label;
 import javax.swing.JTextField;
 
 import guilayer.ManagerWindow;
-import guilayer.interfaces.ItemTableModel;
-import guilayer.interfaces.PerformPanel;
+import guilayer.essentials.ItemTableModel;
+import guilayer.essentials.PerformPanel;
 import modlayer.Invoice;
 import modlayer.InvoiceItem;
 

@@ -5,9 +5,9 @@ import javax.swing.JPanel;
 import ctrllayer.OrderController;
 import guilayer.ManagerWindow;
 import guilayer.WaiterWindow;
-import guilayer.interfaces.ButtonColumn;
-import guilayer.interfaces.ItemTableModel;
-import guilayer.interfaces.PerformListener;
+import guilayer.essentials.ButtonColumn;
+import guilayer.essentials.ItemTableModel;
+import guilayer.essentials.PerformListener;
 import modlayer.Order;
 
 import javax.swing.JTextField;
