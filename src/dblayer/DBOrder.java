@@ -232,7 +232,7 @@ public class DBOrder implements IFDBOrder {
 			PreparedStatement ps;
 			
 			//Order
-			query = "DELETE FROM [Order] WHERE id = ? AND transaction_id IS NULL";
+			query = "DELETE FROM [Order] WHERE id = ?";
 			ps = con.prepareStatement(query);
 			ps.setQueryTimeout(5);
 			ps.setInt(1, order.getId());
