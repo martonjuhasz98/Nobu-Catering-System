@@ -22,6 +22,8 @@ import org.knowm.xchart.XChartPanel;
 
 import ctrllayer.AnalyticsController;
 import ctrllayer.ItemController;
+import guilayer.LoginWindow;
+
 import java.awt.BorderLayout;
 
 public class SalesGraph extends JPanel {
@@ -63,8 +65,7 @@ public class SalesGraph extends JPanel {
 		add(chartLayoutPanel);
 		chartLayoutPanel.setLayout(new BorderLayout(0, 0));
 
-		chart = new CategoryChartBuilder().width(778).height(42).xAxisTitle("Date")
-				.yAxisTitle("% wasted").build();
+		chart = new CategoryChartBuilder().width(778).height(42).xAxisTitle("Date").yAxisTitle("DKK").build();
 		DateFormat format = new SimpleDateFormat("yyyy-mm-dd", Locale.ENGLISH);
 		chart.getStyler().setLegendVisible(false);
 		chart.getStyler().setDatePattern("yyyy-MM-dd");
@@ -72,7 +73,7 @@ public class SalesGraph extends JPanel {
 		ArrayList<Double> yData = new ArrayList<>();
 		xData.add(new java.util.Date());
 		yData.add(0.00);
-		
+
 		chart.addSeries("a", xData, yData);
 		// chart.addSeries("b", new double[] { 0, 2, 4, 6, 9 }, new double[] { -1, 6, 4,
 		// 0, 4 });
@@ -91,15 +92,18 @@ public class SalesGraph extends JPanel {
 		add(fetch);
 
 	}
+
 	private void fetch() {
 		DateFormat format = new SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH);
 		try {
-			
 			String[][] data = ac.getSales(
-					new java.sql.Date(format.parse(fromDatePicker.getFormattedTextField().getText()).getTime()), 
+					new java.sql.Date(format.parse(fromDatePicker.getFormattedTextField().getText()).getTime()),
 					new java.sql.Date(format.parse(toDatePicker.getFormattedTextField().getText()).getTime()));
 
 			chart.removeSeries("a");
+			chart.removeSeries("Revenue");
+			chart.removeSeries("Costs");
+			chart.removeSeries("Profit");
 			chart.getStyler().setLegendVisible(true);
 
 			System.out.println(Arrays.deepToString(data));
@@ -129,7 +133,11 @@ public class SalesGraph extends JPanel {
 			// results.getString("revenue"),
 			// results.getString("costs"),
 			// results.getString("profit")
+		} catch (IndexOutOfBoundsException e) {
+			JOptionPane.showMessageDialog(this, "There are no records for the selected period", "No data found",
+					JOptionPane.PLAIN_MESSAGE);
 		} catch (Exception e1) {
+
 			e1.printStackTrace();
 		}
 	}
