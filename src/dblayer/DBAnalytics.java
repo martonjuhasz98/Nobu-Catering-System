@@ -49,7 +49,7 @@ public class DBAnalytics implements IFDBAnalytics {
 				  "       menu_item.NAME          AS NAME, \n" + 
 				  "       menu_item_category.NAME AS category, \n" + 
 				  "       menu_item.price         AS price, \n" + 
-				  "       CCAST(COALESCE(sold.sold, 0) AS INT)        AS sold \n" + 
+				  "       CAST(COALESCE(sold.sold, 0) AS INT)        AS sold \n" + 
 				  "FROM   menu_item \n" + 
 				  "       LEFT JOIN menu_item_category \n" + 
 				  "              ON menu_item.category_id = menu_item_category.id \n" + 
