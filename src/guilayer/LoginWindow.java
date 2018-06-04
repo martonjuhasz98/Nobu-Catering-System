@@ -94,6 +94,10 @@ public class LoginWindow extends JFrame {
 		});
 		btn_login.setBounds(0, 205, 300, 45);
 		center.add(btn_login);
+		
+		JLabel helpLbl = new JLabel("Use username: a and password: a to log in");
+		helpLbl.setBounds(694, 221, 300, 16);
+		panel.add(helpLbl);
 	}
 	
 	private void login() {
