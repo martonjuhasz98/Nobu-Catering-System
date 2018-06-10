@@ -2,15 +2,13 @@ package guilayer.stocktaking;
 
 import java.util.ArrayList;
 
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
 import ctrllayer.ItemController;
-import ctrllayer.SessionSingleton;
 import guilayer.ManagerWindow;
 import guilayer.essentials.ItemTableModel;
-import modlayer.Employee;
+import guilayer.essentials.NavigationPanel;
 import modlayer.Item;
 
 import javax.swing.ListSelectionModel;
@@ -28,7 +26,7 @@ import javax.swing.JTextField;
 import javax.swing.event.CaretListener;
 import javax.swing.event.CaretEvent;
 
-public class CheckInventory extends JPanel
+public class CheckInventory extends NavigationPanel
 		implements ActionListener, CaretListener, ListSelectionListener, TableModelListener {
 
 	private ItemController itemCtrl;
@@ -41,20 +39,19 @@ public class CheckInventory extends JPanel
 	private JTable tbl_stocktaking;
 	private StocktakingTableModel mdl_stocktaking;
 	private JButton btn_confirm;
-	private boolean isSearching;
+	private boolean fetchingData;
 	private String lastKeyword;
 
 	public CheckInventory() {
+		super();
+		
 		itemCtrl = new ItemController();
-		lastKeyword = "";
-		isSearching = false;
 
 		initialize();
 	}
-
+	//Layout
 	private void initialize() {
 
-		setLayout(null);
 		setBounds(0, 0, ManagerWindow.contentWidth, ManagerWindow.totalHeight);
 
 		mdl_inventory = new InventoryTableModel();
@@ -62,7 +59,6 @@ public class CheckInventory extends JPanel
 
 		txt_search = new JTextField();
 		txt_search.setBounds(10, 12, 142, 20);
-		txt_search.setColumns(10);
 		add(txt_search);
 
 		btn_search = new JButton("Search");
@@ -103,6 +99,8 @@ public class CheckInventory extends JPanel
 		tbl_stocktaking.setModel(mdl_stocktaking);
 		scrlPane_stocktaking.setViewportView(tbl_stocktaking);
 
+		reset();
+		
 		txt_search.addCaretListener(this);
 		btn_search.addActionListener(this);
 		btn_confirm.addActionListener(this);
@@ -111,51 +109,24 @@ public class CheckInventory extends JPanel
 		btn_add.addActionListener(this);
 		btn_remove.addActionListener(this);
 		mdl_stocktaking.addTableModelListener(this);
-
-		reset();
 	}
-
-	private void reset() {
-		mdl_inventory.setItems(itemCtrl.getItems());
+	@Override
+	public void prepare() {
+		new FetchWorker().execute();
+	}
+	@Override
+	public void reset() {
 		mdl_stocktaking.setItems(new ArrayList<Item>());
 
+		txt_search.setText("");
+		lastKeyword = "";
+		fetchingData = false;
+		
 		btn_add.setEnabled(false);
 		btn_remove.setEnabled(false);
 		btn_confirm.setEnabled(false);
 	}
-
-	private void search() {
-		if (isSearching)
-			return;
-		isSearching = true;
-		String keyword = txt_search.getText().trim();
-		if (lastKeyword.equals(keyword)) {
-			isSearching = false;
-			return;
-		}
-		lastKeyword = keyword;
-
-		new SearchWorker(keyword).execute();
-	}
-
-	private void addToStocktaking() {
-		int[] selection = tbl_inventory.getSelectedRows();
-
-		for (int i = 0; i < selection.length; i++) {
-			selection[i] = tbl_inventory.convertRowIndexToModel(selection[i]);
-			mdl_stocktaking.addItem(mdl_inventory.getItem(selection[i]));
-		}
-	}
-
-	private void removeFromStocktaking() {
-		int[] selection = tbl_stocktaking.getSelectedRows();
-
-		for (int i = 0; i < selection.length; i++) {
-			selection[i] = tbl_stocktaking.convertRowIndexToModel(selection[i]);
-			mdl_stocktaking.removeItem(mdl_stocktaking.getItem(selection[i]));
-		}
-	}
-
+	//Functionalities
 	private void createStocktaking() {
 		if (JOptionPane.showConfirmDialog(this, "Are you sure?", "Finalize stock-taking",
 				JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
@@ -173,14 +144,53 @@ public class CheckInventory extends JPanel
 				JOptionPane.INFORMATION_MESSAGE);
 		reset();
 	}
+	private void addToStocktaking() {
+		int[] selection = tbl_inventory.getSelectedRows();
 
+		for (int i = 0; i < selection.length; i++) {
+			selection[i] = tbl_inventory.convertRowIndexToModel(selection[i]);
+			mdl_stocktaking.addItem(mdl_inventory.getItem(selection[i]));
+		}
+	}
+	private void removeFromStocktaking() {
+		int[] selection = tbl_stocktaking.getSelectedRows();
+
+		for (int i = selection.length; i >= 0; i--) {
+			selection[i] = tbl_stocktaking.convertRowIndexToModel(selection[i]);
+			mdl_stocktaking.removeItem(mdl_stocktaking.getItem(selection[i]));
+		}
+	}
+	private void searchInventory() {
+		if (fetchingData) return;
+		
+		String keyword = txt_search.getText().trim();
+		if (lastKeyword.equals(keyword)) return;
+		
+		fetchingData = true;
+		lastKeyword = keyword;
+		
+		new FetchWorker(keyword).execute();
+	}
+	//EventListeners
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		final Object source = e.getSource();
+		if (source == btn_search) {
+			searchInventory();
+		} else if (source == btn_add) {
+			addToStocktaking();
+		} else if (source == btn_remove) {
+			removeFromStocktaking();
+		} else if (source == btn_confirm) {
+			createStocktaking();
+		}
+	}
 	@Override
 	public void caretUpdate(CaretEvent e) {
 		if (e.getSource() == txt_search) {
-			search();
+			searchInventory();
 		}
 	}
-
 	@Override
 	public void valueChanged(ListSelectionEvent e) {
 		ListSelectionModel source = (ListSelectionModel) e.getSource();
@@ -192,7 +202,6 @@ public class CheckInventory extends JPanel
 			btn_remove.setEnabled(!empty);
 		}
 	}
-
 	@Override
 	public void tableChanged(TableModelEvent e) {
 		if (e.getSource() == mdl_stocktaking) {
@@ -200,20 +209,7 @@ public class CheckInventory extends JPanel
 			btn_confirm.setEnabled(!empty);
 		}
 	}
-
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		if (e.getSource() == btn_search) {
-			search();
-		} else if (e.getSource() == btn_add) {
-			addToStocktaking();
-		} else if (e.getSource() == btn_remove) {
-			removeFromStocktaking();
-		} else if (e.getSource() == btn_confirm) {
-			createStocktaking();
-		}
-	}
-
+	//Classes
 	private class InventoryTableModel extends ItemTableModel<Item> {
 
 		public InventoryTableModel() {
@@ -240,7 +236,6 @@ public class CheckInventory extends JPanel
 			return null;
 		}
 	}
-
 	private class StocktakingTableModel extends InventoryTableModel {
 
 		public StocktakingTableModel() {
@@ -261,21 +256,24 @@ public class CheckInventory extends JPanel
 			}
 		}
 	}
-
-	public class SearchWorker extends SwingWorker<ArrayList<Item>, Void> {
+	private class FetchWorker extends SwingWorker<ArrayList<Item>, Void> {
+		
 		private String keyword;
 
-		public SearchWorker(String keyword) {
+		public FetchWorker() {
+			this("");
+		}
+		public FetchWorker(String keyword) {
 			super();
 			this.keyword = keyword;
 		}
 
 		@Override
 		protected ArrayList<Item> doInBackground() throws Exception {
-			// Start
-			return itemCtrl.searchItems(keyword);
+			return keyword.isEmpty()
+					? itemCtrl.getItems()
+					: itemCtrl.searchItems(keyword);
 		}
-
 		@Override
 		protected void done() {
 			try {
@@ -283,8 +281,9 @@ public class CheckInventory extends JPanel
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			isSearching = false;
-			search();
+			
+			fetchingData = false;
+			searchInventory();
 		}
 	}
 }

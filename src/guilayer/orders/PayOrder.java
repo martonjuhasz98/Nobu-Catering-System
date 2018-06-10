@@ -146,7 +146,12 @@ public class PayOrder extends PerformPanel implements ActionListener, ItemListen
 		
 		reset();
 	}
-	private void reset() {
+	@Override
+	public void prepare() {
+		
+	}
+	@Override
+	public void reset() {
 		model.setItems(new ArrayList<OrderMenuItem>());
 		cmb_payment.setSelectedIndex(-1);
 		txt_subtotal.setValue(new Double(0.0));
@@ -167,9 +172,6 @@ public class PayOrder extends PerformPanel implements ActionListener, ItemListen
 	private void cancel() {
 		triggerCancelListeners();
 		close();
-	}
-	private void close() {
-		setVisible(false);
 	}
 	private boolean isFilled() {
 		if (cmb_payment.getSelectedIndex() < 0)

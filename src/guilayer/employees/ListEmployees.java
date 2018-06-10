@@ -1,6 +1,5 @@
 package guilayer.employees;
 
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
@@ -8,10 +7,9 @@ import ctrllayer.EmployeeController;
 import guilayer.ManagerWindow;
 import guilayer.essentials.ButtonColumn;
 import guilayer.essentials.ItemTableModel;
+import guilayer.essentials.NavigationPanel;
 import guilayer.essentials.PerformListener;
-import guilayer.invoices.ListInvoiceHistory.SearchWorker;
 import modlayer.Employee;
-import modlayer.Invoice;
 
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingWorker;
@@ -25,11 +23,10 @@ import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextField;
-import javax.swing.AbstractAction;
 import javax.swing.event.CaretListener;
 import javax.swing.event.CaretEvent;
 
-public class ListEmployees extends JPanel implements ActionListener, MouseListener, PerformListener, CaretListener {
+public class ListEmployees extends NavigationPanel implements ActionListener, MouseListener, PerformListener, CaretListener {
 
 	private EditEmployee employeeEditor;
 	private EmployeeController employeeCtrl;
@@ -38,23 +35,26 @@ public class ListEmployees extends JPanel implements ActionListener, MouseListen
 	private JButton btn_search;
 	private JButton btn_create;
 	private JTextField txt_search;
-	private boolean isSearching;
+	private boolean fetchingData;
 	private String lastKeyword;
+	private ButtonColumn btn_delete;
 
 	public ListEmployees(EditEmployee editEmployee) {
+		super();
+		
 		this.employeeEditor = editEmployee;
+		
 		employeeCtrl = new EmployeeController();
 		lastKeyword = "";
-		isSearching = false;
+		fetchingData = false;
 
 		editEmployee.addPerformListener(this);
 
 		initialize();
 	}
-
+	//Layout
 	private void initialize() {
 
-		setLayout(null);
 		setBounds(0, 0, ManagerWindow.contentWidth, ManagerWindow.totalHeight);
 
 		model = new EmployeeTableModel();
@@ -62,7 +62,6 @@ public class ListEmployees extends JPanel implements ActionListener, MouseListen
 		txt_search = new JTextField();
 		txt_search.setBounds(10, 4, 179, 20);
 		add(txt_search);
-		txt_search.setColumns(10);
 
 		btn_search = new JButton("Search");
 		btn_search.setBounds(199, 4, 73, 20);
@@ -80,71 +79,88 @@ public class ListEmployees extends JPanel implements ActionListener, MouseListen
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		table.getTableHeader().setReorderingAllowed(false);
 		table.setAutoCreateRowSorter(true);
-		model.setItems(employeeCtrl.getEmployees());
 		table.setModel(model);
 		scrollPane.setViewportView(table);
 
-		AbstractAction delete = new AbstractAction() {
-			public void actionPerformed(ActionEvent e) {
-				if (JOptionPane.showConfirmDialog(ListEmployees.this, "Are you sure?", "Deleting employee",
-						JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
-					return;
-				}
+		btn_delete = new ButtonColumn(table, model.getColumnCount() - 1, this);
+		btn_delete.setMnemonic(KeyEvent.VK_DELETE);
 
-				int modelRowIndex = Integer.valueOf(e.getActionCommand());
-				Employee employee = model.getItem(modelRowIndex);
-
-				if (!employeeCtrl.deleteEmployee(employee)) {
-					JOptionPane.showMessageDialog(ListEmployees.this, "An error occured while deleting the Employee!",
-							"Error!", JOptionPane.ERROR_MESSAGE);
-					return;
-				}
-
-				JOptionPane.showMessageDialog(ListEmployees.this, "The Employee was successfully deleted!", "Success!",
-						JOptionPane.INFORMATION_MESSAGE);
-				reset();
-			}
-		};
-
-		ButtonColumn btnColumn = new ButtonColumn(table, delete, model.getColumnCount() - 1);
-		btnColumn.setMnemonic(KeyEvent.VK_D);
-
+		reset();
+		
 		txt_search.addCaretListener(this);
 		btn_search.addActionListener(this);
 		btn_create.addActionListener(this);
 		table.addMouseListener(this);
 	}
-
-	private void reset() {
-		model.setItems(employeeCtrl.getEmployees());
+	@Override
+	public void prepare() {
+		new FetchWorker().execute();
+	}
+	@Override
+	public void reset() {
 		txt_search.setText("");
+		lastKeyword = "";
+		fetchingData = false;
 	}
-
-	private void search() {
-		if (isSearching)
-			return;
-		isSearching = true;
-		String keyword = txt_search.getText().trim();
-		if (lastKeyword.equals(keyword)) {
-			isSearching = false;
-			return;
+	@Override
+	public void performed() {
+		new FetchWorker().execute();
+		setVisible(true);
+	}
+	@Override
+	public void cancelled() {
+		setVisible(true);
+	}
+	//Functionalities
+	private void deleteEmployee(Employee employee) {
+		String message, title;
+		int messageType;
+		
+		if (!employeeCtrl.deleteEmployee(employee)) {
+			message = "An error occured while deleting the Employee!";
+			title = "Error!";
+			messageType = JOptionPane.ERROR_MESSAGE;
+		} else {
+			message = "The Employee was successfully deleted!";
+			title = "Success!";
+			messageType = JOptionPane.INFORMATION_MESSAGE;
+			
+			new FetchWorker().execute();
 		}
-		lastKeyword = keyword;
-		// model.setItems(invoiceCtrl.searchInvoiceHistory(keyword));
-		new SearchWorker(keyword).execute();
+		
+		JOptionPane.showMessageDialog(this, message, title, messageType);
 	}
-
+	private void searchEmployees() {
+		if (fetchingData) return;
+		
+		String keyword = txt_search.getText().trim();
+		if (lastKeyword.equals(keyword)) return;
+		
+		fetchingData = true;
+		lastKeyword = keyword;
+		
+		new FetchWorker(keyword).execute();
+	}
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if (e.getSource() == btn_search) {
-			search();
-		}
-		if (e.getSource() == btn_create) {
+		final Object source = e.getSource();
+		if (source == btn_search) {
+			searchEmployees();
+		} else if (source == btn_delete) {
+			if (JOptionPane.showConfirmDialog(ListEmployees.this, "Are you sure?", "Deleting employee",
+					JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
+				return;
+			}
+
+			int modelRowIndex = Integer.valueOf(e.getActionCommand());
+			Employee employee = model.getItem(modelRowIndex);
+
+			deleteEmployee(employee);
+		} else if (source == btn_create) {
+			employeeEditor.openToCreate();
 			setVisible(false);
-			employeeEditor.create();
 		}
 	}
-
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		if (e.getClickCount() == 2 && e.getSource() == table) {
@@ -152,45 +168,25 @@ public class ListEmployees extends JPanel implements ActionListener, MouseListen
 			int modelRowIndex = table.convertRowIndexToModel(viewRowIndex);
 			Employee employee = model.getItem(modelRowIndex);
 
-			employeeEditor.update(employee);
+			employeeEditor.openToUpdate(employee);
 			setVisible(false);
 		}
 	}
-
 	@Override
 	public void caretUpdate(CaretEvent e) {
 		if (e.getSource() == txt_search) {
-			search();
+			searchEmployees();
 		}
 	}
-
 	@Override
-	public void performed() {
-		model.setItems(employeeCtrl.getEmployees());
-		setVisible(true);
-	}
-
+	public void mousePressed(MouseEvent e) {}
 	@Override
-	public void cancelled() {
-		setVisible(true);
-	}
-
+	public void mouseReleased(MouseEvent e) {}
 	@Override
-	public void mousePressed(MouseEvent e) {
-	}
-
+	public void mouseEntered(MouseEvent e) {}
 	@Override
-	public void mouseReleased(MouseEvent e) {
-	}
-
-	@Override
-	public void mouseEntered(MouseEvent e) {
-	}
-
-	@Override
-	public void mouseExited(MouseEvent e) {
-	}
-
+	public void mouseExited(MouseEvent e) {}
+	//Classes
 	private class EmployeeTableModel extends ItemTableModel<Employee> {
 
 		public EmployeeTableModel() {
@@ -229,27 +225,29 @@ public class ListEmployees extends JPanel implements ActionListener, MouseListen
 
 			return null;
 		}
-
 		@Override
 		public boolean isCellEditable(int rowIndex, int columnIndex) {
 			return columnIndex == getColumnCount() - 1;
 		}
 	}
-
-	public class SearchWorker extends SwingWorker<ArrayList<Employee>, Void> {
+	private class FetchWorker extends SwingWorker<ArrayList<Employee>, Void> {
+		
 		private String keyword;
 
-		public SearchWorker(String keyword) {
+		public FetchWorker() {
+			this("");
+		}
+		public FetchWorker(String keyword) {
 			super();
 			this.keyword = keyword;
 		}
 
 		@Override
 		protected ArrayList<Employee> doInBackground() throws Exception {
-			// Start
-			return employeeCtrl.searchEmployees(keyword);
+			return keyword.isEmpty()
+					? employeeCtrl.getEmployees()
+					: employeeCtrl.searchEmployees(keyword);
 		}
-
 		@Override
 		protected void done() {
 			try {
@@ -257,8 +255,9 @@ public class ListEmployees extends JPanel implements ActionListener, MouseListen
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			isSearching = false;
-			search();
+			
+			fetchingData = false;
+			searchEmployees();
 		}
 	}
 }

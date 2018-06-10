@@ -1,7 +1,6 @@
 package guilayer.employees;
 
 import java.awt.Font;
-import java.awt.Label;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -19,7 +18,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
-import java.awt.Color;
 import javax.swing.JPasswordField;
 import javax.swing.JSpinner;
 
@@ -30,8 +28,6 @@ public class EditEmployee extends PerformPanel implements ActionListener, CaretL
 	private boolean creatingEmployee;
 	private JTextField txtCpr;
 	private JTextField txtAddress;
-	private JButton btn_submit;
-	private JButton btn_cancel;
 	private JTextField txtUsername;
 	private JTextField txtZipCode;
 	private JTextField txtPhone;
@@ -42,11 +38,12 @@ public class EditEmployee extends PerformPanel implements ActionListener, CaretL
 	private JPasswordField passwordRepeatField;
 	private JLabel lblUpdateTooltip;
 	private JSpinner spinnerAccLvl;
-	private Label lbl_username;
-	private Label lbl_password;
-	private Label lbl_confirmPassword;
+	private JButton btn_submit;
+	private JButton btn_cancel;
 
 	public EditEmployee() {
+		super();
+		
 		employeeCtrl = new EmployeeController();
 		creatingEmployee = false;
 
@@ -55,130 +52,96 @@ public class EditEmployee extends PerformPanel implements ActionListener, CaretL
 
 	private void initialize() {
 
-		setLayout(null);
 		setVisible(false);
 		setBounds(0, 0, ManagerWindow.contentWidth, ManagerWindow.totalHeight);
 
-		Label lbl_Cpr = new Label("CPR *");
-		lbl_Cpr.setFont(new Font("Dialog", Font.PLAIN, 15));
+		JLabel lbl_Cpr = new JLabel("CPR *");
 		lbl_Cpr.setBounds(16, 10, 181, 22);
 		add(lbl_Cpr);
 
 		txtCpr = new JTextField();
-		txtCpr.setColumns(10);
 		txtCpr.setBounds(16, 38, 181, 26);
 		add(txtCpr);
 		
-				Label lbl_name = new Label("Name *");
-				lbl_name.setForeground(Color.BLACK);
-				lbl_name.setFont(new Font("Dialog", Font.PLAIN, 15));
-				lbl_name.setBounds(215, 10, 564, 22);
-				add(lbl_name);
+		JLabel lbl_name = new JLabel("Name *");
+		lbl_name.setBounds(215, 10, 564, 22);
+		add(lbl_name);
 
 		txtName = new JTextField();
 		txtName.setBounds(215, 38, 399, 26);
-		txtName.setColumns(10);
 		add(txtName);
 		
-		Label lbl_zipCode = new Label("Zipcode *");
-		lbl_zipCode.setForeground(Color.BLACK);
-		lbl_zipCode.setFont(new Font("Dialog", Font.PLAIN, 15));
+		JLabel lbl_zipCode = new JLabel("Zipcode *");
 		lbl_zipCode.setBounds(16, 75, 129, 22);
 		add(lbl_zipCode);
 
 		txtZipCode = new JTextField();
 		txtZipCode.setBounds(16, 103, 48, 26);
-		txtZipCode.setColumns(4);
 		add(txtZipCode);
 
 		txtCity = new JTextField();
 		txtCity.setEditable(false);
 		txtCity.setBounds(66, 103, 131, 26);
-		txtCity.setColumns(10);
 		add(txtCity);
 		
-		Label lbl_address = new Label("Address *");
-		lbl_address.setForeground(Color.BLACK);
-		lbl_address.setFont(new Font("Dialog", Font.PLAIN, 15));
+		JLabel lbl_address = new JLabel("Address *");
 		lbl_address.setBounds(215, 75, 129, 22);
 		add(lbl_address);
 		
-				txtAddress = new JTextField();
-				txtAddress.setColumns(10);
-				txtAddress.setBounds(215, 103, 399, 26);
-				add(txtAddress);
-				txtAddress.addCaretListener(this);
+		txtAddress = new JTextField();
+		txtAddress.setBounds(215, 103, 399, 26);
+		add(txtAddress);
 		
-		Label lbl_phone = new Label("Phone *");
-		lbl_phone.setForeground(Color.BLACK);
-		lbl_phone.setFont(new Font("Dialog", Font.PLAIN, 15));
+		JLabel lbl_phone = new JLabel("Phone *");
 		lbl_phone.setBounds(16, 140, 129, 22);
 		add(lbl_phone);
 
 		txtPhone = new JTextField();
 		txtPhone.setBounds(16, 168, 181, 26);
 		add(txtPhone);
-		txtPhone.setColumns(15);
 		
-		Label lbl_email = new Label("Email");
-		lbl_email.setForeground(Color.BLACK);
-		lbl_email.setFont(new Font("Dialog", Font.PLAIN, 15));
+		JLabel lbl_email = new JLabel("Email");
 		lbl_email.setBounds(215, 140, 129, 22);
 		add(lbl_email);
 
 		txtEmail = new JTextField();
 		txtEmail.setBounds(215, 168, 399, 26);
 		add(txtEmail);
-		txtEmail.setColumns(10);
 		
-		lbl_username = new Label("Username *");
-		lbl_username.setForeground(Color.BLACK);
-		lbl_username.setFont(new Font("Dialog", Font.PLAIN, 15));
+		JLabel lbl_username = new JLabel("Username *");
 		lbl_username.setBounds(16, 238, 129, 22);
 		add(lbl_username);
 		
-				txtUsername = new JTextField();
-				txtUsername.setText("");
-				txtUsername.setColumns(10);
-				txtUsername.setBounds(16, 265, 150, 26);
-				add(txtUsername);
-				txtUsername.addCaretListener(this);
-				txtUsername.addCaretListener(this);
+		txtUsername = new JTextField();
+		txtUsername.setBounds(16, 265, 150, 26);
+		add(txtUsername);
 		
-		lbl_password = new Label("Password *");
-		lbl_password.setForeground(Color.BLACK);
-		lbl_password.setFont(new Font("Dialog", Font.PLAIN, 15));
+		JLabel lbl_password = new JLabel("Password *");
 		lbl_password.setBounds(16, 297, 129, 22);
 		add(lbl_password);
 		
-				passwordField = new JPasswordField();
-				passwordField.setBounds(16, 320, 181, 26);
-				add(passwordField);
-				passwordField.addCaretListener(this);
+		passwordField = new JPasswordField();
+		passwordField.setBounds(16, 320, 181, 26);
+		add(passwordField);
 		
-		lbl_confirmPassword = new Label("Confirm password*");
-		lbl_confirmPassword.setForeground(Color.BLACK);
-		lbl_confirmPassword.setFont(new Font("Dialog", Font.PLAIN, 15));
+		JLabel lbl_confirmPassword = new JLabel("Confirm password*");
 		lbl_confirmPassword.setBounds(216, 293, 129, 22);
 		add(lbl_confirmPassword);
 		
-				passwordRepeatField = new JPasswordField();
-				passwordRepeatField.setBounds(216, 321, 209, 26);
-				add(passwordRepeatField);
-				passwordRepeatField.addCaretListener(this);
+		passwordRepeatField = new JPasswordField();
+		passwordRepeatField.setBounds(216, 321, 209, 26);
+		add(passwordRepeatField);
+
+		lblUpdateTooltip = new JLabel("*Leave empty for no changes");
+		lblUpdateTooltip.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
+		lblUpdateTooltip.setBounds(16, 348, 200, 16);
+		add(lblUpdateTooltip);
 		
-				lblUpdateTooltip = new JLabel("*Leave empty for no changes");
-				lblUpdateTooltip.setForeground(Color.GRAY);
-				lblUpdateTooltip.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
-				lblUpdateTooltip.setBounds(16, 348, 200, 16);
-				add(lblUpdateTooltip);
-		
-		SpinnerNumberModel spinnerModel = new SpinnerNumberModel(3, 0, 3, 1);
-		Label lbl_accessLevel = new Label("Access level *");
-		lbl_accessLevel.setForeground(Color.BLACK);
-		lbl_accessLevel.setFont(new Font("Dialog", Font.PLAIN, 15));
+		JLabel lbl_accessLevel = new JLabel("Access level *");
 		lbl_accessLevel.setBounds(17, 375, 129, 22);
 		add(lbl_accessLevel);
+		
+		SpinnerNumberModel spinnerModel = new SpinnerNumberModel(3, 0, 3, 1);
 		spinnerAccLvl = new JSpinner(spinnerModel);
 		spinnerAccLvl.setBounds(16, 403, 33, 26);
 		add(spinnerAccLvl);
@@ -186,13 +149,14 @@ public class EditEmployee extends PerformPanel implements ActionListener, CaretL
 		btn_submit = new JButton("Create");
 		btn_submit.setBounds(522, 444, 122, 32);
 		add(btn_submit);
-		btn_submit.addActionListener(this);
 
 		btn_cancel = new JButton("Cancel");
 		btn_cancel.setBounds(654, 444, 122, 32);
 		add(btn_cancel);
-		btn_cancel.addActionListener(this);
+
+		reset();
 		
+		txtAddress.addCaretListener(this);
 		txtCpr.addCaretListener(this);
 		txtName.addCaretListener(this);
 		txtZipCode.addCaretListener(this);
@@ -201,29 +165,13 @@ public class EditEmployee extends PerformPanel implements ActionListener, CaretL
 		txtUsername.addCaretListener(this);
 		passwordField.addCaretListener(this);
 		passwordRepeatField.addCaretListener(this);
-		reset();
+		btn_submit.addActionListener(this);
+		btn_cancel.addActionListener(this);
 	}
-
-	private void fill(Employee employee) {
-		this.employee = employee;
-
-		txtCpr.setText(employee.getCpr().trim());
-		txtCpr.setEnabled(false);
-		txtUsername.setText(employee.getUsername().trim());
-		txtName.setText(employee.getName().trim());
-		txtAddress.setText(employee.getAddress().trim());
-		txtZipCode.setText(employee.getCity().getZipCode().trim());
-		txtCity.setText(employee.getCity().getName().trim());
-		txtPhone.setText(employee.getPhone().trim());
-		txtEmail.setText(employee.getEmail().trim());
-		spinnerAccLvl.setValue(employee.getAccessLevel());
-
-		creatingEmployee = false;
-		lblUpdateTooltip.setVisible(true);
-		btn_submit.setText("Update");
-		btn_submit.setEnabled(true);
-	}
-	private void reset() {
+	@Override
+	public void prepare() {}
+	@Override
+	public void reset() {
 		employee = null;
 		creatingEmployee = true;
 
@@ -244,19 +192,73 @@ public class EditEmployee extends PerformPanel implements ActionListener, CaretL
 		btn_submit.setText("Create");
 		btn_submit.setEnabled(false);
 	}
-	public void create() {
+	public void openToCreate() {
 		open();
 	}
-	public void update(Employee employee) {
-		fill(employee);
+	public void openToUpdate(Employee employee) {
 		open();
+		
+		this.employee = employee;
+
+		txtCpr.setText(employee.getCpr().trim());
+		txtCpr.setEnabled(false);
+		txtUsername.setText(employee.getUsername().trim());
+		txtName.setText(employee.getName().trim());
+		txtAddress.setText(employee.getAddress().trim());
+		txtZipCode.setText(employee.getCity().getZipCode().trim());
+		txtCity.setText(employee.getCity().getName().trim());
+		txtPhone.setText(employee.getPhone().trim());
+		txtEmail.setText(employee.getEmail().trim());
+		spinnerAccLvl.setValue(employee.getAccessLevel());
+
+		creatingEmployee = false;
+		lblUpdateTooltip.setVisible(true);
+		btn_submit.setText("Update");
+		btn_submit.setEnabled(true);
 	}
-	private void open() {
-		setVisible(true);
+	//Functionalities
+	private void createEmployee(String cpr, String name, String username, String password, String address, City city,
+			String phone, String email, int accessLevel) {
+		String message, title;
+		int messageType;
+		
+		if (!employeeCtrl.createEmployee(cpr, name, username, password, address, city, phone, email, accessLevel)) {
+			message = "An error occured while creating the Employee!";
+			title = "Error!";
+			messageType = JOptionPane.ERROR_MESSAGE;
+		} else {
+			message = "The Employee was successfully created!";
+			title = "Success!";
+			messageType = JOptionPane.INFORMATION_MESSAGE;
+			
+			triggerPerformListeners();
+			close();
+		}
+		
+		JOptionPane.showMessageDialog(this, message, title, messageType);
 	}
-	private void close() {
-		setVisible(false);
-		reset();
+	private void updateEmployee(Employee employee) {
+		String message, title;
+		int messageType;
+		
+		if (!employeeCtrl.updateEmployee(employee)) {
+			message = "An error occured while updating the Employee!";
+			title = "Error!";
+			messageType = JOptionPane.ERROR_MESSAGE;
+		} else {
+			message = "The Employee was successfully updated!";
+			title = "Success!";
+			messageType = JOptionPane.INFORMATION_MESSAGE;
+			
+			triggerPerformListeners();
+			close();
+		}
+		
+		JOptionPane.showMessageDialog(this, message, title, messageType);
+	}
+	private void cancel() {
+		triggerCancelListeners();
+		close();
 	}
 	private boolean isFilled() {
 		if (!txtCpr.getText().trim().matches("^[0-9]{6}\\-?[0-9]{4}$"))
@@ -276,18 +278,18 @@ public class EditEmployee extends PerformPanel implements ActionListener, CaretL
 			return false;
 		if (txtCity.getText().trim().isEmpty())
 			return false;
-		System.out.println("#"+txtCity.getText().trim()+"#");
 		if (!txtPhone.getText().trim().matches("^\\+?[0-9]{1,15}$"))  
 			return false;
 		if (!txtEmail.getText().trim().matches(".+@.+\\..+"))
 			return false;
+		
 		return true;
 	}
-
+	//EventListeners
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == btn_submit) {
-			if (JOptionPane.showConfirmDialog(this, "Are you sure?", creatingEmployee ? "Creating employee" : "Updating employee", JOptionPane.YES_NO_OPTION)
+			if (JOptionPane.showConfirmDialog(this, "Are you sure?", (creatingEmployee ? "Creating" : "Updating") + " an Employee", JOptionPane.YES_NO_OPTION)
 					!= JOptionPane.YES_OPTION) {
 				return;
 			}
@@ -297,60 +299,41 @@ public class EditEmployee extends PerformPanel implements ActionListener, CaretL
 			String username = txtUsername.getText().trim();
 			String password = new String(passwordField.getPassword());
 			String address = txtAddress.getText().trim();
-			String zipCode = txtZipCode.getText().trim();
 			String phone = txtPhone.getText().trim();
 			String email = txtEmail.getText().trim();
-			int accessLevel = (int) spinnerAccLvl.getValue();
+			int accessLevel = (int)spinnerAccLvl.getValue();
+			City city = new City();
+			city.setZipCode(txtZipCode.getText().trim());
 
 			if (creatingEmployee) {
-				if (!employeeCtrl.createEmployee(cpr, name, username, employeeCtrl.hash(password), address,
-						new City(zipCode), phone, email, accessLevel)) {
-
-					JOptionPane.showMessageDialog(this, "An error occured while creating the Employee!", "Error!",
-							JOptionPane.ERROR_MESSAGE);
-					return;
-				}
-
-				JOptionPane.showMessageDialog(this, "The Employee was successfully created!", "Success!",
-						JOptionPane.INFORMATION_MESSAGE);
-
-				triggerPerformListeners();
+				createEmployee(cpr, name, username, employeeCtrl.hash(password), address, city, phone, email, accessLevel);
 			} else {
 				employee.setName(name);
 				employee.setUsername(username);
 				if (!password.equals(""))
 					employee.setPassword(employeeCtrl.hash(password));
 				employee.setAddress(address);
-				employee.setCity(new City(zipCode));
+				employee.setCity(city);
 				employee.setPhone(phone);
 				employee.setEmail(email);
 				employee.setAccessLevel(accessLevel);
-				if (!employeeCtrl.updateEmployee(employee)) {
-					JOptionPane.showMessageDialog(this, "An error occured while creating the Employee!", "Error!",
-							JOptionPane.ERROR_MESSAGE);
-					return;
-				}
-
-				JOptionPane.showMessageDialog(this, "The Employee was successfully edited!", "Success!",
-						JOptionPane.INFORMATION_MESSAGE);
-
-				triggerPerformListeners();
+				
+				updateEmployee(employee);
 			}
-			close();
 		} else if (e.getSource() == btn_cancel){
-			triggerCancelListeners();
-			close();
+			cancel();
 		}
 	}
 	@Override
 	public void caretUpdate(CaretEvent e) {
-		if (e.getSource() == txtZipCode) {
+		final Object source = e.getSource();
+		if (source == txtZipCode) {
 			City c = employeeCtrl.getCity(txtZipCode.getText().trim());
 			txtCity.setText((c == null) ? "" : c.getName());
 		} 
-		if (e.getSource() == txtCpr || e.getSource() == txtName || e.getSource() == txtUsername
-				|| e.getSource() == passwordField || e.getSource() == passwordRepeatField || e.getSource() == txtAddress
-				|| e.getSource() == txtZipCode || e.getSource() == txtPhone || e.getSource() == txtEmail) {
+		if (source == txtCpr || source == txtName || source == txtUsername
+				|| source == passwordField || source == passwordRepeatField || source == txtAddress
+				|| source == txtZipCode || source == txtPhone || source == txtEmail) {
 			btn_submit.setEnabled(isFilled());
 		}
 	}

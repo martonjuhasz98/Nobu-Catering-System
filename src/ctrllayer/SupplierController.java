@@ -21,21 +21,18 @@ public class SupplierController {
 	public ArrayList<Supplier> getSuppliers() {
 		return dbSupplier.getSuppliers();
 	}
-
 	public ArrayList<Supplier> searchSuppliers(String keyword) {
 		return dbSupplier.searchSuppliers(keyword);
 	}
-
 	public Supplier getSupplier(String barcode) {
 		return dbSupplier.selectSupplier(barcode);
 	}
-
-	public boolean createSupplier(String cvr, String name, String address, String zipCode, String phone, String email) {
+	public boolean createSupplier(String cvr, String name, String address, City city, String phone, String email) {
 		Supplier supplier = new Supplier();
 		supplier.setCvr(cvr);
 		supplier.setName(name);
 		supplier.setAddress(address);
-		supplier.setCity(new City(zipCode));
+		supplier.setCity(city);
 		supplier.setPhone(phone);
 		supplier.setEmail(email);
 
@@ -43,16 +40,13 @@ public class SupplierController {
 
 		return success;
 	}
-
 	public boolean updateSupplier(Supplier supplier) {
 		return dbSupplier.updateSupplier(supplier);
 	}
-
 	public boolean deleteSupplier(Supplier supplier) {
 		boolean success = dbSupplier.deleteSupplier(supplier);
 		return success;
 	}
-
 	public City getCity(String zipCode) {
 		return dbCity.selectCity(zipCode);
 	}

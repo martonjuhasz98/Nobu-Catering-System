@@ -1,11 +1,9 @@
 package guilayer.invoices;
 
-import java.awt.Font;
 import java.awt.Label;
 
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
@@ -16,13 +14,10 @@ import javax.swing.event.TableModelListener;
 
 import ctrllayer.InvoiceController;
 import ctrllayer.ItemController;
-import ctrllayer.SessionSingleton;
 import ctrllayer.SupplierController;
 import guilayer.ManagerWindow;
 import guilayer.essentials.ItemTableModel;
 import guilayer.essentials.PerformPanel;
-import guilayer.stocktaking.CheckInventory.SearchWorker;
-import modlayer.Employee;
 import modlayer.Invoice;
 import modlayer.InvoiceItem;
 import modlayer.Item;
@@ -56,22 +51,21 @@ public class CreateInvoice extends PerformPanel implements ActionListener, Caret
 	private InvoiceTableModel mdl_invoice;
 	private JButton btn_create;
 	private JButton btn_cancel;
-	private boolean isSearching;
+	private boolean fetchingData;
 	private String lastKeyword;
 	
 	public CreateInvoice() {
+		super();
+		
 		invoiceCtrl = new InvoiceController();
 		supplierCtrl = new SupplierController();
 		itemCtrl = new ItemController();
-		lastKeyword = "";
-		isSearching = false;
 		
 		initialize();
 	}
 	
 	private void initialize() {
 		
-		setLayout(null);
 		setVisible(false);
 		setBounds(0, 0, ManagerWindow.contentWidth, ManagerWindow.totalHeight - 30);
 		
@@ -79,7 +73,6 @@ public class CreateInvoice extends PerformPanel implements ActionListener, Caret
 		mdl_invoice = new InvoiceTableModel();
 		
 		Label lbl_supplier = new Label("Supplier *");
-		lbl_supplier.setFont(new Font("Dialog", Font.PLAIN, 15));
 		lbl_supplier.setBounds(10, 10, 129, 22);
 		add(lbl_supplier);
 		
@@ -89,14 +82,12 @@ public class CreateInvoice extends PerformPanel implements ActionListener, Caret
 		add(cmb_supplier);
 		
 		Label lbl_items = new Label("Items *");
-		lbl_items.setFont(new Font("Dialog", Font.PLAIN, 15));
 		lbl_items.setBounds(10, 64, 129, 22);
 		add(lbl_items);
 		
 		txt_search = new JTextField();
 		txt_search.setBounds(10, 92, 179, 20);
 		add(txt_search);
-		txt_search.setColumns(10);
 		
 		btn_search = new JButton("Search");
 		btn_search.setBounds(199, 92, 73, 20);
@@ -110,7 +101,6 @@ public class CreateInvoice extends PerformPanel implements ActionListener, Caret
 		tbl_inventory.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		tbl_inventory.getTableHeader().setReorderingAllowed(false);
 		tbl_inventory.setAutoCreateRowSorter(true);
-		inventoryModel.setItems(itemCtrl.getItems());
 		tbl_inventory.setModel(inventoryModel);
 		scrlPane_inventory.setViewportView(tbl_inventory);
 		
@@ -130,7 +120,6 @@ public class CreateInvoice extends PerformPanel implements ActionListener, Caret
 		tbl_invoiceItem.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		tbl_invoiceItem.getTableHeader().setReorderingAllowed(false);
 		tbl_invoiceItem.setAutoCreateRowSorter(true);
-		mdl_invoice.setItems(new ArrayList<InvoiceItem>());
 		tbl_invoiceItem.setModel(mdl_invoice);
 		scrlPane_invoiceItem.setViewportView(tbl_invoiceItem);
 		
@@ -155,10 +144,18 @@ public class CreateInvoice extends PerformPanel implements ActionListener, Caret
 		tbl_invoiceItem.getSelectionModel().addListSelectionListener(this);
 		mdl_invoice.addTableModelListener(this);
 	}
-	private void reset() {
+	@Override
+	public void prepare() {
+		new FetchWorker().execute();
+		
 		cmb_supplier.setModel(new DefaultComboBoxModel(supplierCtrl.getSuppliers().toArray()));
 		cmb_supplier.setSelectedIndex(-1);
-		inventoryModel.setItems(itemCtrl.getItems());
+	}
+	@Override
+	public void reset() {
+		fetchingData = false;
+		lastKeyword = "";
+		
 		mdl_invoice.setItems(new ArrayList<InvoiceItem>());
 		
 		txt_search.setText("");
@@ -166,65 +163,31 @@ public class CreateInvoice extends PerformPanel implements ActionListener, Caret
 		btn_remove.setEnabled(false);
 		btn_create.setEnabled(false);
 	}
-	public void create() {
-		setVisible(true);
+	public void openToCreate() {
+		open();
 	}
-	private void close() {
-		setVisible(false);
-		reset();
-	}
-	private void createInvoice() {
-		if (JOptionPane.showConfirmDialog(this, "Are you sure?", "Creating invoice", JOptionPane.YES_NO_OPTION)
-				!= JOptionPane.YES_OPTION) {
-			return;
-		}
-		
-		//Supplier
-		Supplier supplier = (Supplier)cmb_supplier.getSelectedItem();
-		
-		//Items
-		ArrayList<InvoiceItem> items = mdl_invoice.getItems();
+	//Functionalities
+	private void createInvoice(Supplier supplier, ArrayList<InvoiceItem> items) {
+		String message, title;
+		int messageType;
 		
 		if (!invoiceCtrl.createInvoice(supplier, items)) {
-			JOptionPane.showMessageDialog(this,
-				    "An error occured while creating the Invoice!",
-				    "Error!",
-				    JOptionPane.ERROR_MESSAGE);
-			return;
+			message = "An error occured while creating the Invoice!";
+			title = "Error!";
+			messageType = JOptionPane.ERROR_MESSAGE;
+		} else {
+			message = "The Invoice was successfully created!";
+			title = "Success!";
+			messageType = JOptionPane.INFORMATION_MESSAGE;
+			
+			new FetchWorker().execute();
 		}
 		
-		JOptionPane.showMessageDialog(this,
-			    "The Invoice was successfully created!",
-			    "Success!",
-			    JOptionPane.INFORMATION_MESSAGE);
-		
-		triggerPerformListeners();
-		close();
+		JOptionPane.showMessageDialog(this, message, title, messageType);
 	}
 	private void cancel() {
 		triggerCancelListeners();
 		close();
-	}
-	private boolean isFilled() {
-		if (cmb_supplier.getSelectedIndex() < 0)
-			return false;
-		if (mdl_invoice.getItems().isEmpty())
-			return false;
-		
-		return true;
-	}
-	private void search() {
-		if (isSearching)
-			return;
-		isSearching = true;
-		String keyword = txt_search.getText().trim();
-		if (lastKeyword.equals(keyword)) {
-			isSearching = false;
-			return;
-		}
-		lastKeyword = keyword;
-		// model.setItems(invoiceCtrl.searchInvoiceHistory(keyword));
-		new SearchWorker(keyword).execute();
 	}
 	private void addToInvoice() {
 		int[] selection = tbl_inventory.getSelectedRows();
@@ -243,22 +206,50 @@ public class CreateInvoice extends PerformPanel implements ActionListener, Caret
 	private void removeFromInvoice() {
 		int[] selection = tbl_invoiceItem.getSelectedRows();
 		
-		for (int i = 0; i < selection.length; i++) {
+		for (int i = selection.length; i >= 0; i--) {
 			selection[i] = tbl_invoiceItem.convertRowIndexToModel(selection[i]);
 			mdl_invoice.removeItem(mdl_invoice.getItem(selection[i]));
 		}
 	}
-
+	private void searchInventory() {
+		if (fetchingData) return;
+		
+		String keyword = txt_search.getText().trim();
+		if (lastKeyword.equals(keyword)) return;
+		
+		fetchingData = true;
+		lastKeyword = keyword;
+		
+		new FetchWorker(keyword).execute();
+	}
+	private boolean isFilled() {
+		if (cmb_supplier.getSelectedIndex() < 0)
+			return false;
+		if (mdl_invoice.getItems().isEmpty())
+			return false;
+		
+		return true;
+	}
+	//EventListeners
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == btn_search) {
-			search();
+			searchInventory();
 		} else if (e.getSource() == btn_add) {
 			addToInvoice();
 		} else if (e.getSource() == btn_remove) {
 			removeFromInvoice();
 		} else if (e.getSource() == btn_create) {
-			createInvoice();
+			if (JOptionPane.showConfirmDialog(this, "Are you sure?", "Creating invoice", JOptionPane.YES_NO_OPTION)
+					!= JOptionPane.YES_OPTION) {
+				return;
+			}
+			//Supplier
+			Supplier supplier = (Supplier)cmb_supplier.getSelectedItem();
+			//Items
+			ArrayList<InvoiceItem> items = mdl_invoice.getItems();
+			
+			createInvoice(supplier, items);
 		} else if (e.getSource() == btn_cancel) {
 			cancel();
 		}
@@ -266,12 +257,12 @@ public class CreateInvoice extends PerformPanel implements ActionListener, Caret
 	@Override
 	public void caretUpdate(CaretEvent e) {
 		if (e.getSource() == txt_search) {
-			search();
+			searchInventory();
 		}
 	}
 	@Override
 	public void valueChanged(ListSelectionEvent e) {
-		ListSelectionModel source = (ListSelectionModel)e.getSource();
+		final ListSelectionModel source = (ListSelectionModel)e.getSource();
 		boolean empty = source.isSelectionEmpty();
 		
 		if (source == tbl_inventory.getSelectionModel()) {
@@ -292,6 +283,7 @@ public class CreateInvoice extends PerformPanel implements ActionListener, Caret
 			btn_create.setEnabled(isFilled());
 		}
 	}
+	//Classes
 	private class InventoryTableModel extends ItemTableModel<Item> {
 
 		public InventoryTableModel() {
@@ -374,21 +366,24 @@ public class CreateInvoice extends PerformPanel implements ActionListener, Caret
 			}
 		}
 	}
-	
-	public class SearchWorker extends SwingWorker<ArrayList<Item>, Void> {
+	private class FetchWorker extends SwingWorker<ArrayList<Item>, Void> {
+		
 		private String keyword;
 
-		public SearchWorker(String keyword) {
+		public FetchWorker() {
+			this("");
+		}
+		public FetchWorker(String keyword) {
 			super();
 			this.keyword = keyword;
 		}
 
 		@Override
 		protected ArrayList<Item> doInBackground() throws Exception {
-			// Start
-			return itemCtrl.searchItems(keyword);
+			return keyword.isEmpty()
+					? itemCtrl.getItems()
+					: itemCtrl.searchItems(keyword);
 		}
-
 		@Override
 		protected void done() {
 			try {
@@ -396,8 +391,9 @@ public class CreateInvoice extends PerformPanel implements ActionListener, Caret
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			isSearching = false;
-			search();
+			
+			fetchingData = false;
+			searchInventory();
 		}
 	}
 }

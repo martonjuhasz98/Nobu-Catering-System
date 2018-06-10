@@ -117,9 +117,9 @@ public class ListOrders extends JPanel
 			}
 		};
 
-		ButtonColumn payColumn = new ButtonColumn(table, pay, model.getColumnCount() - 2);
+		ButtonColumn payColumn = new ButtonColumn(table, model.getColumnCount() - 2, this);
 		payColumn.setMnemonic(KeyEvent.VK_ACCEPT);
-		ButtonColumn cancelColumn = new ButtonColumn(table, cancel, model.getColumnCount() - 1);
+		ButtonColumn cancelColumn = new ButtonColumn(table, model.getColumnCount() - 1, this);
 		cancelColumn.setMnemonic(KeyEvent.VK_CANCEL);
 
 		payOrder.addPerformListener(this);

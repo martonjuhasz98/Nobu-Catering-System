@@ -14,6 +14,7 @@ import modlayer.InvoiceItem;
 import modlayer.Item;
 
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingWorker;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.JButton;
@@ -32,6 +33,7 @@ public class ConfirmInvoice extends PerformPanel implements ActionListener, Care
 
 	private InvoiceController invoiceCtrl;
 	private Invoice invoice;
+	private JTextField txt_supplier;
 	private JTextField txt_search;
 	private JButton btn_search;
 	private JTable tbl_ordered;
@@ -42,17 +44,17 @@ public class ConfirmInvoice extends PerformPanel implements ActionListener, Care
 	private DeliveredTableModel mdl_delivered;
 	private JButton btn_confirm;
 	private JButton btn_cancel;
-	private JTextField txt_supplier;
 	
 	public ConfirmInvoice() {
+		super();
+		
 		invoiceCtrl = new InvoiceController();
 		
 		initialize();
 	}
-	
+	//Layout
 	private void initialize() {
 		
-		setLayout(null);
 		setVisible(false);
 		setBounds(0, 0, ManagerWindow.contentWidth, ManagerWindow.totalHeight - 30);
 		
@@ -60,24 +62,20 @@ public class ConfirmInvoice extends PerformPanel implements ActionListener, Care
 		mdl_delivered = new DeliveredTableModel();
 		
 		Label lbl_supplier = new Label("Supplier");
-		lbl_supplier.setFont(new Font("Dialog", Font.PLAIN, 15));
 		lbl_supplier.setBounds(10, 11, 129, 22);
 		add(lbl_supplier);
 		
 		txt_supplier = new JTextField();
 		txt_supplier.setEditable(false);
-		txt_supplier.setColumns(10);
 		txt_supplier.setBounds(10, 39, 341, 20);
 		add(txt_supplier);
 		
 		Label lbl_items = new Label("Items");
-		lbl_items.setFont(new Font("Dialog", Font.PLAIN, 15));
 		lbl_items.setBounds(10, 80, 129, 22);
 		add(lbl_items);
 		
 		txt_search = new JTextField();
 		txt_search.setBounds(10, 110, 217, 20);
-		txt_search.setColumns(10);
 		add(txt_search);
 		
 		btn_search = new JButton("Search");
@@ -124,6 +122,8 @@ public class ConfirmInvoice extends PerformPanel implements ActionListener, Care
 		btn_cancel.setBounds(717, 11, 73, 23);
 		add(btn_cancel);
 		
+		reset();
+		
 		txt_search.addCaretListener(this);
 		btn_search.addActionListener(this);
 		tbl_ordered.getSelectionModel().addListSelectionListener(this);
@@ -132,42 +132,49 @@ public class ConfirmInvoice extends PerformPanel implements ActionListener, Care
 		btn_remove.addActionListener(this);
 		btn_confirm.addActionListener(this);
 		btn_cancel.addActionListener(this);
-		
-		resetForm();
 	}
-	private void resetForm() {
+	@Override
+	public void prepare() {}
+	@Override
+	public void reset() {
 		txt_supplier.setText("");
 		txt_search.setText("");
-		mdl_ordered.setItems(new ArrayList<InvoiceItem>());
+
 		mdl_delivered.setItems(new ArrayList<InvoiceItem>());
 		
 		btn_add.setEnabled(false);
 		btn_remove.setEnabled(false);
 	}
-	public void confirm(Invoice invoice) {
-		resetForm();
+	public void openToConfirm(Invoice invoice) {
+		open();
 		
 		this.invoice = invoice;
 		txt_supplier.setText(invoice.getSupplier().toString());
 		mdl_ordered.setItems(invoice.getItems());
+	}
+	//Functionalities
+	private void confirmInvoice() {
+		String message, title;
+		int messageType;
 		
-		setVisible(true);
-	}
-	private void close() {
-		setVisible(false);
-	}
-	
-	private void searchOrdered() {
-		String keyword = txt_search.getText().trim();
-		ArrayList<InvoiceItem> results = new ArrayList<InvoiceItem>();
-		for (InvoiceItem invoiceItem : invoice.getItems()) {
-			Item item = invoiceItem.getItem(); 
-			if (item.getBarcode().contains(keyword) ||
-					item.getName().contains(keyword)) {
-				results.add(invoiceItem);
-			}
+		if (!invoiceCtrl.confirmInvoice(invoice)) {
+			message = "An error occured while confirming the Invoice!";
+			title = "Error!";
+			messageType = JOptionPane.ERROR_MESSAGE;
+		} else {
+			message = "The Invoice was successfully confirmed!";
+			title = "Success!";
+			messageType = JOptionPane.INFORMATION_MESSAGE;
+			
+			triggerPerformListeners();
+			close();
 		}
-		mdl_ordered.setItems(results);
+		
+		JOptionPane.showMessageDialog(this, message, title, messageType);
+	}
+	private void cancel() {
+		triggerCancelListeners();
+		close();
 	}
 	private void addToDelivered() {
 		int[] selection = tbl_ordered.getSelectedRows();
@@ -180,49 +187,48 @@ public class ConfirmInvoice extends PerformPanel implements ActionListener, Care
 	private void removeFromDelivered() {
 		int[] selection = tbl_delivered.getSelectedRows();
 		
-		for (int i = 0; i < selection.length; i++) {
+		for (int i = selection.length; i >= 0; i--) {
 			selection[i] = tbl_delivered.convertRowIndexToModel(selection[i]);
 			mdl_delivered.removeItem(mdl_ordered.getItem(selection[i]));
 		}
 	}
-	private void confirmInvoice() {
-		if (JOptionPane.showConfirmDialog(this, "Are you sure?", "Confirming invoice", JOptionPane.YES_NO_OPTION)
-				!= JOptionPane.YES_OPTION) {
-			return;
+	private void searchOrderedItems() {
+		String keyword = txt_search.getText().trim();
+		ArrayList<InvoiceItem> results = new ArrayList<InvoiceItem>();
+		for (InvoiceItem invoiceItem : invoice.getItems()) {
+			Item item = invoiceItem.getItem(); 
+			if (item.getBarcode().contains(keyword) ||
+					item.getName().contains(keyword)) {
+				results.add(invoiceItem);
+			}
 		}
-		
-		invoice.setItems(mdl_delivered.getItems());
-		
-		if (!invoiceCtrl.confirmInvoice(invoice)) {
-			JOptionPane.showMessageDialog(this,
-				    "An error occured while confirming the Invoice!",
-				    "Error!",
-				    JOptionPane.ERROR_MESSAGE);
-			return;
-		}
-		
-		JOptionPane.showMessageDialog(this,
-				"The Invoice was successfully confirmed!",
-			    "Success!",
-			    JOptionPane.INFORMATION_MESSAGE);
-		
-		triggerPerformListeners();
-		close();
+		mdl_ordered.setItems(results);
 	}
-	private void cancel() {
-		triggerCancelListeners();
-		close();
-	}
-	
+	//EventListener
 	@Override
-	public void caretUpdate(CaretEvent e) {
-		if (e.getSource() == txt_search) {
-			searchOrdered();
+	public void actionPerformed(ActionEvent e) {
+		final Object source = e.getSource();
+		if (source == btn_search) {
+			searchOrderedItems();
+		} else if (source == btn_add) {
+			addToDelivered();
+		} else if (source == btn_remove) {
+			removeFromDelivered();
+		} else if (source == btn_confirm) {
+			if (JOptionPane.showConfirmDialog(this, "Are you sure?", "Confirming invoice", JOptionPane.YES_NO_OPTION)
+					!= JOptionPane.YES_OPTION) {
+				return;
+			}
+			invoice.setItems(mdl_delivered.getItems());
+			
+			confirmInvoice();
+		} else if (source == btn_cancel) {
+			cancel();
 		}
 	}
 	@Override
 	public void valueChanged(ListSelectionEvent e) {
-		ListSelectionModel source = (ListSelectionModel)e.getSource();
+		final ListSelectionModel source = (ListSelectionModel)e.getSource();
 		boolean empty = source.isSelectionEmpty();
 		
 		if (source == tbl_ordered.getSelectionModel()) {
@@ -232,17 +238,9 @@ public class ConfirmInvoice extends PerformPanel implements ActionListener, Care
 		}
 	}
 	@Override
-	public void actionPerformed(ActionEvent e) {
-		if (e.getSource() == btn_search) {
-			searchOrdered();
-		} else if (e.getSource() == btn_add) {
-			addToDelivered();
-		} else if (e.getSource() == btn_remove) {
-			removeFromDelivered();
-		} else if (e.getSource() == btn_confirm) {
-			confirmInvoice();
-		} else if (e.getSource() == btn_cancel) {
-			cancel();
+	public void caretUpdate(CaretEvent e) {
+		if (e.getSource() == txt_search) {
+			searchOrderedItems();
 		}
 	}
 	

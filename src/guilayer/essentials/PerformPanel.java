@@ -4,12 +4,23 @@ import java.util.ArrayList;
 
 import javax.swing.JPanel;
 
-public class PerformPanel extends JPanel {
+public abstract class PerformPanel extends NavigationPanel {
 	
 	private ArrayList<PerformListener> listeners;
 	
 	public PerformPanel() {
+		super();
+		
 		listeners = new ArrayList<>();
+	}
+	
+	protected void open() {
+		prepare();
+		setVisible(true);
+	}
+	protected void close() {
+		setVisible(false);
+		reset();
 	}
 	
 	public void addPerformListener(PerformListener listener) {

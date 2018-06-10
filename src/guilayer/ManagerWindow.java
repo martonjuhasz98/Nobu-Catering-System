@@ -1,6 +1,8 @@
 package guilayer;
 
+import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import java.awt.CardLayout;
@@ -8,10 +10,12 @@ import java.awt.Color;
 import java.awt.Font;
 
 import guilayer.contentpanels.*;
+import guilayer.essentials.Navigatable;
 import guilayer.menu.Menu;
 import guilayer.menu.MenuItemListener;
+import java.awt.Component;
 
-public class ManagerWindow extends JFrame {
+public class ManagerWindow extends JFrame implements MenuItemListener {
 	
 	public static final int totalWidth = 1000;
 	public static final int totalHeight = 500;
@@ -27,9 +31,20 @@ public class ManagerWindow extends JFrame {
 	public static final Font menuFont = new Font("Segoe UI", Font.BOLD, 16);
 	public static final Font contentFont = new Font("Segoe UI", Font.PLAIN, 14);
 	private JPanel contentPane;
+	private CardLayout layout;
+	private JPanel content;
+	private Menu menu;
+	private JComponent[] contentPanels;
+	private boolean loading;
+	private int lastIndex;
+	private int prevIndex;
 	
 	public ManagerWindow() {
 		super();
+		
+		lastIndex = 0;
+		prevIndex = 0;
+		loading = false;
 		
 		initialize();
 	}
@@ -47,7 +62,7 @@ public class ManagerWindow extends JFrame {
 		contentPane.setLayout(null);
 		setContentPane(contentPane);
 		
-		Menu menu = new Menu();
+		menu = new Menu();
 		menu.setLayout(null);
 		menu.setBounds(0, 0, menuWidth, totalHeight);
 		menu.setItemHeight(menuItemHeight);
@@ -58,15 +73,15 @@ public class ManagerWindow extends JFrame {
 		menu.setCurrentColour(activeMenuItemSignColour);
 		menu.add("Analytics");
 		menu.add("Inventory");
-		menu.add("Stock-taking");
+		menu.add("Stocktaking");
 		menu.add("Invoices");
 		menu.add("Suppliers");
 		menu.add("Menu Items");
 		menu.add("Employees");
 		contentPane.add(menu);
 		
-		JPanel content = new JPanel();
-		CardLayout layout = new CardLayout(0, 0);
+		content = new JPanel();
+		layout = new CardLayout(0, 0);
 		content.setLayout(layout);
 		content.setBounds(200, 0, contentWidth, totalHeight);
 		content.setBackground(contentBackgroundColour);
@@ -74,42 +89,41 @@ public class ManagerWindow extends JFrame {
 		content.setFont(contentFont);
 		contentPane.add(content);
 		
-		content.add(new Analytics(), "0");
-		content.add(new ManageInventory(), "1");
-		content.add(new Stocktaking(), "2");
-		content.add(new ManageInvoices(), "3");
-		content.add(new ManageSuppliers(), "4");
-		content.add(new ManageMenuItems(), "5");
-		content.add(new ManageEmployees(), "6");
+		contentPanels = new JComponent[7];
+		contentPanels[0] = new Analytics();
+		contentPanels[1] = new ManageInventory();
+		contentPanels[2] = new Stocktaking();
+		contentPanels[3] = new ManageInvoices();
+		contentPanels[4] = new ManageSuppliers();
+		contentPanels[5] = new ManageMenuItems();
+		contentPanels[6] = new ManageEmployees();
+		for (int i = 0; i < contentPanels.length; i++) {
+			content.add(contentPanels[i], Integer.toString(i));
+		}
 		
-		menu.addMenuItemListener(new MenuItemListener() {
-			@Override
-			public void menuItemClicked(int clickedIndex) {
-				switch(clickedIndex) {
-					case 0:
-						layout.show(content, "0");
-						break;
-					case 1:
-						layout.show(content, "1");
-						break;
-					case 2:
-						layout.show(content, "2");
-						break;
-					case 3:
-						layout.show(content, "3");
-						break;
-					case 4:
-						layout.show(content, "4");
-						break;
-					case 5:
-						layout.show(content, "5");
-						break;
-					case 6:
-						layout.show(content, "6");
-						break;
+		menu.addMenuItemListener(this);
+	}
+	@Override
+	public void menuItemClicked(int clickedIndex) {
+		lastIndex = clickedIndex;
+		if (loading || clickedIndex < 0 || clickedIndex >= contentPanels.length || clickedIndex == prevIndex) return;
+		loading = true;
+
+		layout.show(content, Integer.toString(clickedIndex));
+
+		new Thread() {
+			public void run() {
+				//Load stuff in background
+				((Navigatable)contentPanels[clickedIndex]).prepare();
+				((Navigatable)contentPanels[prevIndex]).reset();
+				//Release lock
+				prevIndex = clickedIndex;
+				loading = false;
+				//If this is not the last one clicked
+				if (lastIndex != prevIndex) {
+					menuItemClicked(lastIndex);
 				}
 			}
-		});
-		
+		}.start();
 	}
 }

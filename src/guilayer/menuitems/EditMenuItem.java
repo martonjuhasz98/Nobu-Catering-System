@@ -1,11 +1,9 @@
 package guilayer.menuitems;
 
-import java.awt.Font;
 import java.awt.Label;
 
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
@@ -16,19 +14,13 @@ import javax.swing.event.TableModelListener;
 
 import ctrllayer.MenuItemController;
 import ctrllayer.ItemController;
-import ctrllayer.SupplierController;
 import guilayer.ManagerWindow;
 import guilayer.essentials.ItemTableModel;
 import guilayer.essentials.PerformPanel;
-import guilayer.stocktaking.CheckInventory.SearchWorker;
-import modlayer.Employee;
 import modlayer.Ingredient;
 import modlayer.MenuItem;
 import modlayer.MenuItemCategory;
 import modlayer.Item;
-import modlayer.MenuItem;
-import modlayer.Supplier;
-import modlayer.Unit;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -53,17 +45,14 @@ public class EditMenuItem extends PerformPanel
 	private JTextField txt_search;
 	private JButton btn_search;
 	private JTable tbl_inventory;
-	private InventoryTableModel inventoryModel;
+	private InventoryTableModel mdl_inventory;
 	private JButton btn_add;
 	private JButton btn_remove;
-	private JTable tbl_menuItemItem;
+	private JTable tbl_menuItem;
 	private MenuItemTableModel mdl_menuItem;
 	private JButton btn_submit;
 	private JButton btn_cancel;
-	private boolean isCreatingMenuItem;
-	private boolean isSearching;
-	private boolean creatingCategory;
-	private String lastKeyword;
+	private boolean creatingMenuItem;
 	private MenuItem menuItem;
 	private JTextField txtId;
 	private JTextField txtName;
@@ -71,76 +60,69 @@ public class EditMenuItem extends PerformPanel
 	private JTextField txtPrice;
 	private ButtonGroup rdbtn_group;
 	private JComboBox<MenuItemCategory> cmb_category;
-	private JScrollPane scrlPane_menuItemItem;
+	private JScrollPane scrlPane_menuItem;
 	private JRadioButton rdbtn_createCategory;
 	private JRadioButton rdbtn_selectCategory;
-	private JScrollPane scrlPane_inventory;
+	private boolean creatingCategory;
+	private boolean fetchingData;
+	private String lastKeyword;
 
 	public EditMenuItem() {
+		super();
+		
 		menuItemCtrl = new MenuItemController();
 		itemCtrl = new ItemController();
-		lastKeyword = "";
-		isSearching = false;
-		isCreatingMenuItem = false;
+		
+		creatingMenuItem = false;
 		creatingCategory = false;
+		fetchingData = false;
+		lastKeyword = "";
 
 		initialize();
 	}
-
+	//Layout
 	private void initialize() {
 
-		setLayout(null);
 		setVisible(false);
 		setBounds(0, 0, ManagerWindow.contentWidth, ManagerWindow.totalHeight - 30);
 
-		inventoryModel = new InventoryTableModel();
+		mdl_inventory = new InventoryTableModel();
 		mdl_menuItem = new MenuItemTableModel();
 
 		Label lbl_id = new Label("ID *");
-		lbl_id.setFont(new Font("Dialog", Font.PLAIN, 15));
 		lbl_id.setBounds(29, 16, 83, 22);
 		add(lbl_id);
 
 		txtId = new JTextField();
-		txtId.setText("");
-		txtId.setEnabled(true);
-		txtId.setColumns(10);
 		txtId.setBounds(29, 44, 83, 20);
 		add(txtId);
 
 		Label lbl_name = new Label("Name *");
-		lbl_name.setFont(new Font("Dialog", Font.PLAIN, 15));
 		lbl_name.setBounds(29, 76, 83, 22);
 		add(lbl_name);
-		rdbtn_group = new ButtonGroup();
 
 		txtName = new JTextField();
-		txtName.setText("");
-		txtName.setColumns(10);
 		txtName.setBounds(29, 104, 316, 20);
 		add(txtName);
 		
 		Label lbl_price = new Label("Price *");
-		lbl_price.setFont(new Font("Dialog", Font.PLAIN, 15));
 		lbl_price.setBounds(29, 136, 83, 22);
 		add(lbl_price);
 
 		txtPrice = new JTextField();
-		txtPrice.setText("");
-		txtPrice.setEnabled(true);
-		txtPrice.setColumns(10);
 		txtPrice.setBounds(29, 164, 83, 20);
 		add(txtPrice);
 
 		txt_search = new JTextField();
 		txt_search.setBounds(29, 224, 179, 20);
 		add(txt_search);
-		txt_search.setColumns(10);
 
 		btn_search = new JButton("Search");
 		btn_search.setBounds(208, 224, 73, 20);
 		add(btn_search);
 
+
+		JScrollPane scrlPane_inventory = new JScrollPane();
 		scrlPane_inventory = new JScrollPane();
 		scrlPane_inventory.setBounds(23, 256, 316, 167);
 		add(scrlPane_inventory);
@@ -149,8 +131,7 @@ public class EditMenuItem extends PerformPanel
 		tbl_inventory.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		tbl_inventory.getTableHeader().setReorderingAllowed(false);
 		tbl_inventory.setAutoCreateRowSorter(true);
-		inventoryModel.setItems(itemCtrl.getItems());
-		tbl_inventory.setModel(inventoryModel);
+		tbl_inventory.setModel(mdl_inventory);
 		scrlPane_inventory.setViewportView(tbl_inventory);
 
 		btn_add = new JButton("Add");
@@ -161,17 +142,16 @@ public class EditMenuItem extends PerformPanel
 		btn_remove.setBounds(347, 341, 73, 23);
 		add(btn_remove);
 
-		scrlPane_menuItemItem = new JScrollPane();
-		scrlPane_menuItemItem.setBounds(432, 256, 316, 167);
-		add(scrlPane_menuItemItem);
+		scrlPane_menuItem = new JScrollPane();
+		scrlPane_menuItem.setBounds(432, 256, 316, 167);
+		add(scrlPane_menuItem);
 
-		tbl_menuItemItem = new JTable();
-		tbl_menuItemItem.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-		tbl_menuItemItem.getTableHeader().setReorderingAllowed(false);
-		tbl_menuItemItem.setAutoCreateRowSorter(true);
-		mdl_menuItem.setItems(new ArrayList<Ingredient>());
-		tbl_menuItemItem.setModel(mdl_menuItem);
-		scrlPane_menuItemItem.setViewportView(tbl_menuItemItem);
+		tbl_menuItem = new JTable();
+		tbl_menuItem.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+		tbl_menuItem.getTableHeader().setReorderingAllowed(false);
+		tbl_menuItem.setAutoCreateRowSorter(true);
+		tbl_menuItem.setModel(mdl_menuItem);
+		scrlPane_menuItem.setViewportView(tbl_menuItem);
 
 		btn_submit = new JButton("Create");
 		btn_submit.setBounds(494, 427, 122, 32);
@@ -180,7 +160,9 @@ public class EditMenuItem extends PerformPanel
 		btn_cancel = new JButton("Cancel");
 		btn_cancel.setBounds(626, 427, 122, 32);
 		add(btn_cancel);
-
+		
+		rdbtn_group = new ButtonGroup();
+		
 		rdbtn_selectCategory = new JRadioButton("Select from existing");
 		rdbtn_selectCategory.setSelected(true);
 		rdbtn_selectCategory.setBounds(432, 84, 316, 19);
@@ -195,23 +177,25 @@ public class EditMenuItem extends PerformPanel
 		rdbtn_createCategory = new JRadioButton("Create new");
 		rdbtn_createCategory.setBounds(432, 137, 316, 20);
 		rdbtn_group.add(rdbtn_createCategory);
-
 		add(rdbtn_createCategory);
+		
+		Label lbl_category = new Label("Category *");
+		lbl_category.setBounds(432, 56, 83, 22);
+		add(lbl_category);
 
 		txt_category = new JTextField();
-		txt_category.setText("");
-		txt_category.setEnabled(false);
-		txt_category.setColumns(10);
 		txt_category.setBounds(432, 164, 316, 20);
 		add(txt_category);
 
+		reset();
+		
 		btn_search.addActionListener(this);
 		btn_add.addActionListener(this);
 		btn_remove.addActionListener(this);
 		btn_submit.addActionListener(this);
 		btn_cancel.addActionListener(this);
 		tbl_inventory.getSelectionModel().addListSelectionListener(this);
-		tbl_menuItemItem.getSelectionModel().addListSelectionListener(this);
+		tbl_menuItem.getSelectionModel().addListSelectionListener(this);
 		mdl_menuItem.addTableModelListener(this);
 		txt_search.addCaretListener(this);
 		txtName.addCaretListener(this);
@@ -221,51 +205,41 @@ public class EditMenuItem extends PerformPanel
 		cmb_category.addItemListener(this);
 		rdbtn_selectCategory.addItemListener(this);
 		rdbtn_createCategory.addItemListener(this);
-		
-		Label lbl_category = new Label("Category *");
-		lbl_category.setFont(new Font("Dialog", Font.PLAIN, 15));
-		lbl_category.setBounds(432, 56, 83, 22);
-		add(lbl_category);
-
-		reset();
 	}
-
-	private void reset() {
+	@Override
+	public void prepare() {
+		new FetchWorker().execute();
+		cmb_category.setModel(new DefaultComboBoxModel(menuItemCtrl.getCategories().toArray()));
+		cmb_category.setSelectedIndex(-1);
+	}
+	@Override
+	public void reset() {
 		txtId.setText("");
 		txtName.setText("");
 		txtPrice.setText("");
-		inventoryModel.setItems(itemCtrl.getItems());
 		mdl_menuItem.setItems(new ArrayList<Ingredient>());
 		menuItem = null;
 		creatingCategory = false;
-		isCreatingMenuItem = true;
+		creatingMenuItem = true;
 
 		rdbtn_selectCategory.setSelected(true);
 		cmb_category.setSelectedIndex(-1);
 		txt_category.setText("");
+		txt_category.setEnabled(false);
 
 		txt_search.setText("");
 		btn_add.setEnabled(false);
 		btn_remove.setEnabled(false);
 		btn_submit.setEnabled(false);
 	}
-
-	public void create() {
-		cmb_category.setModel(new DefaultComboBoxModel(menuItemCtrl.getCategories().toArray()));
-		cmb_category.setSelectedIndex(-1);
+	public void openToCreate() {
 		open();
 	}
-
-	public void update(MenuItem menuItem) {
-		cmb_category.setModel(new DefaultComboBoxModel(menuItemCtrl.getCategories().toArray()));
-		cmb_category.setSelectedIndex(-1);
-		fill(menuItem);
+	public void openToUpdate(MenuItem menuItem) {
 		open();
-	}
-
-	public void fill(MenuItem menuItem) {
+		
 		this.menuItem = menuItem;
-		isCreatingMenuItem = false;
+		creatingMenuItem = false;
 
 		txtId.setText(String.valueOf(menuItem.getId()));
 		txtName.setText(menuItem.getName());
@@ -276,105 +250,62 @@ public class EditMenuItem extends PerformPanel
 		btn_submit.setText("Update");
 		btn_submit.setEnabled(true);
 	}
-
-	private void open() {
-
-		setVisible(true);
-	}
-
-	private void close() {
-		setVisible(false);
-		reset();
-	}
-
-	private void submit() {
-		if (JOptionPane.showConfirmDialog(this, "Are you sure?", "Creating menuItem",
-				JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
-			return;
-		}
-		int id = Integer.valueOf(txtId.getText());
-		String name = txtName.getText();
-		Double price = Double.valueOf(txtPrice.getText());
-		MenuItemCategory menuItemCategory;
-		if (!creatingCategory) {
-			menuItemCategory = (MenuItemCategory) cmb_category.getSelectedItem();
+	//Functionalities
+	private void createMenuItem(int id, String name, double price, MenuItemCategory category, ArrayList<Ingredient> ingredients) {
+		String message, title;
+		int messageType;
+		
+		if (!menuItemCtrl.createMenuItem(id, name, price, category, ingredients)) {
+			message = "An error occured while creating the Menu Item!";
+			title = "Error!";
+			messageType = JOptionPane.ERROR_MESSAGE;
 		} else {
-			menuItemCategory = new MenuItemCategory();
-			menuItemCategory.setName(txt_category.getText().trim());
-		}
-		ArrayList<Ingredient> ingredients = mdl_menuItem.getItems();
-
-		if (isCreatingMenuItem) {
-			if (!menuItemCtrl.createMenuItem(id, name, price, menuItemCategory, ingredients)) {
-				JOptionPane.showMessageDialog(this, "An error occured while creating the Item!", "Error!",
-						JOptionPane.ERROR_MESSAGE);
-				return;
-			}
-
-			JOptionPane.showMessageDialog(this, "The Item was successfully created!", "Success!",
-					JOptionPane.INFORMATION_MESSAGE);
-
-			triggerPerformListeners();
-		} else {
-			menuItem.setId(id);
-			menuItem.setName(name);
-			menuItem.setPrice(price);
-			menuItem.setCategory(menuItemCategory);
-			menuItem.setIngredients(ingredients);
-
-			if (!menuItemCtrl.updateMenuItem(menuItem)) {
-				JOptionPane.showMessageDialog(this, "An error occured while creating the Item!", "Error!",
-						JOptionPane.ERROR_MESSAGE);
-				return;
-			}
-
-			JOptionPane.showMessageDialog(this, "The Item was successfully edited!", "Success!",
-					JOptionPane.INFORMATION_MESSAGE);
-
+			message = "The Menu Item was successfully created!";
+			title = "Success!";
+			messageType = JOptionPane.INFORMATION_MESSAGE;
+			
 			triggerPerformListeners();
 		}
-		close();
+		
+		JOptionPane.showMessageDialog(this, message, title, messageType);
 	}
-
+	private void updateMenuItem(MenuItem menuItem) {
+		String message, title;
+		int messageType;
+		
+		if (!menuItemCtrl.updateMenuItem(menuItem)) {
+			message = "An error occured while updating the Menu Item!";
+			title = "Error!";
+			messageType = JOptionPane.ERROR_MESSAGE;
+		} else {
+			message = "The Menu Item was successfully updated!";
+			title = "Success!";
+			messageType = JOptionPane.INFORMATION_MESSAGE;
+			
+			triggerPerformListeners();
+		}
+		
+		JOptionPane.showMessageDialog(this, message, title, messageType);
+	}
 	private void cancel() {
 		triggerCancelListeners();
 		close();
 	}
-
-	private boolean isFilled() {
-		// Double.valueOf()
-		if (mdl_menuItem.getItems().isEmpty())
-			return false;
-		if (!txtId.getText().trim().matches("[0-9]+"))
-			return false;
-		if (txtName.getText().trim().isEmpty())
-			return false;
-		if (!txtPrice.getText().trim().matches("[0-9]+\\.[0-9]{2}"))
-			return false;
-		if (!creatingCategory) {
-			if (cmb_category.getSelectedIndex() < 0)
-				return false;
+	private MenuItemCategory getCategory() {
+		MenuItemCategory category = null;
+		
+		if (creatingCategory) {
+			String name = txt_category.getText().trim();
+			if (!name.isEmpty()) {
+				category = new MenuItemCategory();
+				category.setName(name);
+			}
 		} else {
-			if (txt_category.getText().trim().isEmpty())
-				return false;
+			category = (MenuItemCategory)cmb_category.getSelectedItem();
 		}
-		return true;
+		
+		return category;
 	}
-
-	private void search() {
-		if (isSearching)
-			return;
-		isSearching = true;
-		String keyword = txt_search.getText().trim();
-		if (lastKeyword.equals(keyword)) {
-			isSearching = false;
-			return;
-		}
-		lastKeyword = keyword;
-		// model.setItems(menuItemCtrl.searchMenuItemHistory(keyword));
-		new SearchWorker(keyword).execute();
-	}
-
 	private void addToMenuItem() {
 		int[] selection = tbl_inventory.getSelectedRows();
 		Ingredient ingredient;
@@ -383,80 +314,126 @@ public class EditMenuItem extends PerformPanel
 			selection[i] = tbl_inventory.convertRowIndexToModel(selection[i]);
 			ingredient = new Ingredient();
 			ingredient.setMenuItem(new MenuItem());
-			ingredient.setItem((Item) inventoryModel.getItem(selection[i]));
+			ingredient.setItem((Item) mdl_inventory.getItem(selection[i]));
 			ingredient.setQuantity(1.0);
 			ingredient.setWaste(0);
 			mdl_menuItem.addItem(ingredient);
 		}
 	}
+	private void removeFromMenuItem() {
+		int[] selection = tbl_menuItem.getSelectedRows();
 
+		for (int i = selection.length; i >= 0; i--) {
+			selection[i] = tbl_menuItem.convertRowIndexToModel(selection[i]);
+			mdl_menuItem.removeItem(mdl_menuItem.getItem(selection[i]));
+		}
+	}
+	private boolean isFilled() {
+		if (mdl_menuItem.getItems().isEmpty())
+			return false;
+		if (!txtId.getText().trim().matches("[0-9]+"))
+			return false;
+		if (txtName.getText().trim().isEmpty())
+			return false;
+		if (!txtPrice.getText().trim().matches("[0-9]+\\.[0-9]{2}"))
+			return false;
+		if (getCategory() == null)
+			return false;
+		
+		return true;
+	}
+	private void searchInventory() {
+		if (fetchingData) return;
+		
+		String keyword = txt_search.getText().trim();
+		if (lastKeyword.equals(keyword)) return;
+		
+		fetchingData = true;
+		lastKeyword = keyword;
+		
+		new FetchWorker(keyword).execute();
+	}
+	//EventListeners
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		final Object source = e.getSource();
+		if (source == btn_search) {
+			searchInventory();
+		} else if (source == btn_add) {
+			addToMenuItem();
+		} else if (source == btn_remove) {
+			removeFromMenuItem();
+		} else if (source == btn_submit) {
+			String message = creatingMenuItem ?  "Creating" : "Updating" + " a Menu Item";
+			if (JOptionPane.showConfirmDialog(this, "Are you sure?", message, JOptionPane.YES_NO_OPTION)
+					!= JOptionPane.YES_OPTION) {
+				return;
+			}
+			
+			int id = Integer.valueOf(txtId.getText());
+			String name = txtName.getText();
+			Double price = Double.valueOf(txtPrice.getText());
+			MenuItemCategory category = getCategory();
+			ArrayList<Ingredient> ingredients = mdl_menuItem.getItems();
+			
+			if (creatingMenuItem) {
+				createMenuItem(id, name, price, category, ingredients);;
+			} else {
+				menuItem.setId(id);
+				menuItem.setName(name);
+				menuItem.setPrice(price);
+				menuItem.setCategory(category);
+				menuItem.setIngredients(ingredients);
+				
+				updateMenuItem(menuItem);
+			}
+			close();
+		} else if (source == btn_cancel) {
+			cancel();
+		}
+	}
 	@Override
 	public void itemStateChanged(ItemEvent e) {
-		if (e.getSource() == rdbtn_selectCategory || e.getSource() == rdbtn_createCategory) {
+		final Object source = e.getSource();
+		if (source == rdbtn_selectCategory || source == rdbtn_createCategory) {
 			creatingCategory = rdbtn_createCategory.isSelected();
 			cmb_category.setEnabled(!creatingCategory);
 			txt_category.setEnabled(creatingCategory);
 
 			btn_submit.setEnabled(isFilled());
-		} else if (e.getSource() == cmb_category) {
+		} else if (source == cmb_category) {
 			btn_submit.setEnabled(isFilled());
 		}
 	}
-
-	private void removeFromMenuItem() {
-		int[] selection = tbl_menuItemItem.getSelectedRows();
-
-		for (int i = 0; i < selection.length; i++) {
-			selection[i] = tbl_menuItemItem.convertRowIndexToModel(selection[i]);
-			mdl_menuItem.removeItem(mdl_menuItem.getItem(selection[i]));
-		}
-	}
-
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		if (e.getSource() == btn_search) {
-			search();
-		} else if (e.getSource() == btn_add) {
-			addToMenuItem();
-		} else if (e.getSource() == btn_remove) {
-			removeFromMenuItem();
-		} else if (e.getSource() == btn_submit) {
-			submit();
-		} else if (e.getSource() == btn_cancel) {
-			cancel();
-		}
-	}
-
 	@Override
 	public void caretUpdate(CaretEvent e) {
-		if (e.getSource() == txt_search) {
-			search();
+		final Object source = e.getSource();
+		if (source == txt_search) {
+			searchInventory();
 		}
-		if (e.getSource() == txtId || e.getSource() == txtName || e.getSource() == txtPrice
-				|| e.getSource() == txt_category) {
+		if (source == txtId || source == txtName || source == txtPrice
+				|| source == txt_category) {
 			btn_submit.setEnabled(isFilled());
 		}
 	}
-
 	@Override
 	public void valueChanged(ListSelectionEvent e) {
-		ListSelectionModel source = (ListSelectionModel) e.getSource();
+		final ListSelectionModel source = (ListSelectionModel) e.getSource();
 		boolean empty = source.isSelectionEmpty();
 
 		if (source == tbl_inventory.getSelectionModel()) {
 			btn_add.setEnabled(!empty);
-		} else if (source == tbl_menuItemItem.getSelectionModel()) {
+		} else if (source == tbl_menuItem.getSelectionModel()) {
 			btn_remove.setEnabled(!empty);
 		}
 	}
-
 	@Override
 	public void tableChanged(TableModelEvent e) {
 		if (e.getSource() == mdl_menuItem) {
 			btn_submit.setEnabled(isFilled());
 		}
 	}
-
+	//Classes
 	private class InventoryTableModel extends ItemTableModel<Item> {
 
 		public InventoryTableModel() {
@@ -481,7 +458,6 @@ public class EditMenuItem extends PerformPanel
 			return null;
 		}
 	}
-
 	private class MenuItemTableModel extends ItemTableModel<Ingredient> {
 
 		public MenuItemTableModel() {
@@ -523,8 +499,7 @@ public class EditMenuItem extends PerformPanel
 				if (quantity > 0) {
 					getItem(rowIndex).setQuantity(quantity);
 				}
-			}
-			if (columnIndex == 3) {
+			} else if (columnIndex == 3) {
 				double waste = (double) value;
 				if (waste >= 0 && waste <= 100) {
 					getItem(rowIndex).setWaste(waste);
@@ -532,30 +507,34 @@ public class EditMenuItem extends PerformPanel
 			}
 		}
 	}
-
-	public class SearchWorker extends SwingWorker<ArrayList<Item>, Void> {
+	private class FetchWorker extends SwingWorker<ArrayList<Item>, Void> {
+		
 		private String keyword;
 
-		public SearchWorker(String keyword) {
+		public FetchWorker() {
+			this("");
+		}
+		public FetchWorker(String keyword) {
 			super();
 			this.keyword = keyword;
 		}
 
 		@Override
 		protected ArrayList<Item> doInBackground() throws Exception {
-			// Start
-			return itemCtrl.searchItems(keyword);
+			return keyword.isEmpty()
+					? itemCtrl.getItems()
+					: itemCtrl.searchItems(keyword);
 		}
-
 		@Override
 		protected void done() {
 			try {
-				inventoryModel.setItems(get());
+				mdl_inventory.setItems(get());
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			isSearching = false;
-			search();
+			
+			fetchingData = false;
+			searchInventory();
 		}
 	}
 }

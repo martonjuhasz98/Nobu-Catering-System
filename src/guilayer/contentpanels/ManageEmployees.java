@@ -1,12 +1,16 @@
 package guilayer.contentpanels;
 
-import javax.swing.JPanel;
-
 import guilayer.employees.*;
+import guilayer.essentials.NavigationPanel;
 
-public class ManageEmployees extends JPanel {
+public class ManageEmployees extends NavigationPanel {
+	
+	private ListEmployees listEmployee;
+	private EditEmployee employeeEditor;
 	
 	public ManageEmployees() {
+		super();
+		
 		initalize();
 	}
 
@@ -14,10 +18,20 @@ public class ManageEmployees extends JPanel {
 		
 		setLayout(null);
 		
-		EditEmployee EmployeeEditor = new EditEmployee();
-		add(EmployeeEditor);
+		employeeEditor = new EditEmployee();
+		add(employeeEditor);
 		
-		ListEmployees listSup = new ListEmployees(EmployeeEditor);
-		add(listSup);
+		listEmployee = new ListEmployees(employeeEditor);
+		add(listEmployee);
+	}
+	@Override
+	public void prepare() {
+		listEmployee.prepare();
+		employeeEditor.prepare();
+	}
+	@Override
+	public void reset() {
+		listEmployee.reset();
+		employeeEditor.reset();
 	}
 }

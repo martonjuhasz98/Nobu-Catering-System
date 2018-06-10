@@ -10,7 +10,7 @@ public class SessionSingleton {
     
 	private SessionSingleton() {
 	}
-
+	
 	public static SessionSingleton getInstance() {
 		if (instance == null)
 			instance = new SessionSingleton();
@@ -18,13 +18,16 @@ public class SessionSingleton {
 	}
 
 	public boolean logIn(String username, String password) {
+		if (user != null) return true;
+		
 		user = new EmployeeController().getEmployee(username, password);
-		return (user != null && user.getAccessLevel() <= ACCESSLEVEL) ? true : false;
+		if (user == null || user.getAccessLevel() > ACCESSLEVEL) {
+			user = null;
+			return false;
+		}
+		
+		return true;
 	}
-	
-//	public Employee getEmployee() {
-//		return user;
-//	}
 	public Employee getUser() {
 		return user;
 	}

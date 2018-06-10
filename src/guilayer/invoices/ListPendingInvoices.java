@@ -1,13 +1,11 @@
 package guilayer.invoices;
 
-import javax.swing.JPanel;
-
 import ctrllayer.InvoiceController;
 import guilayer.ManagerWindow;
 import guilayer.essentials.ButtonColumn;
 import guilayer.essentials.ItemTableModel;
+import guilayer.essentials.NavigationPanel;
 import guilayer.essentials.PerformListener;
-import guilayer.invoices.ListInvoiceHistory.SearchWorker;
 import modlayer.Invoice;
 
 import javax.swing.JTextField;
@@ -23,13 +21,12 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 
-import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
-public class ListPendingInvoices extends JPanel
+public class ListPendingInvoices extends NavigationPanel
 		implements ActionListener, MouseListener, PerformListener, CaretListener {
 
 	private InvoiceController invoiceCtrl;
@@ -38,35 +35,38 @@ public class ListPendingInvoices extends JPanel
 	private ConfirmInvoice confirmInvoice;
 	private JTextField txt_search;
 	private JButton btn_search;
-	private JButton btn_create;
 	private JTable table;
 	private InvoiceTableModel model;
-	private boolean isSearching;
+	private ButtonColumn btn_confirm;
+	private ButtonColumn btn_cancel;
+	private JButton btn_create;
+	private boolean fetchingData;
 	private String lastKeyword;
 
 	public ListPendingInvoices(ConfirmInvoice confirmInvoice, CreateInvoice createInvoice, ShowInvoice showInvoice) {
+		super();
+		
 		this.confirmInvoice = confirmInvoice;
 		this.createInvoice = createInvoice;
 		this.showInvoice = showInvoice;
+		
 		invoiceCtrl = new InvoiceController();
-		lastKeyword = "";
-		isSearching = false;
+		
 		showInvoice.addPerformListener(this);
 		createInvoice.addPerformListener(this);
 		confirmInvoice.addPerformListener(this);
 
 		initialize();
 	}
-
+	//Layout
 	private void initialize() {
-		setLayout(null);
+		
 		setBounds(0, 0, ManagerWindow.contentWidth, ManagerWindow.totalHeight - 30);
 
 		model = new InvoiceTableModel();
 
 		txt_search = new JTextField();
 		txt_search.setBounds(10, 12, 142, 20);
-		txt_search.setColumns(10);
 		add(txt_search);
 
 		btn_search = new JButton("Search");
@@ -88,87 +88,111 @@ public class ListPendingInvoices extends JPanel
 		table.setModel(model);
 		scrollPane.setViewportView(table);
 
-		AbstractAction confirm = new AbstractAction() {
-			public void actionPerformed(ActionEvent e) {
-				int modelRowIndex = Integer.valueOf(e.getActionCommand());
-				Invoice invoice = model.getItem(modelRowIndex);
+		btn_confirm = new ButtonColumn(table, model.getColumnCount() - 2, this);
+		btn_confirm.setMnemonic(KeyEvent.VK_ACCEPT);
+		btn_cancel = new ButtonColumn(table, model.getColumnCount() - 1, this);
+		btn_cancel.setMnemonic(KeyEvent.VK_CANCEL);
 
-				setVisible(false);
-				confirmInvoice.confirm(invoice);
-			}
-		};
-		AbstractAction cancel = new AbstractAction() {
-			public void actionPerformed(ActionEvent e) {
-				if (JOptionPane.showConfirmDialog(ListPendingInvoices.this, "Are you sure?", "Canceling invoice",
-						JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
-					return;
-				}
-
-				int modelRowIndex = Integer.valueOf(e.getActionCommand());
-				Invoice invoice = model.getItem(modelRowIndex);
-
-				if (!invoiceCtrl.cancelInvoice(invoice)) {
-					JOptionPane.showMessageDialog(ListPendingInvoices.this,
-							"An error occured while canceled the Invoice!", "Error!", JOptionPane.ERROR_MESSAGE);
-					return;
-				}
-
-				JOptionPane.showMessageDialog(ListPendingInvoices.this, "The Invoice was successfully canceled!",
-						"Success!", JOptionPane.INFORMATION_MESSAGE);
-				reset();
-			}
-		};
-
-		ButtonColumn confirmColumn = new ButtonColumn(table, confirm, model.getColumnCount() - 2);
-		confirmColumn.setMnemonic(KeyEvent.VK_ACCEPT);
-		ButtonColumn cancelColumn = new ButtonColumn(table, cancel, model.getColumnCount() - 1);
-		cancelColumn.setMnemonic(KeyEvent.VK_CANCEL);
-
+		reset();
+		
 		confirmInvoice.addPerformListener(this);
 		txt_search.addCaretListener(this);
 		btn_search.addActionListener(this);
 		btn_create.addActionListener(this);
 		table.addMouseListener(this);
-
-		reset();
 	}
-
-	private void reset() {
-		model.setItems(invoiceCtrl.getPendingInvoices());
+	@Override
+	public void prepare() {
+		new FetchWorker().execute();
+	}
+	@Override
+	public void reset() {
 		txt_search.setText("");
+		lastKeyword = "";
+		fetchingData = false;
 	}
-
-	private void search() {
-		if (isSearching)
-			return;
-		isSearching = true;
-		String keyword = txt_search.getText().trim();
-		if (lastKeyword.equals(keyword)) {
-			isSearching = false;
-			return;
+	@Override
+	public void performed() {
+		setVisible(true);
+		new FetchWorker().execute();
+	}
+	@Override
+	public void cancelled() {
+		setVisible(true);
+	}
+	//Functionalities
+	private void showInvoice(Invoice invoice) {
+		showInvoice.openToShow(invoice);
+		setVisible(false);
+	}
+	private void confirmInvoice(Invoice invoice) {
+		confirmInvoice.openToConfirm(invoice);
+		setVisible(false);
+	}
+	private void cancelInvoice(Invoice invoice) {
+		String message, title;
+		int messageType;
+		
+		if (!invoiceCtrl.cancelInvoice(invoice)) {
+			message = "An error occured while cancelling the Invoice!";
+			title = "Error!";
+			messageType = JOptionPane.ERROR_MESSAGE;
+		} else {
+			message = "The Invoice was successfully cancelled!";
+			title = "Success!";
+			messageType = JOptionPane.INFORMATION_MESSAGE;
+			
+			new FetchWorker().execute();
 		}
-		lastKeyword = keyword;
-		new SearchWorker(keyword).execute();
+		
+		JOptionPane.showMessageDialog(this, message, title, messageType);
 	}
-
+	private void createInvoice() {
+		createInvoice.openToCreate();
+		setVisible(false);
+	}
+	private void searchPendingInvoices() {
+		if (fetchingData) return;
+		
+		String keyword = txt_search.getText().trim();
+		if (lastKeyword.equals(keyword)) return;
+		
+		fetchingData = true;
+		lastKeyword = keyword;
+		
+		new FetchWorker(keyword).execute();
+	}
+	//EventListeners
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if (e.getSource() == btn_search) {
-			search();
-		}
-		if (e.getSource() == btn_create) {
-			createInvoice.create();
-			setVisible(false);
+		final Object source = e.getSource();
+		if (source == btn_search) {
+			searchPendingInvoices();
+		} else if (source == btn_confirm) {
+			int modelRowIndex = Integer.valueOf(e.getActionCommand());
+			Invoice invoice = model.getItem(modelRowIndex);
+
+			confirmInvoice(invoice);
+		} else if (source == btn_cancel) {
+			if (JOptionPane.showConfirmDialog(this, "Are you sure?", "Canceling invoice",
+					JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
+				return;
+			}
+
+			int modelRowIndex = Integer.valueOf(e.getActionCommand());
+			Invoice invoice = model.getItem(modelRowIndex);
+			
+			cancelInvoice(invoice);
+		} else if (source == btn_create) {
+			createInvoice();
 		}
 	}
-
 	@Override
 	public void caretUpdate(CaretEvent e) {
 		if (e.getSource() == txt_search) {
-			search();
+			searchPendingInvoices();
 		}
 	}
-
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		if (e.getClickCount() == 2 && e.getSource() == table) {
@@ -176,38 +200,18 @@ public class ListPendingInvoices extends JPanel
 			int modelRowIndex = table.convertRowIndexToModel(viewRowIndex);
 			Invoice invoice = model.getItem(modelRowIndex);
 
-			showInvoice.show(invoice);
-			setVisible(false);
+			showInvoice(invoice);
 		}
 	}
-
 	@Override
-	public void performed() {
-		model.setItems(invoiceCtrl.getPendingInvoices());
-		setVisible(true);
-	}
-
+	public void mousePressed(MouseEvent e) {}
 	@Override
-	public void cancelled() {
-		setVisible(true);
-	}
-
+	public void mouseReleased(MouseEvent e) {}
 	@Override
-	public void mousePressed(MouseEvent e) {
-	}
-
+	public void mouseEntered(MouseEvent e) {}
 	@Override
-	public void mouseReleased(MouseEvent e) {
-	}
-
-	@Override
-	public void mouseEntered(MouseEvent e) {
-	}
-
-	@Override
-	public void mouseExited(MouseEvent e) {
-	}
-
+	public void mouseExited(MouseEvent e) {}
+	//Classes
 	private class InvoiceTableModel extends ItemTableModel<Invoice> {
 
 		public InvoiceTableModel() {
@@ -241,21 +245,24 @@ public class ListPendingInvoices extends JPanel
 			return columnIndex >= getColumnCount() - 2;
 		}
 	}
-
-	public class SearchWorker extends SwingWorker<ArrayList<Invoice>, Void> {
+	private class FetchWorker extends SwingWorker<ArrayList<Invoice>, Void> {
+		
 		private String keyword;
 
-		public SearchWorker(String keyword) {
+		public FetchWorker() {
+			this("");
+		}
+		public FetchWorker(String keyword) {
 			super();
 			this.keyword = keyword;
 		}
 
 		@Override
 		protected ArrayList<Invoice> doInBackground() throws Exception {
-			// Start
-			return invoiceCtrl.searchPendingInvoices(keyword);
+			return keyword.isEmpty()
+					? invoiceCtrl.getPendingInvoices()
+					: invoiceCtrl.searchPendingInvoices(keyword);
 		}
-
 		@Override
 		protected void done() {
 			try {
@@ -263,8 +270,9 @@ public class ListPendingInvoices extends JPanel
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			isSearching = false;
-			search();
+			
+			fetchingData = false;
+			searchPendingInvoices();
 		}
 	}
 }

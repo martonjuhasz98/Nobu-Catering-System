@@ -212,9 +212,9 @@ public class EditOrder extends PerformPanel implements ActionListener, CaretList
 			}
 		};
 
-		ButtonColumn addColumn = new ButtonColumn(tbl_menu, add, mdl_menu.getColumnCount() - 1);
+		ButtonColumn addColumn = new ButtonColumn(tbl_menu, mdl_menu.getColumnCount() - 1, this);
 		addColumn.setMnemonic(KeyEvent.VK_ACCEPT);
-		ButtonColumn removeColumn = new ButtonColumn(tbl_order, remove, mdl_order.getColumnCount() - 1);
+		ButtonColumn removeColumn = new ButtonColumn(tbl_order, mdl_order.getColumnCount() - 1, this);
 		removeColumn.setMnemonic(KeyEvent.VK_CANCEL);
 		
 		cmb_table.addItemListener(this);
@@ -224,7 +224,12 @@ public class EditOrder extends PerformPanel implements ActionListener, CaretList
 		btn_back.addActionListener(this);
 		mdl_order.addTableModelListener(this);
 	}
-	private void reset() {
+	@Override
+	public void prepare() {
+		
+	}
+	@Override
+	public void reset() {
 		reseting = true;
 		order = null;
 		isCreating = true;
@@ -261,13 +266,6 @@ public class EditOrder extends PerformPanel implements ActionListener, CaretList
 	public void update(Order order) {
 		open();
 		fill(order);
-	}
-	private void open() {
-		reset();
-		setVisible(true);
-	}
-	private void close() {
-		setVisible(false);
 	}
 	private void createOrder() {
 		order = new Order();

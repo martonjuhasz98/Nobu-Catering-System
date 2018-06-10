@@ -1,22 +1,22 @@
 package guilayer.contentpanels;
 
-import javax.swing.JPanel;
-
+import guilayer.essentials.NavigationPanel;
 import guilayer.essentials.PerformListener;
 import guilayer.orders.*;
 
-public class CreateOrders extends JPanel {
+public class CreateOrders extends NavigationPanel {
+	
+	private EditOrder createOrder;
 	
 	public CreateOrders() {
+		super();
 		
 		initalize();
 	}
 
 	private void initalize() {
 		
-		setLayout(null);
-		
-		EditOrder createOrder = new EditOrder();
+		createOrder = new EditOrder();
 		add(createOrder);
 		
 		createOrder.addPerformListener(new PerformListener() {
@@ -30,5 +30,13 @@ public class CreateOrders extends JPanel {
 			}
 		});
 		createOrder.create();
+	}
+	@Override
+	public void prepare() {
+		//createOrder.prepare();
+	}
+	@Override
+	public void reset() {
+		//createOrder.reset();
 	}
 }

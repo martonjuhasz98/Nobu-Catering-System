@@ -31,6 +31,13 @@ public class ItemController {
 		return dbItem.selectItem(barcode);
 	}
 	public boolean createItem(String barcode, String name, double quantity, Unit unit, ItemCategory category) {
+		//New category
+		if (category.getId() < 1) {
+			int categoryId = dbCategory.insertCategory(category);
+			if (categoryId < 1) return false;
+			category.setId(categoryId);
+		}
+		//Item
 		Item item = new Item();
 		item.setBarcode(barcode);
 		item.setName(name);
@@ -38,49 +45,37 @@ public class ItemController {
 		item.setUnit(unit);
 		item.setCategory(category);
 		
-		boolean success = dbItem.insertItem(item) != null;
-		
-		return success;
+		return dbItem.insertItem(item).equals(barcode);
 	}
 	public boolean updateItem(Item item) {
+		//New category
+		ItemCategory category = item.getCategory();
+		if (category.getId() < 1) {
+			int categoryId = dbCategory.insertCategory(category);
+			if (categoryId < 1) return false;
+			category.setId(categoryId);
+			item.setCategory(category);
+		}
+		
 		return dbItem.updateItem(item);
 	}
 	public boolean deleteItem(Item item) {
-		boolean success = dbItem.deleteItem(item);
-		
-		return success;
+		return dbItem.deleteItem(item);
 	}
 	
 	//ItemCategories
 	public ArrayList<ItemCategory> getCategories() {
 		return dbCategory.getCategories();
 	}
-	public ItemCategory getCategory(int id) {
-		return dbCategory.selectCategory(id);
-	}
-	public boolean createItemCategory(String name) {
-		ItemCategory category = new ItemCategory();
-		category.setName(name);
-		
-		int id = dbCategory.insertCategory(category);
-		boolean success = id > 0;
-		if (success) {
-			category.setId(id);
-		}
-		
-		return success;
-	}
 
 	//Units
 	public ArrayList<Unit> getUnits() {
 		return dbUnit.getUnits();
 	}
-	public Unit getUnit(String abbr) {
-		return dbUnit.selectUnit(abbr);
-	}
 	
 	//Stocktaking
 	public boolean createStocktaking( ArrayList<Item> items) {
+		//Discrepancies
 		ArrayList<Discrepancy> discrepancies = new ArrayList<Discrepancy>();
 		for (Item item : items) {
 			Discrepancy discrepancy = new Discrepancy();
@@ -88,17 +83,14 @@ public class ItemController {
 			discrepancy.setQuantity(item.getQuantity());
 			discrepancies.add(discrepancy);
 		}
-		
+		//User
+		Employee user = SessionSingleton.getInstance().getUser();
+		if (user == null) return false;
+		//Stocktaking
 		Stocktaking stocktaking = new Stocktaking();
-		stocktaking.setEmployee(SessionSingleton.getInstance().getUser());
 		stocktaking.setDiscrepancies(discrepancies);
+		stocktaking.setEmployee(user);
 		
-		int id = dbStocktaking.insertStocktaking(stocktaking);
-		boolean success = id > 0;
-		if (success) {
-			stocktaking.setId(id);
-		}
-		
-		return success;
+		return dbStocktaking.insertStocktaking(stocktaking) > 0;
 	}
 }
