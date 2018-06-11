@@ -103,7 +103,7 @@ public class ListMenuItems extends NavigationPanel implements ActionListener, Mo
 	}
 	@Override
 	public void performed() {
-		new FetchWorker().execute();
+		prepare();
 		setVisible(true);
 	}
 	@Override
@@ -111,6 +111,10 @@ public class ListMenuItems extends NavigationPanel implements ActionListener, Mo
 		setVisible(true);
 	}
 	//Functionalities
+	private void createMenuItem() {
+		editMenuItem.openToCreate();
+		setVisible(false);
+	}
 	private void updateMenuItem(MenuItem menuItem) {
 		editMenuItem.openToUpdate(menuItem);
 		setVisible(false);
@@ -128,7 +132,7 @@ public class ListMenuItems extends NavigationPanel implements ActionListener, Mo
 			title = "Success!";
 			messageType = JOptionPane.INFORMATION_MESSAGE;
 			
-			new FetchWorker().execute();
+			prepare();
 		}
 		
 		JOptionPane.showMessageDialog(this, message, title, messageType);
@@ -161,8 +165,7 @@ public class ListMenuItems extends NavigationPanel implements ActionListener, Mo
 
 			deleteMenuItem(menuItem);
 		} else if (source == btn_create) {
-			editMenuItem.openToCreate();
-			setVisible(false);
+			createMenuItem();
 		}
 	}
 	@Override
@@ -172,8 +175,7 @@ public class ListMenuItems extends NavigationPanel implements ActionListener, Mo
 			int modelRowIndex = table.convertRowIndexToModel(viewRowIndex);
 			MenuItem menuItem = model.getItem(modelRowIndex);
 
-			editMenuItem.openToUpdate(menuItem);
-			setVisible(false);
+			updateMenuItem(menuItem);
 		}
 	}
 	@Override

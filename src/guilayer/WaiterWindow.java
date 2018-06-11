@@ -3,8 +3,6 @@ package guilayer;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import ctrllayer.SessionSingleton;
-
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Font;

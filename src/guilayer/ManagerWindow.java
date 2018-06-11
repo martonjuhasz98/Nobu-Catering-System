@@ -2,7 +2,6 @@ package guilayer;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import java.awt.CardLayout;
@@ -13,7 +12,6 @@ import guilayer.contentpanels.*;
 import guilayer.essentials.Navigatable;
 import guilayer.menu.Menu;
 import guilayer.menu.MenuItemListener;
-import java.awt.Component;
 
 public class ManagerWindow extends JFrame implements MenuItemListener {
 	
@@ -105,11 +103,12 @@ public class ManagerWindow extends JFrame implements MenuItemListener {
 	}
 	@Override
 	public void menuItemClicked(int clickedIndex) {
-		lastIndex = clickedIndex;
-		if (loading || clickedIndex < 0 || clickedIndex >= contentPanels.length || clickedIndex == prevIndex) return;
-		loading = true;
-
+		if (clickedIndex < 0 || clickedIndex >= contentPanels.length || clickedIndex == prevIndex) return;
 		layout.show(content, Integer.toString(clickedIndex));
+		lastIndex = clickedIndex;
+		
+		if (loading == true) return;
+		loading = true;
 
 		new Thread() {
 			public void run() {

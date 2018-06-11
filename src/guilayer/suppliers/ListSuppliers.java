@@ -104,7 +104,7 @@ public class ListSuppliers extends NavigationPanel implements ActionListener, Mo
 	}
 	@Override
 	public void performed() {
-		new FetchWorker().execute();
+		prepare();
 		setVisible(true);
 	}
 	@Override
@@ -125,7 +125,7 @@ public class ListSuppliers extends NavigationPanel implements ActionListener, Mo
 			title = "Success!";
 			messageType = JOptionPane.INFORMATION_MESSAGE;
 			
-			new FetchWorker().execute();
+			prepare();
 		}
 		
 		JOptionPane.showMessageDialog(this, message, title, messageType);

@@ -180,7 +180,7 @@ public class CreateInvoice extends PerformPanel implements ActionListener, Caret
 			title = "Success!";
 			messageType = JOptionPane.INFORMATION_MESSAGE;
 			
-			new FetchWorker().execute();
+			prepare();
 		}
 		
 		JOptionPane.showMessageDialog(this, message, title, messageType);

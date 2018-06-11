@@ -114,7 +114,7 @@ public class ListPendingInvoices extends NavigationPanel
 	@Override
 	public void performed() {
 		setVisible(true);
-		new FetchWorker().execute();
+		prepare();
 	}
 	@Override
 	public void cancelled() {
@@ -142,7 +142,7 @@ public class ListPendingInvoices extends NavigationPanel
 			title = "Success!";
 			messageType = JOptionPane.INFORMATION_MESSAGE;
 			
-			new FetchWorker().execute();
+			prepare();
 		}
 		
 		JOptionPane.showMessageDialog(this, message, title, messageType);

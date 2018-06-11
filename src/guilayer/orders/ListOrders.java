@@ -1,12 +1,11 @@
 package guilayer.orders;
 
-import javax.swing.JPanel;
 
 import ctrllayer.OrderController;
-import guilayer.ManagerWindow;
 import guilayer.WaiterWindow;
 import guilayer.essentials.ButtonColumn;
 import guilayer.essentials.ItemTableModel;
+import guilayer.essentials.NavigationPanel;
 import guilayer.essentials.PerformListener;
 import modlayer.Order;
 
@@ -23,48 +22,49 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 
-import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
-public class ListOrders extends JPanel
+public class ListOrders extends NavigationPanel
 		implements ActionListener, MouseListener, PerformListener, CaretListener {
 
-	private OrderController orderCtrl;
 	private EditOrder editOrder;
 	private PayOrder payOrder;
+	private OrderController orderCtrl;
 	private JTextField txt_search;
 	private JButton btn_search;
-	private JButton btn_create;
 	private JTable table;
 	private OrderTableModel model;
-	private boolean isSearching;
+	private ButtonColumn btn_pay;
+	private ButtonColumn btn_cancel;
+	private JButton btn_create;
+	private boolean fetchingData;
 	private String lastKeyword;
 
 	public ListOrders(PayOrder payOrder, EditOrder editOrder) {
+		super();
+		
 		this.payOrder = payOrder;
 		this.editOrder = editOrder;
+		
 		orderCtrl = new OrderController();
-		lastKeyword = "";
-		isSearching = false;
 		
 		payOrder.addPerformListener(this);
 		editOrder.addPerformListener(this);
 
 		initialize();
 	}
-
+	//Layout
 	private void initialize() {
-		setLayout(null);
+
 		setBounds(0, 0, WaiterWindow.contentWidth, WaiterWindow.totalHeight);
 
 		model = new OrderTableModel();
 
 		txt_search = new JTextField();
 		txt_search.setBounds(10, 11, 142, 20);
-		txt_search.setColumns(10);
 		add(txt_search);
 
 		btn_search = new JButton("Search");
@@ -86,82 +86,109 @@ public class ListOrders extends JPanel
 		table.setModel(model);
 		scrollPane.setViewportView(table);
 
-		AbstractAction pay = new AbstractAction() {
-			public void actionPerformed(ActionEvent e) {
-				int modelRowIndex = Integer.valueOf(e.getActionCommand());
-				Order order = model.getItem(modelRowIndex);
+		btn_pay = new ButtonColumn(table, model.getColumnCount() - 2, this);
+		btn_pay.setMnemonic(KeyEvent.VK_ACCEPT);
+		btn_cancel = new ButtonColumn(table, model.getColumnCount() - 1, this);
+		btn_cancel.setMnemonic(KeyEvent.VK_CANCEL);
 
-				setVisible(false);
-				payOrder.pay(order);
-			}
-		};
-		AbstractAction cancel = new AbstractAction() {
-			public void actionPerformed(ActionEvent e) {
-				if (JOptionPane.showConfirmDialog(ListOrders.this, "Are you sure?", "Canceling order",
-						JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
-					return;
-				}
-
-				int modelRowIndex = Integer.valueOf(e.getActionCommand());
-				Order order = model.getItem(modelRowIndex);
-
-				if (!orderCtrl.cancelOrder(order)) {
-					JOptionPane.showMessageDialog(ListOrders.this,
-							"An error occured while canceling the Order!", "Error!", JOptionPane.ERROR_MESSAGE);
-					return;
-				}
-
-				JOptionPane.showMessageDialog(ListOrders.this, "The Order was successfully canceled!",
-						"Success!", JOptionPane.INFORMATION_MESSAGE);
-				reset();
-			}
-		};
-
-		ButtonColumn payColumn = new ButtonColumn(table, model.getColumnCount() - 2, this);
-		payColumn.setMnemonic(KeyEvent.VK_ACCEPT);
-		ButtonColumn cancelColumn = new ButtonColumn(table, model.getColumnCount() - 1, this);
-		cancelColumn.setMnemonic(KeyEvent.VK_CANCEL);
-
+		reset();
+		
 		payOrder.addPerformListener(this);
 		txt_search.addCaretListener(this);
 		btn_search.addActionListener(this);
 		btn_create.addActionListener(this);
 		table.addMouseListener(this);
-
-		reset();
 	}
-	private void reset() {
-		model.setItems(orderCtrl.getUnpaidOrders());
+	@Override
+	public void prepare() {
+		new FetchWorker().execute();
+	}
+	@Override
+	public void reset() {
 		txt_search.setText("");
+		fetchingData = false;
+		lastKeyword = "";
 	}
-	private void search() {
-		if (isSearching)
-			return;
-		isSearching = true;
-		String keyword = txt_search.getText().trim();
-		if (lastKeyword.equals(keyword)) {
-			isSearching = false;
-			return;
+	@Override
+	public void performed() {
+		setVisible(true);
+		prepare();
+	}
+	@Override
+	public void cancelled() {
+		setVisible(true);
+	}
+	//Functionalities
+	private void createOrder() {
+		editOrder.openToCreate();
+		setVisible(false);
+	}
+	private void editOrder(Order order) {
+		editOrder.openToUpdate(order);
+		setVisible(false);
+	}
+	private void payOrder(Order order) {
+		payOrder.openToPay(order);
+		setVisible(false);
+	}
+	private void cancelOrder(Order order) {
+		String message, title;
+		int messageType;
+		
+		if (!orderCtrl.cancelOrder(order)) {
+			message = "An error occured while cancelling the Order!";
+			title = "Error!";
+			messageType = JOptionPane.ERROR_MESSAGE;
+		} else {
+			message = "The Order was successfully cancelled!";
+			title = "Success!";
+			messageType = JOptionPane.INFORMATION_MESSAGE;
+			
+			prepare();
 		}
+		
+		JOptionPane.showMessageDialog(this, message, title, messageType);
+	}
+	private void searchOrders() {
+		if (fetchingData) return;
+		
+		String keyword = txt_search.getText().trim();
+		if (lastKeyword.equals(keyword)) return;
+		
+		fetchingData = true;
 		lastKeyword = keyword;
 		
-		new SearchWorker(keyword).execute();
+		new FetchWorker(keyword).execute();
 	}
-	
+	//EventListeners
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if (e.getSource() == btn_search) {
-			search();
-		}
-		if (e.getSource() == btn_create) {
-			editOrder.create();
-			setVisible(false);
+		final Object source = e.getSource();
+		if (source == btn_search) {
+			searchOrders();
+		} else if (source == btn_pay) {
+			int modelRowIndex = Integer.valueOf(e.getActionCommand());
+			Order order = model.getItem(modelRowIndex);
+
+			payOrder(order);
+		} else if (source == btn_cancel) {
+			if (JOptionPane.showConfirmDialog(ListOrders.this, "Are you sure?", "Cancelling order",
+					JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
+				return;
+			}
+
+			int modelRowIndex = Integer.valueOf(e.getActionCommand());
+			Order order = model.getItem(modelRowIndex);
+
+			cancelOrder(order);
+		} else if (source == btn_create) {
+			createOrder();
 		}
 	}
 	@Override
 	public void caretUpdate(CaretEvent e) {
 		if (e.getSource() == txt_search) {
-			search();
+			searchOrders();
 		}
 	}
 	@Override
@@ -171,18 +198,8 @@ public class ListOrders extends JPanel
 			int modelRowIndex = table.convertRowIndexToModel(viewRowIndex);
 			Order order = model.getItem(modelRowIndex);
 
-			editOrder.update(order);
-			setVisible(false);
+			editOrder(order);
 		}
-	}
-	@Override
-	public void performed() {
-		model.setItems(orderCtrl.getUnpaidOrders());
-		setVisible(true);
-	}
-	@Override
-	public void cancelled() {
-		setVisible(true);
 	}
 	@Override
 	public void mousePressed(MouseEvent e) {}
@@ -192,7 +209,7 @@ public class ListOrders extends JPanel
 	public void mouseEntered(MouseEvent e) {}
 	@Override
 	public void mouseExited(MouseEvent e) {}
-
+	//Classes
 	private class OrderTableModel extends ItemTableModel<Order> {
 
 		public OrderTableModel() {
@@ -226,21 +243,24 @@ public class ListOrders extends JPanel
 			return columnIndex >= getColumnCount() - 2;
 		}
 	}
-
-	public class SearchWorker extends SwingWorker<ArrayList<Order>, Void> {
+	private class FetchWorker extends SwingWorker<ArrayList<Order>, Void> {
+		
 		private String keyword;
 
-		public SearchWorker(String keyword) {
+		public FetchWorker() {
+			this("");
+		}
+		public FetchWorker(String keyword) {
 			super();
 			this.keyword = keyword;
 		}
 
 		@Override
 		protected ArrayList<Order> doInBackground() throws Exception {
-			// Start
-			return orderCtrl.searchUnpaidOrders(keyword);
+			return keyword.isEmpty()
+					? orderCtrl.getUnpaidOrders()
+					: orderCtrl.searchUnpaidOrders(keyword);
 		}
-
 		@Override
 		protected void done() {
 			try {
@@ -248,8 +268,9 @@ public class ListOrders extends JPanel
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			isSearching = false;
-			search();
+			
+			fetchingData = false;
+			searchOrders();
 		}
 	}
 }

@@ -14,7 +14,6 @@ import modlayer.InvoiceItem;
 import modlayer.Item;
 
 import javax.swing.ListSelectionModel;
-import javax.swing.SwingWorker;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.JButton;
@@ -25,8 +24,6 @@ import java.awt.event.ActionEvent;
 import javax.swing.JTextField;
 import javax.swing.event.CaretListener;
 import javax.swing.event.CaretEvent;
-import javax.swing.JLabel;
-import java.awt.Font;
 import java.awt.Label;
 
 public class ConfirmInvoice extends PerformPanel implements ActionListener, CaretListener, ListSelectionListener {

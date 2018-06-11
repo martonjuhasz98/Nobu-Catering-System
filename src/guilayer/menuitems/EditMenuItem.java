@@ -209,6 +209,7 @@ public class EditMenuItem extends PerformPanel
 	@Override
 	public void prepare() {
 		new FetchWorker().execute();
+		
 		cmb_category.setModel(new DefaultComboBoxModel(menuItemCtrl.getCategories().toArray()));
 		cmb_category.setSelectedIndex(-1);
 	}

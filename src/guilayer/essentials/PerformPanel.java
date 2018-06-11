@@ -2,8 +2,6 @@ package guilayer.essentials;
 
 import java.util.ArrayList;
 
-import javax.swing.JPanel;
-
 public abstract class PerformPanel extends NavigationPanel {
 	
 	private ArrayList<PerformListener> listeners;

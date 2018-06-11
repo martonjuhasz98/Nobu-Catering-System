@@ -8,11 +8,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 
 import dblayer.interfaces.IFDBMenuItem;
-import modlayer.City;
 import modlayer.Ingredient;
-import modlayer.InvoiceItem;
-import modlayer.Item;
-import modlayer.ItemCategory;
 import modlayer.MenuItem;
 import modlayer.MenuItemCategory;
 

@@ -100,7 +100,7 @@ public class ListInvoiceHistory extends NavigationPanel
 	@Override
 	public void performed() {
 		setVisible(true);
-		new FetchWorker().execute();
+		prepare();
 	}
 	@Override
 	public void cancelled() {

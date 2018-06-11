@@ -18,6 +18,7 @@ import modlayer.MenuItem;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.text.NumberFormatter;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JFormattedTextField;
 import javax.swing.JOptionPane;
@@ -27,7 +28,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.text.NumberFormat;
 import java.awt.event.ActionEvent;
-import java.awt.Font;
 import java.awt.Label;
 import javax.swing.JComboBox;
 
@@ -45,21 +45,21 @@ public class PayOrder extends PerformPanel implements ActionListener, ItemListen
 	private JComboBox<TransactionType> cmb_payment;
 	
 	public PayOrder() {
+		super();
+		
 		orderCtrl = new OrderController();
 		
 		initialize();
 	}
-	
+	//Layout
 	private void initialize() {
-		
-		setLayout(null);
+
 		setVisible(false);
 		setBounds(0, 0, ManagerWindow.contentWidth, ManagerWindow.totalHeight - 30);
 		
 		model = new OrderTableModel();
 		
 		Label lbl_items = new Label("Items");
-		lbl_items.setFont(new Font("Dialog", Font.PLAIN, 15));
 		lbl_items.setBounds(10, 11, 129, 22);
 		add(lbl_items);
 		
@@ -74,7 +74,6 @@ public class PayOrder extends PerformPanel implements ActionListener, ItemListen
 		formatter.setOverwriteMode(true);
 		
 		Label lbl_subtotal = new Label("Subtotal");
-		lbl_subtotal.setFont(new Font("Dialog", Font.PLAIN, 15));
 		lbl_subtotal.setBounds(10, 40, 97, 22);
 		add(lbl_subtotal);
 		
@@ -85,7 +84,6 @@ public class PayOrder extends PerformPanel implements ActionListener, ItemListen
 		add(txt_subtotal);
 		
 		Label lbl_tax = new Label("Tax");
-		lbl_tax.setFont(new Font("Dialog", Font.PLAIN, 15));
 		lbl_tax.setBounds(10, 64, 97, 22);
 		add(lbl_tax);
 		
@@ -100,7 +98,6 @@ public class PayOrder extends PerformPanel implements ActionListener, ItemListen
 		add(separator);
 		
 		Label lbl_total = new Label("Total");
-		lbl_total.setFont(new Font("Dialog", Font.PLAIN, 15));
 		lbl_total.setBounds(10, 100, 97, 22);
 		add(lbl_total);
 		
@@ -122,33 +119,31 @@ public class PayOrder extends PerformPanel implements ActionListener, ItemListen
 		scrlPane.setViewportView(table);
 		
 		Label lbl_payment = new Label("Payment");
-		lbl_payment.setFont(new Font("Dialog", Font.PLAIN, 15));
 		lbl_payment.setBounds(491, 11, 129, 22);
 		add(lbl_payment);
 		
-		cmb_payment = new JComboBox<TransactionType>(TransactionType.values());
+		cmb_payment = new JComboBox<TransactionType>();
 		cmb_payment.setBounds(491, 42, 217, 20);
 		add(cmb_payment);
 		
 		btn_pay = new JButton("Pay");
 		btn_pay.setBounds(635, 428, 73, 23);
-		btn_pay.setEnabled(true);
 		add(btn_pay);
 		
 		btn_cancel = new JButton("Cancel");
-		btn_cancel.setEnabled(true);
 		btn_cancel.setBounds(717, 428, 73, 23);
 		add(btn_cancel);
+		
+		reset();
 		
 		cmb_payment.addItemListener(this);
 		btn_pay.addActionListener(this);
 		btn_cancel.addActionListener(this);
-		
-		reset();
 	}
 	@Override
 	public void prepare() {
-		
+		cmb_payment.setModel(new DefaultComboBoxModel<>(TransactionType.values()));
+		cmb_payment.setSelectedIndex(-1);
 	}
 	@Override
 	public void reset() {
@@ -160,47 +155,42 @@ public class PayOrder extends PerformPanel implements ActionListener, ItemListen
 		
 		btn_pay.setEnabled(false);
 	}
-	public void pay(Order order) {
-		reset();
+	public void openToPay(Order order) {
+		open();
 		
 		this.order = order;
 		model.setItems(order.getItems());
 		updatePrices();
-		
-		setVisible(true);
 	}
 	private void cancel() {
 		triggerCancelListeners();
 		close();
 	}
+	//Functionalities
 	private boolean isFilled() {
 		if (cmb_payment.getSelectedIndex() < 0)
 			return false;
 		
 		return true;
 	}
-	private void payOrder() {
-		if (JOptionPane.showConfirmDialog(this, "Are you sure?", "Paying order", JOptionPane.YES_NO_OPTION)
-				!= JOptionPane.YES_OPTION) {
-			return;
-		}
+	private void payOrder(TransactionType payment, Order order) {
+		String message, title;
+		int messageType;
 		
-		TransactionType payment = (TransactionType)cmb_payment.getSelectedItem();
 		if (!orderCtrl.payOrder(payment, order)) {
-			JOptionPane.showMessageDialog(this,
-				    "An error occured while paying the Order!",
-				    "Error!",
-				    JOptionPane.ERROR_MESSAGE);
-			return;
+			message = "An error occured while paying the Order!";
+			title = "Error!";
+			messageType = JOptionPane.ERROR_MESSAGE;
+		} else {
+			message = "The Order was successfully payed!";
+			title = "Success!";
+			messageType = JOptionPane.INFORMATION_MESSAGE;
+			
+			triggerPerformListeners();
+			close();
 		}
 		
-		JOptionPane.showMessageDialog(this,
-				"The Order was successfully payed!",
-			    "Success!",
-			    JOptionPane.INFORMATION_MESSAGE);
-		
-		triggerPerformListeners();
-		close();
+		JOptionPane.showMessageDialog(this, message, title, messageType);
 	}
 	private void updatePrices() {
 		double subtotal = 0, tax = 0, total = 0;
@@ -217,9 +207,16 @@ public class PayOrder extends PerformPanel implements ActionListener, ItemListen
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if (e.getSource() == btn_pay) {
-			payOrder();
-		} else if (e.getSource() == btn_cancel) {
+		final Object source = e.getSource();
+		if (source == btn_pay) {
+			if (JOptionPane.showConfirmDialog(this, "Are you sure?", "Paying the Order", JOptionPane.YES_NO_OPTION)
+					!= JOptionPane.YES_OPTION) {
+				return;
+			}
+			TransactionType payment = (TransactionType)cmb_payment.getSelectedItem();
+			
+			payOrder(payment, order);
+		} else if (source == btn_cancel) {
 			cancel();
 		}
 	}
@@ -229,7 +226,7 @@ public class PayOrder extends PerformPanel implements ActionListener, ItemListen
 			btn_pay.setEnabled(isFilled());
 		}
 	}
-	
+	//Classes
 	private class OrderTableModel extends ItemTableModel<OrderMenuItem> {
 
 		public OrderTableModel() {

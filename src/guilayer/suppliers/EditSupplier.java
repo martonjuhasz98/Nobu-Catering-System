@@ -11,7 +11,6 @@ import ctrllayer.SupplierController;
 import guilayer.ManagerWindow;
 import guilayer.essentials.PerformPanel;
 import modlayer.City;
-import modlayer.Employee;
 import modlayer.Supplier;
 
 import java.awt.event.ActionListener;

@@ -22,14 +22,14 @@ public class CreateOrders extends NavigationPanel {
 		createOrder.addPerformListener(new PerformListener() {
 			@Override
 			public void performed() {
-				createOrder.create();
+				createOrder.openToCreate();
 			}
 			@Override
 			public void cancelled() {
-				createOrder.create();
+				createOrder.openToCreate();
 			}
 		});
-		createOrder.create();
+		createOrder.openToCreate();
 	}
 	@Override
 	public void prepare() {
