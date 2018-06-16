@@ -23,7 +23,7 @@ public class DBMenuItem implements IFDBMenuItem {
 	}
 
 	@Override
-	public ArrayList<MenuItem> getMenuItems() {
+	public ArrayList<MenuItem> getMenuItems(boolean orderByCategory) {
 		ArrayList<MenuItem> menuItems = new ArrayList<>();
 		
 		String query = "SELECT "
@@ -34,7 +34,10 @@ public class DBMenuItem implements IFDBMenuItem {
 					+ "c.name AS categoryName "
 					+ "FROM [Menu_Item] AS i "
 					+ "INNER JOIN [Menu_Item_Category] AS c "
-					+ "ON i.category_id = c.id ";
+					+ "ON i.category_id = c.id";
+		if (orderByCategory) {
+			query += " ORDER BY c.id";
+		}
 		try {
 			
 			Statement st = con.createStatement();
@@ -57,7 +60,7 @@ public class DBMenuItem implements IFDBMenuItem {
 	}
 
 	@Override
-	public ArrayList<MenuItem> searchMenuItems(String keyword) {
+	public ArrayList<MenuItem> searchMenuItems(String keyword, boolean orderByCategory) {
 		ArrayList<MenuItem> menuItems = new ArrayList<MenuItem>();
 
 		String query = "SELECT "
@@ -71,6 +74,9 @@ public class DBMenuItem implements IFDBMenuItem {
 					+ "ON i.category_id = c.id "
 					+ "WHERE i.id LIKE ? "
 					+ "OR i.name LIKE ?";
+		if (orderByCategory) {
+			query += " ORDER BY c.id";
+		}
 		
 		try {
 			PreparedStatement ps = con.prepareStatement(query);

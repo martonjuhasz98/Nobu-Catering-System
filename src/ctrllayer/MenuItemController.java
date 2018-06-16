@@ -18,10 +18,16 @@ public class MenuItemController {
 
 	//MenuItems
 	public ArrayList<MenuItem> getMenuItems() {
-		return dbMenuItem.getMenuItems();
+		return dbMenuItem.getMenuItems(false);
 	}
 	public ArrayList<MenuItem> searchMenuItems(String keyword) {
-		return dbMenuItem.searchMenuItems(keyword);
+		return dbMenuItem.searchMenuItems(keyword, false);
+	}
+	public ArrayList<MenuItem> getOrderedMenuItems() {
+		return dbMenuItem.getMenuItems(true);
+	}
+	public ArrayList<MenuItem> searchOrderedMenuItems(String keyword) {
+		return dbMenuItem.searchMenuItems(keyword, true);
 	}
 	public MenuItem getMenuItem(int id) {
 		return dbMenuItem.selectMenuItem(id);

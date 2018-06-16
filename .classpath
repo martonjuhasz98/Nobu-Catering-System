@@ -5,6 +5,8 @@
 	<classpathentry kind="lib" path="lib/jdatepicker-2.0.3.jar"/>
 	<classpathentry kind="lib" path="lib/xchart-3.5.2.jar"/>
 	<classpathentry kind="lib" path="lib/sqljdbc4.jar"/>
+	<classpathentry kind="lib" path="lib/jgoodies-common-1.8.1.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/5"/>
+	<classpathentry kind="lib" path="lib/jgoodies-forms-1.8.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

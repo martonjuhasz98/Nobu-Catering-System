@@ -28,14 +28,14 @@ public class ManageOrders extends NavigationPanel {
 	}
 	@Override
 	public void prepare() {
-		//payOrder.prepare();
-		//editOrder.prepare();
-		//listOrders.prepare();
+		payOrder.prepare();
+		editOrder.prepare();
+		listOrders.prepare();
 	}
 	@Override
 	public void reset() {
-		//payOrder.reset();
-		//editOrder.reset();
-		//listOrders.reset();
+		payOrder.reset();
+		editOrder.reset();
+		listOrders.reset();
 	}
 }

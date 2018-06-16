@@ -33,10 +33,10 @@ public class CreateOrders extends NavigationPanel {
 	}
 	@Override
 	public void prepare() {
-		//createOrder.prepare();
+		createOrder.prepare();
 	}
 	@Override
 	public void reset() {
-		//createOrder.reset();
+		createOrder.reset();
 	}
 }

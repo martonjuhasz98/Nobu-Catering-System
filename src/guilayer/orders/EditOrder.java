@@ -37,6 +37,12 @@ import javax.swing.JSeparator;
 import javax.swing.JFormattedTextField;
 import javax.swing.SwingConstants;
 import javax.swing.JComboBox;
+import javax.swing.border.LineBorder;
+import java.awt.Color;
+import java.awt.Insets;
+import javax.swing.border.MatteBorder;
+import javax.swing.border.TitledBorder;
+import javax.swing.border.EtchedBorder;
 
 public class EditOrder extends PerformPanel implements ActionListener, CaretListener, TableModelListener, ItemListener {
 
@@ -96,6 +102,7 @@ public class EditOrder extends PerformPanel implements ActionListener, CaretList
 		add(lbl_items);
 		
 		txt_search = new JTextField();
+		txt_search.setMargin(new Insets(2, 5, 5, 5));
 		txt_search.setBounds(10, 92, 179, 20);
 		add(txt_search);
 		
