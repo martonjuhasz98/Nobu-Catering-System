@@ -150,14 +150,14 @@ public class EditOrder2 extends PerformPanel implements ActionListener, CaretLis
 		lblOrder.setHorizontalAlignment(SwingConstants.CENTER);
 		lblOrder.setPreferredSize(new Dimension(620, 32));
 		lblOrder.setForeground(SystemColor.textInactiveText);
-		lblOrder.setFont(new Font("Tahoma", Font.BOLD, 14));
+		lblOrder.setFont(getFont().deriveFont(Font.BOLD, 14));
 		pnl_top.add(lblOrder);
 		
 		lbl_table = new JLabel("Change table");
 		lbl_table.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		lbl_table.setForeground(new Color(70, 130, 180));
 		lbl_table.setPreferredSize(new Dimension(90, 32));
-		lbl_table.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		lbl_table.setFont(getFont().deriveFont(Font.PLAIN, 14));
 		pnl_top.add(lbl_table);
 		
 		JPanel pnl_left = new JPanel();
@@ -234,7 +234,7 @@ public class EditOrder2 extends PerformPanel implements ActionListener, CaretLis
 		
 		JLabel lbl_groupName_1 = new JLabel("Menu Category");
 		lbl_groupName_1.setForeground(SystemColor.textInactiveText);
-		lbl_groupName_1.setFont(new Font("Segoe UI", Font.BOLD, 14));
+		lbl_groupName_1.setFont(getFont().deriveFont(Font.BOLD, 14));
 		lbl_groupName_1.setBorder(new EmptyBorder(10, 10, 10, 10));
 		lbl_groupName_1.setPreferredSize(new Dimension(400, 32));
 		group_1.add(lbl_groupName_1);
@@ -258,7 +258,7 @@ public class EditOrder2 extends PerformPanel implements ActionListener, CaretLis
 		
 		JLabel label = new JLabel("12");
 		label.setForeground(SystemColor.textInactiveText);
-		label.setFont(new Font("Tahoma", Font.PLAIN, 32));
+		label.setFont(getFont().deriveFont(Font.PLAIN, 32));
 		label.setVerticalAlignment(SwingConstants.BOTTOM);
 		label.setHorizontalAlignment(SwingConstants.CENTER);
 		label.setPreferredSize(new Dimension(62, 38));
@@ -266,7 +266,7 @@ public class EditOrder2 extends PerformPanel implements ActionListener, CaretLis
 		
 		JLabel lblRoastedChickenWith = new JLabel("<html><p text-align:'center'>Menu item name</p></html>");
 		lblRoastedChickenWith.setForeground(SystemColor.textInactiveText);
-		lblRoastedChickenWith.setFont(new Font("Tahoma", Font.PLAIN, 11));
+		lblRoastedChickenWith.setFont(getFont().deriveFont(Font.PLAIN, 11));
 		lblRoastedChickenWith.setHorizontalTextPosition(SwingConstants.CENTER);
 		lblRoastedChickenWith.setHorizontalAlignment(SwingConstants.CENTER);
 		lblRoastedChickenWith.setVerticalAlignment(SwingConstants.TOP);
@@ -305,7 +305,7 @@ public class EditOrder2 extends PerformPanel implements ActionListener, CaretLis
 		JLabel lbl_groupName_2 = new JLabel("Menu Category");
 		lbl_groupName_2.setPreferredSize(new Dimension(400, 32));
 		lbl_groupName_2.setForeground(SystemColor.textInactiveText);
-		lbl_groupName_2.setFont(new Font("Segoe UI", Font.BOLD, 14));
+		lbl_groupName_2.setFont(getFont().deriveFont(Font.BOLD, 14));
 		lbl_groupName_2.setBorder(new EmptyBorder(10, 10, 10, 10));
 		group_2.add(lbl_groupName_2);
 		
@@ -341,7 +341,7 @@ public class EditOrder2 extends PerformPanel implements ActionListener, CaretLis
 		JLabel lbl_groupName_3 = new JLabel("Menu Category");
 		lbl_groupName_3.setPreferredSize(new Dimension(400, 32));
 		lbl_groupName_3.setForeground(SystemColor.textInactiveText);
-		lbl_groupName_3.setFont(new Font("Segoe UI", Font.BOLD, 14));
+		lbl_groupName_3.setFont(getFont().deriveFont(Font.BOLD, 14));
 		lbl_groupName_3.setBorder(new EmptyBorder(10, 10, 10, 10));
 		group_3.add(lbl_groupName_3);
 		
@@ -452,7 +452,7 @@ public class EditOrder2 extends PerformPanel implements ActionListener, CaretLis
 		
 		subtotal = new JLabel("22,29");
 		subtotal.setForeground(SystemColor.windowBorder);
-		subtotal.setFont(new Font("Tahoma", Font.BOLD, 14));
+		subtotal.setFont(getFont().deriveFont(Font.BOLD, 14));
 		pnl_subtotal.add(subtotal, "3, 1");
 		
 		JLabel lbl_discount = new JLabel("DISCOUNT");
@@ -462,7 +462,7 @@ public class EditOrder2 extends PerformPanel implements ActionListener, CaretLis
 		
 		discount = new JLabel("4,99");
 		discount.setForeground(SystemColor.windowBorder);
-		discount.setFont(new Font("Tahoma", Font.BOLD, 14));
+		discount.setFont(getFont().deriveFont(Font.BOLD, 14));
 		pnl_subtotal.add(discount, "3, 2");
 		
 		chk_tax = new JCheckBox("");
@@ -478,7 +478,7 @@ public class EditOrder2 extends PerformPanel implements ActionListener, CaretLis
 		
 		tax = new JLabel("1,48");
 		tax.setForeground(SystemColor.windowBorder);
-		tax.setFont(new Font("Tahoma", Font.BOLD, 14));
+		tax.setFont(getFont().deriveFont(Font.BOLD, 14));
 		pnl_subtotal.add(tax, "3, 3");
 		
 		JPanel pnl_grandTotal = new JPanel();
@@ -528,7 +528,7 @@ public class EditOrder2 extends PerformPanel implements ActionListener, CaretLis
 		btn_cash.add(ico_cash);
 		
 		JLabel lbl_cash = new JLabel("Cash");
-		lbl_cash.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		lbl_cash.setFont(getFont().deriveFont(Font.PLAIN, 14));
 		lbl_cash.setForeground(new Color(255, 255, 255));
 		btn_cash.add(lbl_cash);
 		
@@ -548,7 +548,7 @@ public class EditOrder2 extends PerformPanel implements ActionListener, CaretLis
 		
 		JLabel lbl_card = new JLabel("Card");
 		lbl_card.setForeground(Color.WHITE);
-		lbl_card.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		lbl_card.setFont(getFont().deriveFont(Font.PLAIN, 14));
 		btn_card.add(lbl_card);
 		
 		JPanel btn_scan = new JPanel();
@@ -562,7 +562,7 @@ public class EditOrder2 extends PerformPanel implements ActionListener, CaretLis
 		
 		JLabel lbl_scan = new JLabel("Scan");
 		lbl_scan.setHorizontalAlignment(SwingConstants.CENTER);
-		lbl_scan.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		lbl_scan.setFont(getFont().deriveFont(Font.PLAIN, 14));
 		lbl_scan.setPreferredSize(new Dimension(185, 36));
 		lbl_scan.setForeground(Color.WHITE);
 		btn_scan.add(lbl_scan);
@@ -577,7 +577,7 @@ public class EditOrder2 extends PerformPanel implements ActionListener, CaretLis
 		
 		JLabel lbl_other = new JLabel("Other");
 		lbl_other.setHorizontalAlignment(SwingConstants.CENTER);
-		lbl_other.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		lbl_other.setFont(getFont().deriveFont(Font.PLAIN, 14));
 		lbl_other.setPreferredSize(new Dimension(185, 36));
 		lbl_other.setForeground(Color.WHITE);
 		btn_other.add(lbl_other);
@@ -632,7 +632,7 @@ public class EditOrder2 extends PerformPanel implements ActionListener, CaretLis
 			lbl_empty.setText("No results.");
 			lbl_empty.setBorder(new EmptyBorder(10, 10, 10, 10));
 			lbl_empty.setForeground(SystemColor.textInactiveText);
-			lbl_empty.setFont(new Font("Segoe UI", Font.BOLD, 14));
+			lbl_empty.setFont(getFont().deriveFont(Font.BOLD, 14));
 			lbl_empty.setPreferredSize(new Dimension(400, 32));
 			pnl_menu.add(lbl_empty);
 			
@@ -664,7 +664,7 @@ public class EditOrder2 extends PerformPanel implements ActionListener, CaretLis
 					
 					lbl_groupName = new JLabel(category.getName());
 					lbl_groupName.setForeground(SystemColor.textInactiveText);
-					lbl_groupName.setFont(new Font("Segoe UI", Font.BOLD, 14));
+					lbl_groupName.setFont(getFont().deriveFont(Font.BOLD, 14));
 					lbl_groupName.setBorder(new EmptyBorder(10, 10, 10, 10));
 					lbl_groupName.setPreferredSize(new Dimension(400, 32));
 					pnl_group.add(lbl_groupName);
@@ -712,7 +712,7 @@ public class EditOrder2 extends PerformPanel implements ActionListener, CaretLis
 				
 				lbl_itemId = new JLabel(Integer.toString(item.getId()));
 				lbl_itemId.setForeground(SystemColor.textInactiveText);
-				lbl_itemId.setFont(new Font("Tahoma", Font.PLAIN, 32));
+				lbl_itemId.setFont(getFont().deriveFont(Font.PLAIN, 32));
 				lbl_itemId.setVerticalAlignment(SwingConstants.BOTTOM);
 				lbl_itemId.setHorizontalAlignment(SwingConstants.CENTER);
 				lbl_itemId.setPreferredSize(new Dimension(62, 38));
@@ -720,7 +720,7 @@ public class EditOrder2 extends PerformPanel implements ActionListener, CaretLis
 				
 				lbl_itemName = new JLabel("<html><p text-align:'center'>" + item.getName() + "</p></html>");
 				lbl_itemName.setForeground(SystemColor.textInactiveText);
-				lbl_itemName.setFont(new Font("Tahoma", Font.PLAIN, 11));
+				lbl_itemName.setFont(getFont().deriveFont(Font.PLAIN, 11));
 				lbl_itemName.setHorizontalTextPosition(SwingConstants.CENTER);
 				lbl_itemName.setHorizontalAlignment(SwingConstants.CENTER);
 				lbl_itemName.setVerticalAlignment(SwingConstants.TOP);
