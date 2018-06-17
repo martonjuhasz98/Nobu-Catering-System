@@ -5,9 +5,9 @@ import guilayer.orders.*;
 
 public class ManageOrders extends NavigationPanel {
 	
-	private PayOrder payOrder;
 	private EditOrder editOrder;
 	private ListOrders listOrders;
+	private SelectTable selectTable;
 
 	public ManageOrders() {
 		super();
@@ -17,24 +17,24 @@ public class ManageOrders extends NavigationPanel {
 
 	private void initalize() {
 		
-		payOrder = new PayOrder();
-		add(payOrder);
+		selectTable = new SelectTable(20);
+		add(selectTable);
 		
-		editOrder = new EditOrder();
+		editOrder = new EditOrder(selectTable);
 		add(editOrder);
 		
-		listOrders = new ListOrders(payOrder, editOrder);
+		listOrders = new ListOrders(editOrder);
 		add(listOrders);
 	}
 	@Override
 	public void prepare() {
-		payOrder.prepare();
+		selectTable.prepare();
 		editOrder.prepare();
 		listOrders.prepare();
 	}
 	@Override
 	public void reset() {
-		payOrder.reset();
+		selectTable.reset();
 		editOrder.reset();
 		listOrders.reset();
 	}

@@ -1,11 +1,13 @@
 package modlayer;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 public class Order {
 
 	private int id;
 	private int tableNo;
+	private Date timestamp;
 	private Employee employee;
 	private Transaction transaction;
 	private ArrayList<OrderMenuItem> items;
@@ -21,6 +23,9 @@ public class Order {
 	public int getTableNo() {
 		return tableNo;
 	}
+	public Date getTimestamp() {
+		return timestamp;
+	}
 	public Employee getEmployee() {
 		return employee;
 	}
@@ -35,6 +40,9 @@ public class Order {
 	}
 	public void setTableNo(int tableNo) {
 		this.tableNo = tableNo;
+	}
+	public void setTimestamp(Date timestamp) {
+		this.timestamp = timestamp;
 	}
 	public void setEmployee(Employee employee) {
 		this.employee = employee;

@@ -1,5 +1,6 @@
 package guilayer;
 
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
@@ -8,9 +9,10 @@ import java.awt.Color;
 import java.awt.Font;
 
 import guilayer.contentpanels.*;
+import guilayer.essentials.Navigatable;
 import guilayer.menu.*;
 
-public class WaiterWindow extends JFrame {
+public class WaiterWindow extends JFrame implements MenuItemListener {
 	
 	public static final int totalWidth = 1000;
 	public static final int totalHeight = 500;
@@ -26,9 +28,20 @@ public class WaiterWindow extends JFrame {
 	public static final Font menuFont = new Font("Segoe UI", Font.BOLD, 16);
 	public static final Font contentFont = new Font("Segoe UI", Font.PLAIN, 14);
 	private JPanel contentPane;
+	private Menu menu;
+	private JPanel content;
+	private CardLayout layout;
+	private JComponent[] contentPanels;
+	private boolean loading;
+	private int lastIndex;
+	private int prevIndex;
 	
 	public WaiterWindow() {
 		super();
+		
+		lastIndex = 0;
+		prevIndex = 0;
+		loading = false;
 		
 		initialize();
 	}
@@ -47,7 +60,7 @@ public class WaiterWindow extends JFrame {
 		contentPane.setLayout(null);
 		setContentPane(contentPane);
 		
-		Menu menu = new Menu();
+		menu = new Menu();
 		menu.setLayout(null);
 		menu.setBounds(0, 0, menuWidth, totalHeight);
 		menu.setItemHeight(menuItemHeight);
@@ -56,12 +69,12 @@ public class WaiterWindow extends JFrame {
 		menu.setForeground(menuFontColour);
 		menu.setFont(menuFont);
 		menu.setCurrentColour(activeMenuItemSignColour);
-		menu.add("Order");
-		menu.add("Pay");
+		menu.add("Create Order");
+		menu.add("List Orders");
 		contentPane.add(menu);
 		
-		JPanel content = new JPanel();
-		CardLayout layout = new CardLayout(0, 0);
+		content = new JPanel();
+		layout = new CardLayout(0, 0);
 		content.setLayout(layout);
 		content.setBounds(200, 0, contentWidth, totalHeight);
 		content.setBackground(contentBackgroundColour);
@@ -69,21 +82,37 @@ public class WaiterWindow extends JFrame {
 		content.setFont(contentFont);
 		contentPane.add(content);
 		
-		content.add(new CreateOrders(), "0");
-		content.add(new ManageOrders(), "1");
+		contentPanels = new JComponent[2];
+		contentPanels[0] = new CreateOrders();
+		contentPanels[1] = new ManageOrders();
+		for (int i = 0; i < contentPanels.length; i++) {
+			content.add(contentPanels[i], Integer.toString(i));
+		}
 		
-		menu.addMenuItemListener(new MenuItemListener() {
-			@Override
-			public void menuItemClicked(int clickedIndex) {
-				switch(clickedIndex) {
-					case 0:
-						layout.show(content, "0");
-						break;
-					case 1:
-						layout.show(content, "1");
-						break;
+		menu.addMenuItemListener(this);
+	}
+	@Override
+	public void menuItemClicked(int clickedIndex) {
+		if (clickedIndex < 0 || clickedIndex >= contentPanels.length || clickedIndex == prevIndex) return;
+		layout.show(content, Integer.toString(clickedIndex));
+		lastIndex = clickedIndex;
+		
+		if (loading == true) return;
+		loading = true;
+
+		new Thread() {
+			public void run() {
+				//Load stuff in background
+				((Navigatable)contentPanels[clickedIndex]).prepare();
+				((Navigatable)contentPanels[prevIndex]).reset();
+				//Release lock
+				prevIndex = clickedIndex;
+				loading = false;
+				//If this is not the last one clicked
+				if (lastIndex != prevIndex) {
+					menuItemClicked(lastIndex);
 				}
 			}
-		});
+		}.start();
 	}
 }

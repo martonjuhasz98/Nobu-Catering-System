@@ -157,8 +157,8 @@ public class LoginWindow extends JFrame implements ActionListener, CaretListener
 			//Log loading time
 			time = System.nanoTime();
 			
-			return new ManagerWindow();
-			//return new WaiterWindow();
+			//return new ManagerWindow();
+			return new WaiterWindow();
 		}
 
 		@Override

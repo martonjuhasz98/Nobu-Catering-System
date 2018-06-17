@@ -7,6 +7,7 @@ import guilayer.orders.*;
 public class CreateOrders extends NavigationPanel {
 	
 	private EditOrder createOrder;
+	private SelectTable selectTable;
 	
 	public CreateOrders() {
 		super();
@@ -16,7 +17,10 @@ public class CreateOrders extends NavigationPanel {
 
 	private void initalize() {
 		
-		createOrder = new EditOrder();
+		selectTable = new SelectTable(20);
+		add(selectTable);
+		
+		createOrder = new EditOrder(selectTable);
 		add(createOrder);
 		
 		createOrder.addPerformListener(new PerformListener() {
@@ -33,10 +37,12 @@ public class CreateOrders extends NavigationPanel {
 	}
 	@Override
 	public void prepare() {
+		selectTable.prepare();
 		createOrder.prepare();
 	}
 	@Override
 	public void reset() {
+		selectTable.reset();
 		createOrder.reset();
 	}
 }

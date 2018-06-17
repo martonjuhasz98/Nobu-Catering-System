@@ -218,7 +218,9 @@ public class SelectTable extends PerformPanel {
 		}
 	}
 	@Override
-	public void prepare() {}
+	public void prepare() {
+		reset();
+	}
 	@Override
 	public void reset() {
 		if (selectedTable != null) {

@@ -7,7 +7,7 @@ import javax.swing.UIManager;
 import javax.swing.plaf.FontUIResource;
 
 import guilayer.LoginWindow;
-import guilayer.orders.EditOrder2;
+import guilayer.orders.EditOrder;
 
 public class Main {
 
@@ -16,7 +16,7 @@ public class Main {
 			public void run() {
 				try {
 					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-					Font defaultFont = importFont("/font/helvetica.otf").deriveFont(14f);
+					Font defaultFont = importFont("/font/helvetica.otf").deriveFont(Font.PLAIN, 14f);
 					Main.setDefaultFont(new FontUIResource(defaultFont));
 					
 					new LoginWindow();

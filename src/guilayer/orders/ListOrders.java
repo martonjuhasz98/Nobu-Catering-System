@@ -15,6 +15,7 @@ import javax.swing.SwingWorker;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -31,27 +32,22 @@ public class ListOrders extends NavigationPanel
 		implements ActionListener, MouseListener, PerformListener, CaretListener {
 
 	private EditOrder editOrder;
-	private PayOrder payOrder;
 	private OrderController orderCtrl;
 	private JTextField txt_search;
 	private JButton btn_search;
 	private JTable table;
 	private OrderTableModel model;
-	private ButtonColumn btn_pay;
 	private ButtonColumn btn_cancel;
-	private JButton btn_create;
 	private boolean fetchingData;
 	private String lastKeyword;
 
-	public ListOrders(PayOrder payOrder, EditOrder editOrder) {
+	public ListOrders(EditOrder editOrder) {
 		super();
 		
-		this.payOrder = payOrder;
 		this.editOrder = editOrder;
 		
 		orderCtrl = new OrderController();
 		
-		payOrder.addPerformListener(this);
 		editOrder.addPerformListener(this);
 
 		initialize();
@@ -71,32 +67,26 @@ public class ListOrders extends NavigationPanel
 		btn_search.setBounds(162, 10, 65, 23);
 		add(btn_search);
 
-		btn_create = new JButton("Create");
-		btn_create.setBounds(725, 10, 65, 23);
-		add(btn_create);
-
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setBounds(10, 42, 780, 417);
 		add(scrollPane);
 
 		table = new JTable();
+		table.setRowHeight(32);
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		table.getTableHeader().setReorderingAllowed(false);
+		table.getTableHeader().setPreferredSize(new Dimension(0, 32));
 		table.setAutoCreateRowSorter(true);
 		table.setModel(model);
 		scrollPane.setViewportView(table);
 
-		btn_pay = new ButtonColumn(table, model.getColumnCount() - 2, this);
-		btn_pay.setMnemonic(KeyEvent.VK_ACCEPT);
 		btn_cancel = new ButtonColumn(table, model.getColumnCount() - 1, this);
 		btn_cancel.setMnemonic(KeyEvent.VK_CANCEL);
 
 		reset();
 		
-		payOrder.addPerformListener(this);
 		txt_search.addCaretListener(this);
 		btn_search.addActionListener(this);
-		btn_create.addActionListener(this);
 		table.addMouseListener(this);
 	}
 	@Override
@@ -125,10 +115,6 @@ public class ListOrders extends NavigationPanel
 	}
 	private void editOrder(Order order) {
 		editOrder.openToUpdate(order);
-		setVisible(false);
-	}
-	private void payOrder(Order order) {
-		payOrder.openToPay(order);
 		setVisible(false);
 	}
 	private void cancelOrder(Order order) {
@@ -166,11 +152,6 @@ public class ListOrders extends NavigationPanel
 		final Object source = e.getSource();
 		if (source == btn_search) {
 			searchOrders();
-		} else if (source == btn_pay) {
-			int modelRowIndex = Integer.valueOf(e.getActionCommand());
-			Order order = model.getItem(modelRowIndex);
-
-			payOrder(order);
 		} else if (source == btn_cancel) {
 			if (JOptionPane.showConfirmDialog(ListOrders.this, "Are you sure?", "Cancelling order",
 					JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
@@ -181,8 +162,6 @@ public class ListOrders extends NavigationPanel
 			Order order = model.getItem(modelRowIndex);
 
 			cancelOrder(order);
-		} else if (source == btn_create) {
-			createOrder();
 		}
 	}
 	@Override
@@ -215,7 +194,7 @@ public class ListOrders extends NavigationPanel
 		public OrderTableModel() {
 			super();
 
-			columns = new String[] { "Id", "Table No.", "Menu items", "", "" };
+			columns = new String[] { "Id", "Table No.", "Menu items", "" };
 		}
 
 		@Override
@@ -230,8 +209,6 @@ public class ListOrders extends NavigationPanel
 			case 2:
 				return order.getItems().size();
 			case 3:
-				return "Pay";
-			case 4:
 				return "Cancel";
 			}
 
@@ -240,7 +217,7 @@ public class ListOrders extends NavigationPanel
 
 		@Override
 		public boolean isCellEditable(int rowIndex, int columnIndex) {
-			return columnIndex >= getColumnCount() - 2;
+			return columnIndex >= getColumnCount() - 1;
 		}
 	}
 	private class FetchWorker extends SwingWorker<ArrayList<Order>, Void> {

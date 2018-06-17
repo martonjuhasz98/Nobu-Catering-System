@@ -52,6 +52,7 @@ public class OrderController {
 	public boolean payOrder(TransactionType payment, Order order) {
 		Transaction transaction = new Transaction();
 		transaction.setType(payment);
+		order = dbOrder.selectOrder(order.getId());
 		order.setTransaction(transaction);
 		
 		boolean success = dbOrder.payOrder(order);

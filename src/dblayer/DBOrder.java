@@ -284,6 +284,7 @@ public class DBOrder implements IFDBOrder {
 			order = new Order();
 			order.setId(results.getInt("orderId"));
 			order.setTableNo(results.getInt("orderTableNo"));
+			order.setTimestamp(results.getDate("orderTimestamp"));
 			
 			//City
 			City city = new City();
