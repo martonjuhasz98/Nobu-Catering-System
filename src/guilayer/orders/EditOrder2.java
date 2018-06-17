@@ -14,12 +14,15 @@ import javax.swing.text.Document;
 import javax.swing.text.NumberFormatter;
 
 import ctrllayer.OrderController;
+import ctrllayer.SessionSingleton;
 import ctrllayer.MenuItemController;
 import guilayer.WaiterWindow;
 import guilayer.essentials.ButtonColumn;
 import guilayer.essentials.ItemTableModel;
+import guilayer.essentials.PerformListener;
 import guilayer.essentials.PerformPanel;
 import modlayer.OrderMenuItem;
+import modlayer.TransactionType;
 import modlayer.MenuItem;
 import modlayer.MenuItemCategory;
 import modlayer.Order;
@@ -48,9 +51,11 @@ import java.awt.Graphics2D;
 import java.awt.SystemColor;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
 
 import java.awt.Component;
 import java.awt.ComponentOrientation;
+import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.EventQueue;
@@ -69,7 +74,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.RowSpec;
 
-public class EditOrder2 extends PerformPanel implements ActionListener, CaretListener, TableModelListener, ItemListener {
+public class EditOrder2 extends PerformPanel implements PerformListener, ActionListener, CaretListener, TableModelListener, ItemListener {
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -77,9 +82,17 @@ public class EditOrder2 extends PerformPanel implements ActionListener, CaretLis
 				try {
 					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 					JFrame window = new JFrame();
+					window.setPreferredSize(new Dimension(816, 536));
 					
-					EditOrder2 editor = new EditOrder2();
-					window.getContentPane().add(editor);
+					SessionSingleton.getInstance().logIn("martonjuhasz98", "Asa123456");
+					
+					Container content = window.getContentPane();
+					
+					SelectTable selecter = new SelectTable(20);
+					content.add(selecter);
+					
+					EditOrder2 editor = new EditOrder2(selecter);
+					content.add(editor);
 					
 					editor.openToCreate();
 					window.pack();
@@ -92,6 +105,7 @@ public class EditOrder2 extends PerformPanel implements ActionListener, CaretLis
 		});
 	}
 	
+	private SelectTable selectTable;
 	private OrderController orderCtrl;
 	private MenuItemController itemCtrl;
 	private Order order;
@@ -106,13 +120,16 @@ public class EditOrder2 extends PerformPanel implements ActionListener, CaretLis
 	private JLabel tax;
 	private JLabel discount;
 	private JLabel subtotal;
-	private JLabel lblOrder;
+	private JLabel lbl_title;
 	private JLabel lbl_table;
 	private JPanel pnl_menu;
 	private JCheckBox chk_tax;
 	
-	public EditOrder2() {
+	public EditOrder2(SelectTable selectTable) {
 		super();
+		
+		this.selectTable = selectTable;
+		
 		setSize(new Dimension(800, 500));
 		setPreferredSize(new Dimension(800, 500));
 		setBackground(SystemColor.window);
@@ -120,10 +137,7 @@ public class EditOrder2 extends PerformPanel implements ActionListener, CaretLis
 		itemCtrl = new MenuItemController();
 		orderCtrl = new OrderController();
 		
-		order = null;
-		isCreating = true;
-		lastKeyword = "";
-		fetchingData = false;
+		selectTable.addPerformListener(this);
 		
 		initialize();
 	}
@@ -146,12 +160,12 @@ public class EditOrder2 extends PerformPanel implements ActionListener, CaretLis
 		fl_pnl_top.setHgap(0);
 		add(pnl_top);
 		
-		lblOrder = new JLabel("Order#32 for Table 10");
-		lblOrder.setHorizontalAlignment(SwingConstants.CENTER);
-		lblOrder.setPreferredSize(new Dimension(620, 32));
-		lblOrder.setForeground(SystemColor.textInactiveText);
-		lblOrder.setFont(getFont().deriveFont(Font.BOLD, 14));
-		pnl_top.add(lblOrder);
+		lbl_title = new JLabel("Order#1 for Table 00");
+		lbl_title.setHorizontalAlignment(SwingConstants.CENTER);
+		lbl_title.setPreferredSize(new Dimension(620, 32));
+		lbl_title.setForeground(SystemColor.textInactiveText);
+		lbl_title.setFont(getFont().deriveFont(Font.BOLD, 14));
+		pnl_top.add(lbl_title);
 		
 		lbl_table = new JLabel("Change table");
 		lbl_table.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -222,160 +236,6 @@ public class EditOrder2 extends PerformPanel implements ActionListener, CaretLis
 		pnl_menu.setAlignmentY(Component.TOP_ALIGNMENT);
 		pnl_menu.setAlignmentX(Component.LEFT_ALIGNMENT);
 		scr_menu.setViewportView(pnl_menu);
-		
-		JPanel group_1 = new JPanel();
-		FlowLayout flowLayout_3 = (FlowLayout) group_1.getLayout();
-		flowLayout_3.setVgap(0);
-		flowLayout_3.setHgap(0);
-		flowLayout_3.setAlignment(FlowLayout.LEFT);
-		group_1.setBackground(SystemColor.window);
-		group_1.setPreferredSize(new Dimension(400, 222));
-		pnl_menu.add(group_1);
-		
-		JLabel lbl_groupName_1 = new JLabel("Menu Category");
-		lbl_groupName_1.setForeground(SystemColor.textInactiveText);
-		lbl_groupName_1.setFont(getFont().deriveFont(Font.BOLD, 14));
-		lbl_groupName_1.setBorder(new EmptyBorder(10, 10, 10, 10));
-		lbl_groupName_1.setPreferredSize(new Dimension(400, 32));
-		group_1.add(lbl_groupName_1);
-		
-		JPanel itemsContainer = new JPanel();
-		itemsContainer.setBackground(SystemColor.window);
-		itemsContainer.setOpaque(false);
-		itemsContainer.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-		itemsContainer.setPreferredSize(new Dimension(400, 190));
-		group_1.add(itemsContainer);
-		itemsContainer.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 10));
-		
-		JPanel item_1 = new JPanel();
-		item_1.setBackground(SystemColor.scrollbar);
-		item_1.setBorder(new EmptyBorder(8, 8, 8, 8));
-		item_1.setPreferredSize(new Dimension(80, 80));
-		FlowLayout flowLayout_2 = (FlowLayout) item_1.getLayout();
-		flowLayout_2.setVgap(0);
-		flowLayout_2.setHgap(0);
-		itemsContainer.add(item_1);
-		
-		JLabel label = new JLabel("12");
-		label.setForeground(SystemColor.textInactiveText);
-		label.setFont(getFont().deriveFont(Font.PLAIN, 32));
-		label.setVerticalAlignment(SwingConstants.BOTTOM);
-		label.setHorizontalAlignment(SwingConstants.CENTER);
-		label.setPreferredSize(new Dimension(62, 38));
-		item_1.add(label);
-		
-		JLabel lblRoastedChickenWith = new JLabel("<html><p text-align:'center'>Menu item name</p></html>");
-		lblRoastedChickenWith.setForeground(SystemColor.textInactiveText);
-		lblRoastedChickenWith.setFont(getFont().deriveFont(Font.PLAIN, 11));
-		lblRoastedChickenWith.setHorizontalTextPosition(SwingConstants.CENTER);
-		lblRoastedChickenWith.setHorizontalAlignment(SwingConstants.CENTER);
-		lblRoastedChickenWith.setVerticalAlignment(SwingConstants.TOP);
-		lblRoastedChickenWith.setPreferredSize(new Dimension(62, 28));
-		item_1.add(lblRoastedChickenWith);
-		
-		JPanel item_2 = new JPanel();
-		item_2.setPreferredSize(new Dimension(80, 80));
-		itemsContainer.add(item_2);
-		
-		JPanel item_3 = new JPanel();
-		item_3.setPreferredSize(new Dimension(80, 80));
-		itemsContainer.add(item_3);
-		
-		JPanel item_4 = new JPanel();
-		item_4.setPreferredSize(new Dimension(80, 80));
-		itemsContainer.add(item_4);
-		
-		JPanel item_5 = new JPanel();
-		item_5.setPreferredSize(new Dimension(80, 80));
-		itemsContainer.add(item_5);
-		
-		JPanel item_6 = new JPanel();
-		item_6.setPreferredSize(new Dimension(80, 80));
-		itemsContainer.add(item_6);
-		
-		JPanel item_7 = new JPanel();
-		item_7.setPreferredSize(new Dimension(80, 80));
-		itemsContainer.add(item_7);
-		
-		JPanel group_2 = new JPanel();
-		group_2.setPreferredSize(new Dimension(400, 142));
-		group_2.setBackground(Color.WHITE);
-		pnl_menu.add(group_2);
-		
-		JLabel lbl_groupName_2 = new JLabel("Menu Category");
-		lbl_groupName_2.setPreferredSize(new Dimension(400, 32));
-		lbl_groupName_2.setForeground(SystemColor.textInactiveText);
-		lbl_groupName_2.setFont(getFont().deriveFont(Font.BOLD, 14));
-		lbl_groupName_2.setBorder(new EmptyBorder(10, 10, 10, 10));
-		group_2.add(lbl_groupName_2);
-		
-		JPanel itemsContainer_2 = new JPanel();
-		itemsContainer_2.setPreferredSize(new Dimension(400, 100));
-		itemsContainer_2.setOpaque(false);
-		itemsContainer_2.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-		itemsContainer_2.setBackground(Color.WHITE);
-		group_2.add(itemsContainer_2);
-		itemsContainer_2.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 10));
-		
-		JPanel item_8 = new JPanel();
-		item_8.setPreferredSize(new Dimension(80, 80));
-		itemsContainer_2.add(item_8);
-		
-		JPanel item_9 = new JPanel();
-		item_9.setPreferredSize(new Dimension(80, 80));
-		itemsContainer_2.add(item_9);
-		
-		JPanel item_10 = new JPanel();
-		item_10.setPreferredSize(new Dimension(80, 80));
-		itemsContainer_2.add(item_10);
-		
-		JPanel item_11 = new JPanel();
-		item_11.setPreferredSize(new Dimension(80, 80));
-		itemsContainer_2.add(item_11);
-		
-		JPanel group_3 = new JPanel();
-		group_3.setPreferredSize(new Dimension(400, 222));
-		group_3.setBackground(Color.WHITE);
-		pnl_menu.add(group_3);
-		
-		JLabel lbl_groupName_3 = new JLabel("Menu Category");
-		lbl_groupName_3.setPreferredSize(new Dimension(400, 32));
-		lbl_groupName_3.setForeground(SystemColor.textInactiveText);
-		lbl_groupName_3.setFont(getFont().deriveFont(Font.BOLD, 14));
-		lbl_groupName_3.setBorder(new EmptyBorder(10, 10, 10, 10));
-		group_3.add(lbl_groupName_3);
-		
-		JPanel itemsContainer_3 = new JPanel();
-		itemsContainer_3.setPreferredSize(new Dimension(400, 190));
-		itemsContainer_3.setOpaque(false);
-		itemsContainer_3.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-		itemsContainer_3.setBackground(Color.WHITE);
-		group_3.add(itemsContainer_3);
-		itemsContainer_3.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 10));
-		
-		JPanel item_12 = new JPanel();
-		item_12.setPreferredSize(new Dimension(80, 80));
-		itemsContainer_3.add(item_12);
-		
-		JPanel item_13 = new JPanel();
-		item_13.setPreferredSize(new Dimension(80, 80));
-		itemsContainer_3.add(item_13);
-		
-		JPanel item_14 = new JPanel();
-		item_14.setPreferredSize(new Dimension(80, 80));
-		itemsContainer_3.add(item_14);
-		
-		JPanel item_15 = new JPanel();
-		item_15.setPreferredSize(new Dimension(80, 80));
-		itemsContainer_3.add(item_15);
-		
-		JPanel item_16 = new JPanel();
-		item_16.setPreferredSize(new Dimension(80, 80));
-		itemsContainer_3.add(item_16);
-		
-		JPanel item_17 = new JPanel();
-		item_17.setPreferredSize(new Dimension(80, 80));
-		itemsContainer_3.add(item_17);
 		
 		txt_search.addCaretListener(this);
 		
@@ -513,6 +373,7 @@ public class EditOrder2 extends PerformPanel implements ActionListener, CaretLis
 		pnl_payment.setLayout(new GridLayout(2, 2, 5, 5));
 		
 		JPanel btn_cash = new JPanel();
+		btn_cash.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		FlowLayout fl_btn_cash = (FlowLayout) btn_cash.getLayout();
 		fl_btn_cash.setVgap(0);
 		fl_btn_cash.setHgap(0);
@@ -533,6 +394,7 @@ public class EditOrder2 extends PerformPanel implements ActionListener, CaretLis
 		btn_cash.add(lbl_cash);
 		
 		JPanel btn_card = new JPanel();
+		btn_card.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		FlowLayout fl_btn_card = (FlowLayout) btn_card.getLayout();
 		fl_btn_card.setVgap(0);
 		fl_btn_card.setHgap(0);
@@ -551,38 +413,135 @@ public class EditOrder2 extends PerformPanel implements ActionListener, CaretLis
 		lbl_card.setFont(getFont().deriveFont(Font.PLAIN, 14));
 		btn_card.add(lbl_card);
 		
-		JPanel btn_scan = new JPanel();
-		FlowLayout fl_btn_scan = (FlowLayout) btn_scan.getLayout();
-		fl_btn_scan.setVgap(0);
-		fl_btn_scan.setHgap(0);
-		btn_scan.setPreferredSize(new Dimension(100, 32));
-		btn_scan.setBackground(new Color(72, 209, 204));
-		pnl_payment.add(btn_scan);
+		JPanel btn_delete = new JPanel();
+		btn_delete.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		FlowLayout flowLayout = (FlowLayout) btn_delete.getLayout();
+		flowLayout.setVgap(0);
+		flowLayout.setHgap(0);
+		btn_delete.setPreferredSize(new Dimension(100, 32));
+		btn_delete.setBackground(new Color(72, 209, 204));
+		pnl_payment.add(btn_delete);
 		
+		JLabel ico_delete = new JLabel("\uf2ed");
+		ico_delete.setPreferredSize(new Dimension(24, 36));
+		ico_delete.setForeground(Color.WHITE);
+		ico_delete.setFont(fontAwesome.deriveFont(Font.PLAIN, 24f));
+		btn_delete.add(ico_delete);
 		
-		JLabel lbl_scan = new JLabel("Scan");
-		lbl_scan.setHorizontalAlignment(SwingConstants.CENTER);
-		lbl_scan.setFont(getFont().deriveFont(Font.PLAIN, 14));
-		lbl_scan.setPreferredSize(new Dimension(185, 36));
-		lbl_scan.setForeground(Color.WHITE);
-		btn_scan.add(lbl_scan);
+		JLabel lbl_delete = new JLabel("Delete");
+		lbl_delete.setForeground(Color.WHITE);
+		lbl_delete.setFont(lbl_delete.getFont().deriveFont(14f));
+		btn_delete.add(lbl_delete);
 		
-		JPanel btn_other = new JPanel();
-		FlowLayout fl_btn_other = (FlowLayout) btn_other.getLayout();
-		fl_btn_other.setHgap(0);
-		fl_btn_other.setVgap(0);
-		btn_other.setPreferredSize(new Dimension(100, 32));
-		btn_other.setBackground(new Color(72, 209, 204));
-		pnl_payment.add(btn_other);
+		JPanel btn_cancel = new JPanel();
+		btn_cancel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		FlowLayout fl_btn_cancel = (FlowLayout) btn_cancel.getLayout();
+		fl_btn_cancel.setHgap(0);
+		fl_btn_cancel.setVgap(0);
+		btn_cancel.setPreferredSize(new Dimension(100, 32));
+		btn_cancel.setBackground(new Color(72, 209, 204));
+		pnl_payment.add(btn_cancel);
 		
-		JLabel lbl_other = new JLabel("Other");
-		lbl_other.setHorizontalAlignment(SwingConstants.CENTER);
-		lbl_other.setFont(getFont().deriveFont(Font.PLAIN, 14));
-		lbl_other.setPreferredSize(new Dimension(185, 36));
-		lbl_other.setForeground(Color.WHITE);
-		btn_other.add(lbl_other);
+		JLabel lbl_cancel = new JLabel("Cancel");
+		lbl_cancel.setHorizontalAlignment(SwingConstants.CENTER);
+		lbl_cancel.setFont(getFont().deriveFont(Font.PLAIN, 14));
+		lbl_cancel.setPreferredSize(new Dimension(185, 36));
+		lbl_cancel.setForeground(Color.WHITE);
+		btn_cancel.add(lbl_cancel);
+		
 		btn_remove.setMnemonic(KeyEvent.VK_DELETE);
+		
+		reset();
+		
+		chk_tax.addItemListener(this);
 		mdl_order.addTableModelListener(this);
+		lbl_table.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				EditOrder2.this.setVisible(false);
+				selectTable.openToChange(order);
+			}
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				lbl_table.setText("<html><u>Change table</u><html>");
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				lbl_table.setText("Change table");
+			}
+		});
+		btn_cash.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (JOptionPane.showConfirmDialog(EditOrder2.this, "Are you sure?", "Paying by Cash", JOptionPane.YES_NO_OPTION)
+						!= JOptionPane.YES_OPTION) {
+					return;
+				}
+				
+				payOrder(TransactionType.CASH, order);
+			}
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				btn_cash.setBackground(new Color(51, 102, 153));
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				btn_cash.setBackground(new Color(70, 130, 180));
+			}
+		});
+		btn_card.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (JOptionPane.showConfirmDialog(EditOrder2.this, "Are you sure?", "Paying by Card", JOptionPane.YES_NO_OPTION)
+						!= JOptionPane.YES_OPTION) {
+					return;
+				}
+				
+				payOrder(TransactionType.CREDITCARD, order);
+			}
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				btn_card.setBackground(new Color(51, 102, 153));
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				btn_card.setBackground(new Color(70, 130, 180));
+			}
+		});
+		btn_delete.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (JOptionPane.showConfirmDialog(EditOrder2.this, "Are you sure?", "Deleting the Order", JOptionPane.YES_NO_OPTION)
+						!= JOptionPane.YES_OPTION) {
+					return;
+				}
+				
+				cancelOrder(order);
+			}
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				btn_delete.setBackground(new Color(32, 178, 170));
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				btn_delete.setBackground(new Color(72, 209, 204));
+			}
+		});
+		btn_cancel.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				cancel();
+			}
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				btn_cancel.setBackground(new Color(32, 178, 170));
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				btn_cancel.setBackground(new Color(72, 209, 204));
+			}
+		});
+		
 	}
 	private Font importFont(String fontName) {
 		try {
@@ -601,8 +560,10 @@ public class EditOrder2 extends PerformPanel implements ActionListener, CaretLis
 	}
 	@Override
 	public void reset() {
-		order = null;
+		order = new Order();
 		isCreating = true;
+		lastKeyword = "";
+		fetchingData = false;
 		
 		mdl_order.setItems(new ArrayList<OrderMenuItem>());
 		updatePrices();
@@ -611,6 +572,11 @@ public class EditOrder2 extends PerformPanel implements ActionListener, CaretLis
 	}
 	public void openToCreate() {
 		open();
+		
+		order = new Order();
+		
+		setVisible(false);
+		selectTable.openToSelect(order);
 	}
 	public void openToUpdate(Order order) {
 		open();
@@ -620,6 +586,18 @@ public class EditOrder2 extends PerformPanel implements ActionListener, CaretLis
 		
 		mdl_order.setItems(order.getItems());
 		updatePrices();
+	}
+	@Override
+	public void performed() {
+		if (isCreating && order.getId() < 1)
+			createOrder(order.getTableNo());
+		
+		lbl_title.setText(String.format("Order#%d for Table %02d", order.getId(), order.getTableNo()));
+		setVisible(true);
+	}
+	@Override
+	public void cancelled() {
+		setVisible(true);
 	}
 	private void categorizeMenuItems(ArrayList<MenuItem> items) {
 		//Empty container
@@ -744,7 +722,7 @@ public class EditOrder2 extends PerformPanel implements ActionListener, CaretLis
 		Dimension dim = pnl_menu.getPreferredSize();
 		dim.height = totalHeight;
 		pnl_menu.setPreferredSize(dim);
-		pnl_menu.validate();
+		pnl_menu.revalidate();
 		pnl_menu.repaint();
 	}
 	private void updatePrices() {
@@ -752,8 +730,11 @@ public class EditOrder2 extends PerformPanel implements ActionListener, CaretLis
 		for (OrderMenuItem item : mdl_order.getItems()) {
 			subtotal += item.getQuantity() * item.getMenuItem().getPrice();
 		}
-		total = subtotal * (chk_tax.isSelected() ? 1.25 : 1);
+		total = subtotal * 1.25;
 		tax = total - subtotal;
+		if (!chk_tax.isSelected()) {
+			total -= tax;
+		}
 		
 		this.subtotal.setText(Double.toString(subtotal));
 		this.discount.setText("0");
@@ -762,12 +743,30 @@ public class EditOrder2 extends PerformPanel implements ActionListener, CaretLis
 	}
 	//Functionalities
 	private void createOrder(int tableNo) {
-		order = new Order();
 		order.setTableNo(tableNo);
 		order.setId(orderCtrl.createOrder(tableNo));
 	}
 	private void updateOrder(Order order) {
 		orderCtrl.updateOrder(order);
+	}
+	private void payOrder(TransactionType payment, Order order) {
+		String message, title;
+		int messageType;
+		
+		if (!orderCtrl.payOrder(payment, order)) {
+			message = "An error occured while paying the Order!";
+			title = "Error!";
+			messageType = JOptionPane.ERROR_MESSAGE;
+		} else {
+			message = "The Order was successfully payed!";
+			title = "Success!";
+			messageType = JOptionPane.INFORMATION_MESSAGE;
+			
+			close();
+			triggerPerformListeners();
+		}
+		
+		JOptionPane.showMessageDialog(this, message, title, messageType);
 	}
 	private void cancelOrder(Order order) {
 		orderCtrl.cancelOrder(order);
@@ -864,7 +863,7 @@ public class EditOrder2 extends PerformPanel implements ActionListener, CaretLis
 		triggerPerformListeners();
 	}
 	private void cancel() {
-		if (isCreating && order != null) {
+		if (isCreating && order.getId() > 0) {
 			cancelOrder(order);
 		}
 		
@@ -895,6 +894,9 @@ public class EditOrder2 extends PerformPanel implements ActionListener, CaretLis
 	}
 	@Override
 	public void itemStateChanged(ItemEvent e) {
+		if (e.getSource() == chk_tax) {
+			updatePrices();
+		}
 	}
 	@Override
 	public void caretUpdate(CaretEvent e) {
