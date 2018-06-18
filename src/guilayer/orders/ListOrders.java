@@ -7,6 +7,7 @@ import guilayer.essentials.ButtonColumn;
 import guilayer.essentials.ItemTableModel;
 import guilayer.essentials.NavigationPanel;
 import guilayer.essentials.PerformListener;
+import guilayer.essentials.PlaceholderTextField;
 import modlayer.Order;
 
 import javax.swing.JTextField;
@@ -16,25 +17,37 @@ import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 
 import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+import javax.swing.JLabel;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.MatteBorder;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.SystemColor;
+import javax.swing.SwingConstants;
 
 public class ListOrders extends NavigationPanel
 		implements ActionListener, MouseListener, PerformListener, CaretListener {
 
 	private EditOrder editOrder;
 	private OrderController orderCtrl;
-	private JTextField txt_search;
-	private JButton btn_search;
+	private PlaceholderTextField txt_search;
 	private JTable table;
 	private OrderTableModel model;
 	private ButtonColumn btn_cancel;
@@ -56,19 +69,48 @@ public class ListOrders extends NavigationPanel
 	private void initialize() {
 
 		setBounds(0, 0, WaiterWindow.contentWidth, WaiterWindow.totalHeight);
+		Font fontAwesome = importFont("fontawesome.otf");
 
 		model = new OrderTableModel();
+		
+		JPanel pnl_search = new JPanel();
+		pnl_search.setSize(400, 52);
+		FlowLayout fl_pnl_search = (FlowLayout) pnl_search.getLayout();
+		fl_pnl_search.setVgap(0);
+		fl_pnl_search.setHgap(0);
+		fl_pnl_search.setAlignment(FlowLayout.LEFT);
+		pnl_search.setAlignmentY(Component.TOP_ALIGNMENT);
+		pnl_search.setAlignmentX(Component.LEFT_ALIGNMENT);
+		pnl_search.setOpaque(false);
+		pnl_search.setBorder(new EmptyBorder(10, 10, 10, 10));
+		pnl_search.setPreferredSize(new Dimension(400, 52));
+		add(pnl_search);
+		
+		txt_search = new PlaceholderTextField();
+		txt_search.setPreferredSize(new Dimension(348, 32));
+		txt_search.setAlignmentX(Component.LEFT_ALIGNMENT);
+		txt_search.setAlignmentY(Component.TOP_ALIGNMENT);
+		txt_search.setFont(getFont().deriveFont(Font.PLAIN, 14f));
+		txt_search.setBorder(new CompoundBorder(new MatteBorder(1, 1, 1, 0, (Color) new Color(160, 160, 160)), new EmptyBorder(4, 8, 4, 0)));
+		txt_search.setCaretColor(SystemColor.textInactiveText);
+		txt_search.setForeground(SystemColor.textInactiveText);
+		txt_search.setMargin(new Insets(0, 0, 0, 0));
+		txt_search.setPlaceholder("Search");
+		pnl_search.add(txt_search);
+		
+		JLabel ico_search = new JLabel("\uf002");
+		ico_search.setPreferredSize(new Dimension(32, 32));
+		ico_search.setAlignmentY(Component.TOP_ALIGNMENT);
+		ico_search.setAlignmentX(Component.RIGHT_ALIGNMENT);
+		ico_search.setHorizontalAlignment(SwingConstants.LEFT);
+		ico_search.setForeground(SystemColor.controlShadow);
+		ico_search.setBorder(new CompoundBorder(new MatteBorder(1, 0, 1, 1, (Color) new Color(160, 160, 160)), new EmptyBorder(8, 8, 8, 8)));
+		ico_search.setFont(fontAwesome.deriveFont(Font.PLAIN, 24f));
+		pnl_search.add(ico_search);
 
-		txt_search = new JTextField();
-		txt_search.setBounds(10, 11, 142, 20);
-		add(txt_search);
-
-		btn_search = new JButton("Search");
-		btn_search.setBounds(162, 10, 65, 23);
-		add(btn_search);
 
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(10, 42, 780, 417);
+		scrollPane.setBounds(10, 57, 780, 432);
 		add(scrollPane);
 
 		table = new JTable();
@@ -86,8 +128,18 @@ public class ListOrders extends NavigationPanel
 		reset();
 		
 		txt_search.addCaretListener(this);
-		btn_search.addActionListener(this);
 		table.addMouseListener(this);
+	}
+	private Font importFont(String fontName) {
+		try {
+			InputStream is = EditOrder.class.getResourceAsStream("/font/" + fontName);
+	        Font font = Font.createFont(Font.TRUETYPE_FONT, is);
+	        return font;
+		} catch (Exception e) {
+			System.out.println(fontName + " could not be imported!");
+			e.printStackTrace();
+	    }
+		return null;
 	}
 	@Override
 	public void prepare() {
@@ -95,6 +147,8 @@ public class ListOrders extends NavigationPanel
 	}
 	@Override
 	public void reset() {
+		setVisible(true);
+		
 		txt_search.setText("");
 		fetchingData = false;
 		lastKeyword = "";
@@ -150,9 +204,7 @@ public class ListOrders extends NavigationPanel
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		final Object source = e.getSource();
-		if (source == btn_search) {
-			searchOrders();
-		} else if (source == btn_cancel) {
+		if (source == btn_cancel) {
 			if (JOptionPane.showConfirmDialog(ListOrders.this, "Are you sure?", "Cancelling order",
 					JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
 				return;

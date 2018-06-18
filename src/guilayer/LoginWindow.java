@@ -68,6 +68,7 @@ public class LoginWindow extends JFrame implements ActionListener, CaretListener
 		JLabel lbl_username = new JLabel("Username");
 		lbl_username.setHorizontalAlignment(SwingConstants.CENTER);
 		lbl_username.setBounds(100, 40, 100, 16);
+		lbl_username.setFont(lbl_username.getFont().deriveFont(14f));
 		center.add(lbl_username);
 
 		txt_username = new JTextField();
@@ -81,6 +82,7 @@ public class LoginWindow extends JFrame implements ActionListener, CaretListener
 
 		txt_password = new JPasswordField();
 		txt_password.setBounds(50, 140, 200, 30);
+		txt_password.setFont(new Font("Arial", Font.PLAIN, 14));
 		center.add(txt_password);
 		
 		btn_login = new JButton("Login");
@@ -157,8 +159,8 @@ public class LoginWindow extends JFrame implements ActionListener, CaretListener
 			//Log loading time
 			time = System.nanoTime();
 			
-			//return new ManagerWindow();
-			return new WaiterWindow();
+			return new ManagerWindow();
+			//return new WaiterWindow();
 		}
 
 		@Override

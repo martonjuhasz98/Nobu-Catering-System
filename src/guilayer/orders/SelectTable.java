@@ -223,6 +223,8 @@ public class SelectTable extends PerformPanel {
 	}
 	@Override
 	public void reset() {
+		setVisible(false);
+		
 		if (selectedTable != null) {
 			selectedTable.setBackground(SystemColor.menu);
 			selectedTable = null;

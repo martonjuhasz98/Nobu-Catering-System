@@ -39,6 +39,8 @@ public class CreateOrders extends NavigationPanel {
 	public void prepare() {
 		selectTable.prepare();
 		createOrder.prepare();
+		
+		createOrder.openToCreate();
 	}
 	@Override
 	public void reset() {
